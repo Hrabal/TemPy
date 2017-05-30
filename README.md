@@ -69,27 +69,27 @@ for i, div in enumerate(container_div):
 container_div[0].append(ps)
 container_div[0][4].attr(id='pId')
 >>> <div>
->>> 	<div id="divId0">
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p id="uniquePid"></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 		<p></p>
->>> 	</div>
->>> 	<div id="divId1"></div>
->>> 	<div id="divId2"></div>
->>> 	<div id="divId3"></div>
->>> 	<div id="divId4"></div>
->>> 	<div id="divId5"></div>
->>> 	<div id="divId6"></div>
->>> 	<div id="divId7"></div>
->>> 	<div id="divId8"></div>
->>> 	<div id="divId9"></div>
+>>>     <div id="divId0">
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p id="uniquePid"></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>         <p></p>
+>>>     </div>
+>>>     <div id="divId1"></div>
+>>>     <div id="divId2"></div>
+>>>     <div id="divId3"></div>
+>>>     <div id="divId4"></div>
+>>>     <div id="divId5"></div>
+>>>     <div id="divId6"></div>
+>>>     <div id="divId7"></div>
+>>>     <div id="divId8"></div>
+>>>     <div id="divId9"></div>
 >>> </div>
 ```
 
@@ -109,17 +109,17 @@ page = Html()(
     )
 ).render(pretty=True)
 >>> <html>
->>> 	<head>
->>> 		<meta charset="utf-8"/>
->>> 		<link href="my.css" type="text/css" rel="stylesheet"/>
->>> 	</head>
->>> 	<body>
->>> 		<div class="linkBox">
->>> 			<a href="www.foo.bar"></a>
->>> 		</div>
->>> 		<p>This is foo</p>
->>> 		<p>This is Bar</p>
->>> 		<p>Have you met my friend Baz?</p>
->>> 	</body>
+>>>     <head>
+>>>         <meta charset="utf-8"/>
+>>>         <link href="my.css" type="text/css" rel="stylesheet"/>
+>>>     </head>
+>>>     <body>
+>>>         <div class="linkBox">
+>>>             <a href="www.foo.bar"></a>
+>>>         </div>
+>>>         <p>This is foo</p>
+>>>         <p>This is Bar</p>
+>>>         <p>Have you met my friend Baz?</p>
+>>>     </body>
 >>> </html>
 ```
