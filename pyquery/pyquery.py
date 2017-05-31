@@ -3,7 +3,6 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import types
-import json
 from copy import deepcopy
 from collections import Mapping
 
@@ -217,9 +216,20 @@ class Tag(TagContainer):
     def contents(self):
         return self.childs
 
-    def css(self):
-        # TODO
-        pass
+    def css(self, *props, **kwprops):
+        styles = {}
+        if props:
+            if len(props) == 1 and isinstance(props[0], Mapping):
+                styles = props[0]
+            elif len(props) == 2:
+                styles = dict(*props)
+            else:
+                raise TagError
+        elif kwprops:
+            styles = kwprops
+        else:
+            raise TagError
+        return self.attr(attrs={'style': styles})
 
     def hide(self):
         self.attrs['style']['display'] = None
