@@ -3,57 +3,42 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import types
+from copy import deepcopy
+from collections import Mapping
 
 from exceptions import TagError
 
-SPECIAL_ATTRS = {
-    'klass': 'class',
-    'typ': 'type',
-}
 
-
-class pyQueryFinder(object):
+class Attrs(dict):
+    MULTI_VALUES_ATTRS = ('klass', 'typ')
 
     def __init__(self):
-        self.__all_tags = []
+        self['style'] = {}
 
-    def __add_new_tag(self, tag):
-        self.__all_tags.append(tag)
+    def __setitem__(self, key, value):
+        if key in self.MULTI_VALUES_ATTRS:
+            if key not in self:
+                super(Attrs, self).__setitem__(key, [])
+            self[key].append(value)
+        else:
+            super(Attrs, self).__setitem__(key, value)
 
-    def __call__(self, pattern):
-        find_func = lambda t: True
-        if isinstance(pattern, Tag):
-            find_func = lambda t: isinstance(t, pattern)
-        elif isinstance(pattern, str):
-            pattern = pattern.strip()
-            if pattern.startswith('.'):
-                find_func = lambda t: t.attr.get('klass') == pattern[1:]
-            elif pattern.startswith('#'):
-                find_func = lambda t: t.attr.get('id') == pattern[1:]
-            else:
-                tag = getattr(self, '_{}__tag'.format(self.__class__.__name__))
-                find_func = lambda t: tag == pattern
-        return filter(find_func, self.__all_tags)
-
-pyQ = pyQueryFinder()
+    def update(self, other=None, **kwargs):
+        if other is not None:
+            for k, v in other.iteritems() if isinstance(other, Mapping) else other:
+                self[k] = v
+        for k, v in kwargs.iteritems():
+            self[k] = v
 
 
-class Tag(object):
-    _template = '<{tag}{attrs}>{inner}</{tag}>'
+class TagContainer(object):
     _void = False
-    _needed = None
 
-    def __init__(self, **kwargs):
-        self.attrs = {}
-        if self._needed and not set(self._needed).issubset(set(kwargs)):
-            raise TagError()
-        self.attr(**kwargs)
+    def __init__(self):
         self.childs = []
-        self.parent = self._own_index = None
-        self._tab_count = 0
-        pyQ._pyQueryFinder__add_new_tag(self)
+        self.parent = None
 
-    def __call__(self, *args):
+    def __call__(self, *args, prepend=False):
         for arg in args:
             if type(arg) in (
                 types.ListType,
@@ -63,9 +48,12 @@ class Tag(object):
                 for tag in arg:
                     self.__call__(tag)
             elif isinstance(arg, Tag):
-                self._add_to_childs(arg)
+                self._add_to_childs(arg, prepend=prepend)
             else:
-                self.childs.append(arg)
+                if not prepend:
+                    self.childs.append(arg)
+                else:
+                    self.childs.insert(0, arg)
         return self
 
     def __getitem__(self, i):
@@ -74,11 +62,28 @@ class Tag(object):
     def __iter__(self):
         return iter(self.childs)
 
-    def _add_to_childs(self, tag):
-        self.childs.append(tag)
+    def _add_to_childs(self, tag, prepend=False):
+        if not prepend:
+            self.childs.append(tag)
+        else:
+            self.childs.insert(0, tag)
         tag.parent = self
         tag._tab_count = self._tab_count + 1
         tag._own_index = self.childs.index(tag)
+
+    def after(self, other):
+        self.parent.childs.insert(self._own_index + 1, other)
+        return self
+
+    def before(self, other):
+        self.parent.childs.insert(self._own_index - 1, other)
+        return self
+
+    def prepend(self, *childs):
+        return self(*childs, prepend=True)
+
+    def prepend_to(self, father):
+        return father.prepend(self)
 
     def append(self, *childs):
         return self(*childs)
@@ -99,19 +104,167 @@ class Tag(object):
             self.childs.remove()
         return self
 
-    def attr(self, **kwargs):
-        for karg in kwargs:
-            self.attrs[SPECIAL_ATTRS.get(karg, karg)] = kwargs[karg]
-        return self
+    def children(self):
+        return filter(lambda x: isinstance(x, Tag), self.childs)
+
+    def filter(self, pattern):
+        # TODO
+        pass
 
     def find(self, pattern):
+        # TODO
         pass
+
+    def first(self):
+        return self.childs[0]
+
+    def last(self):
+        return self.childs[-1]
+
+    @property
+    def length(self):
+        return len(self.childs)
+
+    def has(self, pattern):
+        # TODO
+        # return pattern or tag in self.childs
+        pass
+
+    def next(self):
+        return self.parent.child[self._own_index + 1]
+
+    def prev(self):
+        return self.parent.child[self._own_index - 1]
+
+    def prev_all(self):
+        return self.parent.child[:self._own_index - 1]
+
+    def parent(self):
+        return self.parent
+
+    def siblings(self):
+        return filter(lambda x: isinstance(x, Tag), self.parent.childs)
+
+    def slice(self, start, end):
+        return self.childs[start:end]
+
+
+class Tag(TagContainer):
+    _template = '<{tag}{attrs}>{inner}</{tag}>'
+    _needed = None
+
+    SPECIAL_ATTRS = {
+        'klass': 'class',
+        'typ': 'type'
+    }
+
+    def __init__(self, **kwargs):
+        self._own_index = None
+        self.attrs = Attrs()
+        self.data = {}
+        self.style = {}
+        if self._needed and not set(self._needed).issubset(set(kwargs)):
+            raise TagError()
+        self.attr(**kwargs)
+        self._tab_count = 0
+        super(Tag, self).__init__()
+
+    def index(self):
+        return self._own_index
+
+    def attr(self, other=None, **kwargs):
+        self.attrs.update(other or kwargs)
+        return self
+
+    def prop(self, other=None, **kwargs):
+        return self.attr(other, **kwargs)
+
+    def remove_attr(self, attr):
+        self.attrs.pop(attr, None)
+        return self
+
+    def remove_prop(self, attr):
+        self.attrs.pop(attr, None)
+        return self
+
+    def add_class(self, cssclass):
+        self.attrs['klass'].append(cssclass)
+        return self
+
+    def remove_class(self, cssclass):
+        self.attrs['klass'].remove(cssclass)
+        return self
+
+    def clone(self):
+        return deepcopy(self)
+
+    def remove(self):
+        del self
+
+    def contents(self):
+        return self.childs
+
+    def css(self):
+        #TODO
+        pass
+
+    def hide(self):
+        self.attrs['style']['display'] = None
+        return self
+
+    def show(self):
+        self.attrs['style'].pop('display')
+        return self
+
+    def toggle(self):
+        return self.show() if self.attrs['style']['display'] == None else self.hide()
+
+    def data(self, key, value=None):
+        if value:
+            self.data[key] = value
+            return self
+        else:
+            return self.data[key]
+
+    def has_class(self, cssclass):
+        return cssclass in self.attrs['klass']
+
+    def toggleClass(self, cssclass):
+        return self.remove_class(cssclass) if self.has_class(cssclass) else self.add_class(cssclass)
+
+    def html(self):
+        return self._render_childs()
+
+    def is_a(self, pattern):
+        #TODO
+        # return true if self == pattern
+        pass
+
+    def replace_all():
+        #TODO
+        pass
+
+    def replace_with(self, other):
+        if isinstance(other, Tag):
+            self = other
+        else:
+            raise TagError()
+        return self
+
+    def wrap(self, other):
+        return self.before(other.append(self)).parent.pop(self._own_index)
+
+    def wrap_inner(self, other):
+        self.childs
+
+    def text(self):
+        return ''.join(child.text() for child in self.childs if isinstance(child, Tag) else child)
 
     def render(self, pretty=False):
         prettying = '\t' * self._tab_count + '\n'
         tag_data = {
             'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
-            'attrs': ''.join(' {}="{}"'.format(k, v) for k, v in self.attrs.iteritems())
+            'attrs': ''.join(' {}="{}"'.format(self.SPECIAL_ATTRS.get(k, k), v) for k, v in self.attrs.iteritems())
         }
         if not self._void:
             tag_data['inner'] = self._render_childs(pretty)
