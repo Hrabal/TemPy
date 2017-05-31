@@ -38,23 +38,21 @@ class TagContainer(object):
         self.childs = []
         self.parent = None
 
-    def __call__(self, *args, prepend=False):
-        for arg in args:
-            if type(arg) in (
+    def __call__(self, *args):
+        return self.append(args)
+
+    def _yield_items(self, items):
+        for item in items:
+            print item
+            if type(item) in (
                 types.ListType,
                 types.TupleType,
                 types.GeneratorType,
             ):
-                for tag in arg:
-                    self.__call__(tag)
-            elif isinstance(arg, Tag):
-                self._add_to_childs(arg, prepend=prepend)
+                for subitem in item:
+                    yield subitem
             else:
-                if not prepend:
-                    self.childs.append(arg)
-                else:
-                    self.childs.insert(0, arg)
-        return self
+                yield item
 
     def __getitem__(self, i):
         return self.childs[i]
@@ -62,37 +60,46 @@ class TagContainer(object):
     def __iter__(self):
         return iter(self.childs)
 
-    def _add_to_childs(self, tag, prepend=False):
-        if not prepend:
-            self.childs.append(tag)
+    def _insert(self, child, idx=None, prepend=False):
+        if prepend:
+            idx = 0
         else:
-            self.childs.insert(0, tag)
-        tag.parent = self
-        tag._tab_count = self._tab_count + 1
-        tag._own_index = self.childs.index(tag)
+            idx = idx or len(self.childs)
+        self.childs.insert(idx, child)
+        if isinstance(child, Tag):
+            child.parent = self
+            child._tab_count = self._tab_count + 1
+            child._own_index = self.childs.index(child)
 
-    def after(self, other):
-        self.parent.childs.insert(self._own_index + 1, other)
+    def after(self, *siblings):
+        for i, sibling in enumerate(self._yield_items(*siblings)):
+            self.parent._insert(sibling, idx=self._own_index + i + 1)
         return self
 
-    def before(self, other):
-        self.parent.childs.insert(self._own_index - 1, other)
+    def before(self, *siblings):
+        for i, sibling in enumerate(self._yield_items(*siblings)):
+            self.parent._insert(sibling, idx=self._own_index - i - 1)
         return self
 
     def prepend(self, *childs):
-        return self(*childs, prepend=True)
+        for child in self._yield_items(*reversed(childs)):
+            self._insert(child, prepend=True)
+        return self
 
     def prepend_to(self, father):
         return father.prepend(self)
 
     def append(self, *childs):
-        return self(*childs)
+        print childs
+        for child in self._yield_items(*childs):
+            self._insert(child)
+        return self
 
     def append_to(self, father):
         return father.append(self)
 
     def remove(self):
-        self.parent.childs.pop(self._own_index)
+        self.parent.pop(i=self._own_index)
         return self
 
     def pop(self, i=0):
@@ -258,7 +265,7 @@ class Tag(TagContainer):
         self.childs
 
     def text(self):
-        return ''.join(child.text() for child in self.childs if isinstance(child, Tag) else child)
+        return ''.join(child.text() if isinstance(child, Tag) else child for child in self.childs)
 
     def render(self, pretty=False):
         prettying = '\t' * self._tab_count + '\n'
