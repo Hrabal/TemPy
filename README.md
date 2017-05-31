@@ -15,6 +15,56 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 
 # Usage:
 
+
+## Basic Templating
+
+pyQuery offers a rather clean syntax for building pages in just python:
+```
+my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
+page = Html()(
+    Head()(
+        Meta(charset='utf-8'),
+        Link(href="my.css", typ="text/css", rel="stylesheet")
+    ),
+    Body()(
+        Div(klass='linkBox')(
+            A(href='www.foo.bar')
+        ),
+        (P()(my_text_list[i]) for i in range(2))
+    )
+).render(pretty=True)
+>>> <html>
+>>>     <head>
+>>>         <meta charset="utf-8"/>
+>>>         <link href="my.css" type="text/css" rel="stylesheet"/>
+>>>     </head>
+>>>     <body>
+>>>         <div class="linkBox">
+>>>             <a href="www.foo.bar"></a>
+>>>         </div>
+>>>         <p>This is foo</p>
+>>>         <p>This is Bar</p>
+>>>         <p>Have you met my friend Baz?</p>
+>>>     </body>
+>>> </html>
+```
+
+You can also create blocks and put them togheter using the manipulation api:
+```
+# basic_template.py
+from somewhere import links, foot_imgs
+menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
+footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
+page = Html()(Head(), Body()(menu, Div(klass='container'), footer))
+...
+# my_controller.py
+from basic_template import page
+@controller_framework_decorator
+def mycontroller():
+    content = Div()('This is my content!')
+    return page.find('.container').append(content)
+```
+
 ## Elements creation and removal
 You can create a DOM elements instantiating tags:
 ```
@@ -108,33 +158,19 @@ container_div[0][4].attr(id='pId')
 >>> </div>
 ```
 
-pyQuery offers a rather clean syntax for building pages in just python:
+..or if you feel jQuery-ish you can use:
 ```
-my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
-page = Html()(
-    Head()(
-        Meta(charset='utf-8'),
-        Link(href="my.css", typ="text/css", rel="stylesheet")
-    ),
-    Body()(
-        Div(klass='linkBox')(
-            A(href='www.foo.bar')
-        ),
-        (P()(my_text_list[i]) for i in range(2))
-    )
-).render(pretty=True)
->>> <html>
->>>     <head>
->>>         <meta charset="utf-8"/>
->>>         <link href="my.css" type="text/css" rel="stylesheet"/>
->>>     </head>
->>>     <body>
->>>         <div class="linkBox">
->>>             <a href="www.foo.bar"></a>
->>>         </div>
->>>         <p>This is foo</p>
->>>         <p>This is Bar</p>
->>>         <p>Have you met my friend Baz?</p>
->>>     </body>
->>> </html>
+container_div.children()
+container_div.first()
+container_div.last()
+container_div.next()
+container_div.prev()
+container_div.prev_all()
+container_div.parent()
+container_div.slice()
 ```
+
+## Made and Mantained by Federico Cerchiari / Hrabal
+# Apche 2.0 license, see LICENSE for details
+
+If you like, contribute.
