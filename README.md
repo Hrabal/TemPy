@@ -3,12 +3,15 @@
 
 ### What
 Build HTML without writing a single tag.
-pyQuery lets you dynamically generate HTML and accessing it in a jQuery fashion, navigating the tags and manipulating them in pure python.
+pyQuery lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also "navigating the DOM" and manipulating tags is possible in a Python or jQuery friendly sintax.
 
 ### Why?
-HTML is like SQL: we all know him, we all recognize his importance, we all wish to never write a single tag anymore.
-Templating systems are cool (Python syntax in html code) but not cool enough (still html)..
+HTML is like coffee (..and SQL): we all use it, we know it works, we all recognize it's important, but our biggest dream is to never use it anymore.
+Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
 ..so the idea of pyQuery.
+
+## Build, manipulate, and navigate HTML documents. With no HTML involved.
+
 
 # Usage:
 
@@ -45,20 +48,32 @@ page.pop()
 >>> <html></html>
 ```
 
+All the main jQuery manipulating apis are provided.
+
+
 ## Attributes attribuition 
 You can add attributes to every element at definition time or later:
 ```
-div = Div(id='my_html_id', klass='someHtmlClass')
+div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
 
-div2 = Div(klass='someHtmlClass')
-div2.attr(id='another_dom_id')
->>> <div id="another_dom_id" class="someHtmlClass comeOtherClass"></div>
+a = A(klass='someHtmlClass')('text of this link')
+a.attr(id='another_dom_id')
+a.prop(href='www.thisisalink.com')
+>>> <a id="another_dom_id" class="someHtmlClass" href="www.thisisalink.com">text of this link</a>
+```
+
+Also style is editable in the jQuery fashion:
+```
+div2.css(width='100px', float='left')
+div2.css({'height': '100em'})
+div2.css('background-color', 'blue')
+>>> <div id="another_dom_id" class="someHtmlClass comeOtherClass" style="width: 100px; float: left; height: 100em; background-color: blue"></div>
 ```
 
 ## "Navigating the DOM"
 
-Every pyQuery Tag is iterable and accessible just like a list:
+Every pyQuery Tag content is iterable and accessible just like a Python list:
 ```
 divs = [Div(id=div, klass='inner') for div in range(10)]
 ps = (P() for _ in range(10))
