@@ -3,36 +3,14 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import types
+import json
 from copy import deepcopy
 from collections import Mapping
 
 from exceptions import TagError
 
 
-class Attrs(dict):
-    MULTI_VALUES_ATTRS = ('klass', 'typ')
-
-    def __init__(self):
-        self['style'] = {}
-
-    def __setitem__(self, key, value):
-        if key in self.MULTI_VALUES_ATTRS:
-            if key not in self:
-                super(Attrs, self).__setitem__(key, [])
-            self[key].append(value)
-        else:
-            super(Attrs, self).__setitem__(key, value)
-
-    def update(self, other=None, **kwargs):
-        if other is not None:
-            for k, v in other.iteritems() if isinstance(other, Mapping) else other:
-                self[k] = v
-        for k, v in kwargs.iteritems():
-            self[k] = v
-
-
 class TagContainer(object):
-    _void = False
 
     def __init__(self):
         self.childs = []
@@ -43,7 +21,6 @@ class TagContainer(object):
 
     def _yield_items(self, items):
         for item in items:
-            print item
             if type(item) in (
                 types.ListType,
                 types.TupleType,
@@ -90,7 +67,6 @@ class TagContainer(object):
         return father.prepend(self)
 
     def append(self, *childs):
-        print childs
         for child in self._yield_items(*childs):
             self._insert(child)
         return self
@@ -114,14 +90,6 @@ class TagContainer(object):
     def children(self):
         return filter(lambda x: isinstance(x, Tag), self.childs)
 
-    def filter(self, pattern):
-        # TODO
-        pass
-
-    def find(self, pattern):
-        # TODO
-        pass
-
     def first(self):
         return self.childs[0]
 
@@ -131,11 +99,6 @@ class TagContainer(object):
     @property
     def length(self):
         return len(self.childs)
-
-    def has(self, pattern):
-        # TODO
-        # return pattern or tag in self.childs
-        pass
 
     def next(self):
         return self.parent.child[self._own_index + 1]
@@ -155,21 +118,64 @@ class TagContainer(object):
     def slice(self, start, end):
         return self.childs[start:end]
 
+    def has(self, pattern):
+        # TODO
+        # return pattern in self.childs
+        pass
+
+    def find(self, pattern):
+        # TODO
+        # return filter(pattern, self.childs)
+        pass
+
+
+class TagAttrs(dict):
+    MAPPING_ATTRS = ('style', )
+    MULTI_VALUES_ATTRS = ('klass', 'typ', )
+    SPECIALS = {
+        'klass': 'class',
+        'typ': 'type'
+    }
+    FORMAT = {
+        'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.iteritems()),
+        'klass': lambda x: ' '.join(x) if len(x) > 1 else x,
+        'typ': lambda x: ' '.join(x)
+    }
+
+    def __setitem__(self, key, value):
+        if key in self.MULTI_VALUES_ATTRS:
+            if key not in self:
+                super(TagAttrs, self).__setitem__(key, [])
+            self[key].append(value)
+        if key in self.MAPPING_ATTRS:
+            if key not in self:
+                super(TagAttrs, self).__setitem__(key, {})
+            self[key].update(value)
+        else:
+            super(TagAttrs, self).__setitem__(key, value)
+
+    def update(self, attrs=None, **kwargs):
+        if attrs is not None:
+            for k, v in attrs.iteritems() if isinstance(attrs, Mapping) else attrs:
+                self[k] = v
+        for k, v in kwargs.iteritems():
+            self[k] = v
+
+    def render(self):
+        return ''.join(' {}="{}"'.format(self.SPECIALS.get(k, k),
+                                         self.FORMAT.get(k, lambda x: x)(v))
+                       for k, v in self.iteritems() if v)
+
 
 class Tag(TagContainer):
     _template = '<{tag}{attrs}>{inner}</{tag}>'
     _needed = None
-
-    SPECIAL_ATTRS = {
-        'klass': 'class',
-        'typ': 'type'
-    }
+    _void = False
 
     def __init__(self, **kwargs):
         self._own_index = None
-        self.attrs = Attrs()
+        self.attrs = TagAttrs()
         self.data = {}
-        self.style = {}
         if self._needed and not set(self._needed).issubset(set(kwargs)):
             raise TagError()
         self.attr(**kwargs)
@@ -179,8 +185,8 @@ class Tag(TagContainer):
     def index(self):
         return self._own_index
 
-    def attr(self, other=None, **kwargs):
-        self.attrs.update(other or kwargs)
+    def attr(self, attrs=None, **kwargs):
+        self.attrs.update(attrs or kwargs)
         return self
 
     def prop(self, other=None, **kwargs):
@@ -212,7 +218,7 @@ class Tag(TagContainer):
         return self.childs
 
     def css(self):
-        #TODO
+        # TODO
         pass
 
     def hide(self):
@@ -233,23 +239,14 @@ class Tag(TagContainer):
         else:
             return self.data[key]
 
-    def has_class(self, cssclass):
-        return cssclass in self.attrs['klass']
+    def has_class(self, csscl):
+        return csscl in self.attrs['klass']
 
-    def toggleClass(self, cssclass):
-        return self.remove_class(cssclass) if self.has_class(cssclass) else self.add_class(cssclass)
+    def toggleClass(self, csscl):
+        return self.remove_class(csscl) if self.has_class(csscl) else self.add_class(csscl)
 
     def html(self):
         return self._render_childs()
-
-    def is_a(self, pattern):
-        #TODO
-        # return true if self == pattern
-        pass
-
-    def replace_all():
-        #TODO
-        pass
 
     def replace_with(self, other):
         if isinstance(other, Tag):
@@ -268,10 +265,10 @@ class Tag(TagContainer):
         return ''.join(child.text() if isinstance(child, Tag) else child for child in self.childs)
 
     def render(self, pretty=False):
-        prettying = '\t' * self._tab_count + '\n'
+        prettying = '\t' * self._tab_count + '\n'  # TODO: we're ugly, prettifying don't work
         tag_data = {
             'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
-            'attrs': ''.join(' {}="{}"'.format(self.SPECIAL_ATTRS.get(k, k), v) for k, v in self.attrs.iteritems())
+            'attrs': self.attrs.render()
         }
         if not self._void:
             tag_data['inner'] = self._render_childs(pretty)
@@ -281,7 +278,23 @@ class Tag(TagContainer):
     def _render_childs(self, pretty):
         return ''.join(child.render(pretty) if isinstance(child, Tag) else str(child) for child in self.childs)
 
+    def is_a(self, pattern):
+        # TODO
+        # return true if self == pattern
+        pass
+
 
 class VoidTag(Tag):
     _void = True
     _template = '<{tag}{attrs}/>'
+
+
+class TagFinder(object):
+
+    def replace_all(other):
+        # TODO replace all finded with other
+        pass
+
+    def filter(pattern):
+        # TODO find thing with pattern
+        pass
