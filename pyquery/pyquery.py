@@ -9,9 +9,13 @@ from collections import Mapping
 from exceptions import TagError
 
 
-class TagContainer(object):
-
+class DOMElement(object):
+    """
+    Takes care of the tree structure using the "childs" and "parent" attributes
+    and manages the DOM manipulation with proper valorization of those two.
+    """
     def __init__(self):
+        super(DOMElement, self).__init__()
         self.childs = []
         self.parent = None
 
@@ -95,10 +99,6 @@ class TagContainer(object):
     def last(self):
         return self.childs[-1]
 
-    @property
-    def length(self):
-        return len(self.childs)
-
     def next(self):
         return self.parent.child[self._own_index + 1]
 
@@ -117,6 +117,16 @@ class TagContainer(object):
     def slice(self, start, end):
         return self.childs[start:end]
 
+    def clone(self):
+        return deepcopy(self)
+
+    def replace_with(self, other):
+        if isinstance(other, Tag):
+            self = other
+        else:
+            raise TagError()
+        return self
+
     def has(self, pattern):
         # TODO
         # return pattern in self.childs
@@ -127,8 +137,24 @@ class TagContainer(object):
         # return filter(pattern, self.childs)
         pass
 
+    def wrap(self, other):
+        return self.before(other.append(self)).parent.pop(self._own_index)
+
+    def wrap_inner(self, other):
+        self.childs
+
 
 class TagAttrs(dict):
+    """
+    Html tag attributes container, a subclass of dict with __setitiem__ and update overload.
+    Manages the manipulation and render of tag attributes, using the dict api, with few exceptions:
+    - space separated multiple value keys
+        i.e. the class atrribute, an update on this key will add the value to the list
+    - mapping type attributes
+        i.e. style attribute, an udpate will trigger the dict.update method
+
+    TagAttrs.render formats all the attributes in the proper html format.
+    """
     MAPPING_ATTRS = ('style', )
     MULTI_VALUES_ATTRS = ('klass', 'typ', )
     SPECIALS = {
@@ -166,7 +192,10 @@ class TagAttrs(dict):
                        for k, v in self.iteritems() if v)
 
 
-class Tag(TagContainer):
+class Tag(DOMElement):
+    """
+    Provides an api for tag inner manipulation and for rendering.
+    """
     _template = '<{tag}{attrs}>{inner}</{tag}>'
     _needed = None
     _void = False
@@ -180,6 +209,10 @@ class Tag(TagContainer):
         self.attr(**kwargs)
         self._tab_count = 0
         super(Tag, self).__init__()
+
+    @property
+    def length(self):
+        return len(self.childs)
 
     def index(self):
         return self._own_index
@@ -206,12 +239,6 @@ class Tag(TagContainer):
     def remove_class(self, cssclass):
         self.attrs['klass'].remove(cssclass)
         return self
-
-    def clone(self):
-        return deepcopy(self)
-
-    def remove(self):
-        del self
 
     def contents(self):
         return self.childs
@@ -258,19 +285,6 @@ class Tag(TagContainer):
     def html(self):
         return self._render_childs()
 
-    def replace_with(self, other):
-        if isinstance(other, Tag):
-            self = other
-        else:
-            raise TagError()
-        return self
-
-    def wrap(self, other):
-        return self.before(other.append(self)).parent.pop(self._own_index)
-
-    def wrap_inner(self, other):
-        self.childs
-
     def text(self):
         return ''.join(child.text() if isinstance(child, Tag) else child for child in self.childs)
 
@@ -299,7 +313,15 @@ class VoidTag(Tag):
     _template = '<{tag}{attrs}/>'
 
 
-class TagFinder(object):
+class DOMFinder(object):
+    """
+    Provides methods and api for DOM navigation and tag finding.
+    Emulates the jQuery $('selector') statement.
+    """
+    def _digest_pattern(self, pattern):
+        # TODO
+        # transforms a string (or a Tag) into a filter for tag searching
+        pass
 
     def replace_all(other):
         # TODO replace all finded with other
