@@ -1,14 +1,14 @@
-# pyQuery
+# TemPy
 ### Html templating with no html involved!
 
 ### What
 Build HTML without writing a single tag.
-pyQuery lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also "navigating the DOM" and manipulating tags is possible in a Python or jQuery friendly sintax.
+TemPy lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also "navigating the DOM" and manipulating tags is possible in a Python or jQuery friendly sintax.
 
 ### Why?
 HTML is like coffee (..and SQL): we all use it, we know it works, we all recognize it's important, but our biggest dream is to never use it anymore.
 Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
-..so the idea of pyQuery.
+..so the idea of TemPy.
 
 ## Build, manipulate, and navigate HTML documents. With no HTML involved.
 
@@ -18,7 +18,7 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 
 ## Basic Templating
 
-pyQuery offers a rather clean syntax for building pages in just python:
+TemPy offers a rather clean syntax for building pages in just python:
 ```
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 page = Html()(
@@ -123,7 +123,7 @@ div2.css('background-color', 'blue')
 
 ## "Navigating the DOM"
 
-Every pyQuery Tag content is iterable and accessible just like a Python list:
+Every TemPy Tag content is iterable and accessible just like a Python list:
 ```
 divs = [Div(id=div, klass='inner') for div in range(10)]
 ps = (P() for _ in range(10))
@@ -171,6 +171,16 @@ container_div.slice()
 ```
 
 ## Made and Mantained by Federico Cerchiari / Hrabal
-# Apche 2.0 license, see LICENSE for details
-
-If you like, contribute.
+### Contribute.
+Any contribution is welcome. Fork and PR if you have some ideas you want to code in.
+PM me if you want to help maintaining or coding.
+Next steps of development:
+- Writing tests.
+- Improve .find method.
+- Pretty print
+- To make everything an xml and use lxml.cssselect or to not change everything, here's my dilemma.
+- Docstrings in api.
+- New module: "css builder" extracts the style properties from content, and creates the css file with the correct selector.
+- Cache for css builder module
+- Any suggestion??
+### Apache 2.0 license, see LICENSE for details.

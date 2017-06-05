@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pprint import pprint
-from pyquery.tags import *
+from tempy.tags import *
 
 divs = [Div(id=div, klass='inner') for div in range(10)]
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
