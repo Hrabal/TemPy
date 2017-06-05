@@ -23,6 +23,8 @@ class DOMElement(object):
         return self.append(args)
 
     def _yield_items(self, items):
+        if isinstance(items, DOMElement):
+            yield items
         for item in items:
             if type(item) in (
                 types.ListType,
@@ -41,10 +43,12 @@ class DOMElement(object):
         return iter(self.childs)
 
     def _insert(self, child, idx=None, prepend=False):
+        if idx < 0:
+            idx = 0
         if prepend:
             idx = 0
         else:
-            idx = idx or len(self.childs)
+            idx = idx if idx is not None else len(self.childs)
         self.childs.insert(idx, child)
         if isinstance(child, Tag):
             child.parent = self
@@ -132,16 +136,17 @@ class DOMElement(object):
         # return pattern in self.childs
         pass
 
-    def find(self, pattern):
-        # TODO
-        # return filter(pattern, self.childs)
-        pass
-
     def wrap(self, other):
-        return self.before(other.append(self)).parent.pop(self._own_index)
+        if self.parent:
+            self.before(other)
+            self.parent.pop(self._own_index)
+        return other.append(self)
 
     def wrap_inner(self, other):
         self.childs
+
+    def find(self, id=None, klass=None, tag=None):
+        pass
 
 
 class TagAttrs(dict):
@@ -163,7 +168,7 @@ class TagAttrs(dict):
     }
     FORMAT = {
         'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.iteritems()),
-        'klass': lambda x: ' '.join(x) if len(x) > 1 else x,
+        'klass': lambda x: ' '.join(x),
         'typ': lambda x: ' '.join(x)
     }
 
@@ -172,7 +177,7 @@ class TagAttrs(dict):
             if key not in self:
                 super(TagAttrs, self).__setitem__(key, [])
             self[key].append(value)
-        if key in self.MAPPING_ATTRS:
+        elif key in self.MAPPING_ATTRS:
             if key not in self:
                 super(TagAttrs, self).__setitem__(key, {})
             self[key].update(value)
@@ -311,22 +316,3 @@ class Tag(DOMElement):
 class VoidTag(Tag):
     _void = True
     _template = '<{tag}{attrs}/>'
-
-
-class DOMFinder(object):
-    """
-    Provides methods and api for DOM navigation and tag finding.
-    Emulates the jQuery $('selector') statement.
-    """
-    def _digest_pattern(self, pattern):
-        # TODO
-        # transforms a string (or a Tag) into a filter for tag searching
-        pass
-
-    def replace_all(other):
-        # TODO replace all finded with other
-        pass
-
-    def filter(pattern):
-        # TODO find thing with pattern
-        pass
