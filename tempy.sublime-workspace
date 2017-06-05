@@ -1,0 +1,1068 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"clas",
+				"class\tNew Class"
+			],
+			[
+				"Tag",
+				"TagError\timport"
+			],
+			[
+				"style",
+				"styles\tstatement"
+			],
+			[
+				"po",
+				"props\tparam"
+			],
+			[
+				"pro",
+				"props\tparam"
+			],
+			[
+				"attr",
+				"attrs\tstatement"
+			],
+			[
+				"cla",
+				"class\tNew Class"
+			],
+			[
+				"class",
+				"classmethod\tclass"
+			],
+			[
+				"p",
+				"pyml\tmodule"
+			],
+			[
+				"dom",
+				"dom_element\tparam"
+			],
+			[
+				"Ta",
+				"TagError"
+			],
+			[
+				"pre",
+				"prettying\tstatement"
+			],
+			[
+				"a",
+				"arg"
+			],
+			[
+				"de",
+				"defs\tMethod"
+			],
+			[
+				"def",
+				"defs\tMethod"
+			],
+			[
+				"ha",
+				"hash\tfunction"
+			],
+			[
+				"getco",
+				"getsource\tfunction"
+			],
+			[
+				"E",
+				"Exception\tclass"
+			],
+			[
+				"js",
+				"json\tmodule"
+			],
+			[
+				"json",
+				"json_loads\tfunction"
+			],
+			[
+				"jo",
+				"json_loads\tfunction"
+			],
+			[
+				"lo",
+				"load_json_collection\tfunction"
+			],
+			[
+				"Tes",
+				"TestSet\tclass"
+			],
+			[
+				"set",
+				"setattr\tfunction"
+			],
+			[
+				"is",
+				"isPaused"
+			],
+			[
+				"SLID",
+				"slide_img"
+			],
+			[
+				"slide",
+				"slide_img"
+			],
+			[
+				"month",
+				"month_name\tstatement"
+			],
+			[
+				"font",
+				"font-style"
+			],
+			[
+				"to",
+				"toggleClass"
+			],
+			[
+				"max",
+				"max-width"
+			],
+			[
+				"di",
+				"div\tTag"
+			],
+			[
+				"paddi",
+				"padding-bottom"
+			],
+			[
+				"tran",
+				"translateX()"
+			],
+			[
+				"mar",
+				"margin-bottom"
+			],
+			[
+				"fo",
+				"focus"
+			],
+			[
+				"fl",
+				"inline-flex"
+			],
+			[
+				"hl",
+				"hl_img"
+			],
+			[
+				"padd",
+				"padding-right"
+			],
+			[
+				"pad",
+				"padding-left"
+			],
+			[
+				"mari",
+				"margin"
+			],
+			[
+				"tex",
+				"text-align"
+			],
+			[
+				"bac",
+				"background"
+			],
+			[
+				"min",
+				"min-height"
+			],
+			[
+				"padding",
+				"padding-left"
+			],
+			[
+				"margin",
+				"margin-top"
+			],
+			[
+				"over",
+				"overflow-y"
+			],
+			[
+				"margi",
+				"margin-top"
+			],
+			[
+				"o",
+				"overbg"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"tra",
+				"transition"
+			],
+			[
+				"date",
+				"date\tclass"
+			],
+			[
+				"s",
+				"split"
+			],
+			[
+				"ali",
+				"text-align"
+			],
+			[
+				"align",
+				"vertical-align"
+			],
+			[
+				"star",
+				"start_time"
+			],
+			[
+				"ra",
+				"raw_data\tstatement"
+			],
+			[
+				"C",
+				"C\tstatement"
+			],
+			[
+				"trans",
+				"transform"
+			],
+			[
+				"ne",
+				"new_files\tstatement"
+			],
+			[
+				"renam",
+				"renames\tfunction"
+			],
+			[
+				"cl",
+				"classes"
+			],
+			[
+				"th",
+				"th\tTag"
+			],
+			[
+				"pa",
+				"path\tparam"
+			],
+			[
+				"loca",
+				"local_date\tstatement"
+			],
+			[
+				"get",
+				"getcwd\tfunction"
+			],
+			[
+				"parse",
+				"parse_body\tfunction"
+			],
+			[
+				"exe",
+				"except\tkeyword"
+			],
+			[
+				"co",
+				"color"
+			],
+			[
+				"st",
+				"strike"
+			],
+			[
+				"fon",
+				"font-weight"
+			],
+			[
+				"ove",
+				"overflow-x"
+			],
+			[
+				"wid",
+				"width"
+			],
+			[
+				"re",
+				"render_background"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"delt",
+				"delta_h"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"del",
+				"delta_h"
+			],
+			[
+				"win",
+				"window_min"
+			],
+			[
+				"par",
+				"parseInt"
+			],
+			[
+				"pla",
+				"player_op"
+			],
+			[
+				"sta",
+				"stability"
+			],
+			[
+				"sum",
+				"submit"
+			],
+			[
+				"game",
+				"game\tstatement"
+			],
+			[
+				"str",
+				"strftime\tfunction"
+			],
+			[
+				"i",
+				"imgs"
+			],
+			[
+				"ca",
+				"cards"
+			],
+			[
+				"list",
+				"listdir\tfunction"
+			],
+			[
+				"rem",
+				"remote_file\tstatement"
+			],
+			[
+				"he",
+				"head_img\tstatement"
+			],
+			[
+				"card",
+				"card_pages\tstatement"
+			],
+			[
+				"FO",
+				"font-size"
+			],
+			[
+				"bor",
+				"border-width"
+			],
+			[
+				"in",
+				"input\tTag"
+			],
+			[
+				"backgro",
+				"background-repeat"
+			],
+			[
+				"te",
+				"text-align"
+			],
+			[
+				"font-s",
+				"font-size"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"ite",
+				"iteritems\tfunction"
+			],
+			[
+				"me",
+				"message\tparam"
+			],
+			[
+				"super",
+				"superpow\tstatement"
+			],
+			[
+				"filt",
+				"filtr\tfunction"
+			],
+			[
+				"ba",
+				"battlegrounds\tparam"
+			],
+			[
+				"fi",
+				"filtr\tstatement"
+			],
+			[
+				"battle",
+				"battlegrounds\tstatement"
+			],
+			[
+				"batte",
+				"battlegrounds\tfunction"
+			],
+			[
+				"state",
+				"states\tstatement"
+			],
+			[
+				"shu",
+				"shuffe_deck\tfunction"
+			],
+			[
+				"deck",
+				"decks\tstatement"
+			],
+			[
+				"dum",
+				"dumps\tfunction"
+			],
+			[
+				"fact",
+				"factions"
+			],
+			[
+				"sub",
+				"subregion\tstatement"
+			],
+			[
+				"subr",
+				"subr\tforstmt"
+			],
+			[
+				"su",
+				"subregions\tstatement"
+			],
+			[
+				"ge",
+				"get_element\tfunction"
+			],
+			[
+				"subre",
+				"subregion"
+			],
+			[
+				"loa",
+				"load\tfunction"
+			],
+			[
+				"data",
+				"data_file"
+			],
+			[
+				"op",
+				"open\tfunction"
+			],
+			[
+				"_",
+				"_host"
+			],
+			[
+				"Orin",
+				"OrientDbWrapper\tclass"
+			],
+			[
+				"fin",
+				"finalize"
+			],
+			[
+				"conn",
+				"get_connection"
+			],
+			[
+				"seria",
+				"_serialization_type"
+			],
+			[
+				"ser",
+				"serialization_type\tstatement"
+			],
+			[
+				"cli",
+				"client_id\tparam"
+			],
+			[
+				"client",
+				"client_id"
+			],
+			[
+				"pass",
+				"password\tparam"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "# -*- coding: utf-8 -*-\nfrom pprint import pprint\nfrom tempy.tags import *\n\ndivs = [Div(id=div, klass='inner') for div in range(10)]\nmy_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']\n\npage = Html()(\n    Head()(\n        Meta(charset='utf-8'),\n        Meta(hey='ho')\n        ),\n    Body()(\n        divs,\n        A(href='www.this.com'),\n        (P(style={'color': '#' + str(p) * 6})(p) for p in range(5)),\n        Div()(\n            (P()(my_text_list[i]) for i in range(3))\n            )\n        )\n    )\n\npprint(page.render())\n",
+			"file": "/Users/federico/GitHub/pyquery/test.py",
+			"file_size": 551,
+			"file_write_time": 131411536140000000,
+			"settings":
+			{
+				"buffer_size": 551,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 207.0,
+		"last_filter": "html",
+		"selected_items":
+		[
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"python",
+				"Set Syntax: Python3"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"lin",
+				"SublimeLinter: Lint This View"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"git",
+				"Git: Add..."
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/federico/GitHub/tempy"
+	],
+	"file_history":
+	[
+		"/Users/federico/GitHub/pyquery/test.html",
+		"/Users/federico/GitHub/pyquery/pyquery/exceptions.py",
+		"/Users/federico/GitHub/pyquery/README.md",
+		"/Users/federico/GitHub/pyquery/prepare_selector.py",
+		"/Users/federico/GitHub/pyquery/pyquery/pyquery.py",
+		"/Users/federico/GitHub/pyquery/pyquery/tags.py",
+		"/Users/federico/GitHub/pyquery/pyquery/__init__.py",
+		"/Users/federico/GitHub/pyquery/pyml/tags.py",
+		"/Users/federico/GitHub/pyquery/.git/config",
+		"/Users/federico/GitHub/pyquery/pyml/pyml.py",
+		"/Users/federico/GitHub/pyquery/pyml/exceptions.py",
+		"/Users/federico/pyml/pyml/tags.py",
+		"/Users/federico/pyml/test.py",
+		"/Users/federico/pyml/pyml/pyml.py",
+		"/Users/federico/pyml/pyml/__init__.py",
+		"/Users/federico/Desktop/ttttt.py",
+		"/Users/federico/Desktop/perf_gotchas.py",
+		"/Users/federico/Desktop/async",
+		"/Users/federico/GitHub/ekidna-flask/app.py",
+		"/Users/federico/Desktop/pyTrest/swapi.json",
+		"/Users/federico/Desktop/pyTrest/tools.py",
+		"/Users/federico/Desktop/pyTrest/trest.py",
+		"/Users/federico/Desktop/ekidna_sito/templates/programma.html",
+		"/Users/federico/Desktop/ekidna_sito/static/css/style.css",
+		"/Users/federico/Desktop/ekidna_sito/templates/chi_siamo.html",
+		"/Users/federico/Desktop/ekidna_sito/model.py",
+		"/Users/federico/Desktop/ekidna_sito/static/js/ekidna.js",
+		"/Users/federico/Desktop/ekidna_sito/webapp.py",
+		"/Users/federico/Desktop/MinestraBot/minestra_bot.py",
+		"/Users/federico/Desktop/t.py",
+		"/Users/federico/Desktop/minestra/minestra_bot.py",
+		"/Users/federico/Desktop/minestra_bot.py",
+		"/Users/federico/Desktop/ekidna_sito/templates/gallery.html",
+		"/Users/federico/Desktop/ekidna_sito/templates/base.html",
+		"/Users/federico/Desktop/ekidna_sito/templates/rottura.html",
+		"/Users/federico/Desktop/ekidna_sito/templates/dove_siamo.html",
+		"/Users/federico/Desktop/ekidna_sito/static/map.html",
+		"/Users/federico/Desktop/ekidna_sito/static/js/mm-fontsize.js",
+		"/Users/federico/Desktop/ekidna_sito/templates/map.html",
+		"/Users/federico/Desktop/ekidna_sito/templates/evt_data.html",
+		"/Users/federico/Desktop/ekidna_sito/templates/evt_img.html",
+		"/Users/federico/Desktop/Sito Ekidna/webapp.py",
+		"/Users/federico/Desktop/Sito Ekidna/static/css/style.css",
+		"/Users/federico/Desktop/Sito Ekidna/templates/rottura.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/programma.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/gallery.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/dove_siamo.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/chi_siamo.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/base.html",
+		"/Users/federico/Desktop/Sito Ekidna/static/css/reset.css",
+		"/Users/federico/Desktop/Sito Ekidna/templates/evt_data.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/evt_img.html",
+		"/Users/federico/Desktop/Sito Ekidna/static/js/ekidna.js",
+		"/Users/federico/Desktop/Sito Ekidna/static/css/hamburger.css",
+		"/Users/federico/Desktop/rounded-animated-navigation/index.html",
+		"/Users/federico/Desktop/rounded-animated-navigation/js/main.js",
+		"/Users/federico/Desktop/Sito Ekidna/model.py",
+		"/Users/federico/Desktop/Sito Ekidna/static/js/bg_cycler.js",
+		"/Users/federico/Desktop/sito Jagannah/templates/base.html",
+		"/Users/federico/Desktop/sito Jagannah/webapp.py",
+		"/Users/federico/Desktop/Sito Ekidna/static/js/jquery.maximage.min.js",
+		"/Users/federico/Desktop/Sito Ekidna/templates/programm.html",
+		"/Users/federico/Desktop/Sito Ekidna/templates/test.html",
+		"/Users/federico/Desktop/Sito Ekidna/get_fb_data.py",
+		"/Users/federico/Desktop/bug.py",
+		"/Users/federico/Desktop/sito elisa/yogi/sites/all/themes/yogi/template/views/class/class-schedule/views-view-unformatted--class--class-schedule.tpl.php",
+		"/Users/federico/Desktop/sito elisa/index.html",
+		"/Users/federico/Desktop/amici/webapp.py",
+		"/Users/federico/Desktop/cartella senza titolo 2/static/js/amici.js",
+		"/Users/federico/Desktop/index.html",
+		"/Users/federico/Desktop/amici/static/css/style.css",
+		"/Users/federico/Desktop/amici/templates/base.html",
+		"/Users/federico/Desktop/gone driver - visual/main.py",
+		"/Users/federico/Desktop/sito Jagannah/static/css/style.css",
+		"/Users/federico/Desktop/sito Jagannah/static/js/jagannah.js",
+		"/Users/federico/Desktop/gone driver - visual/beat_times.csv",
+		"/Users/federico/Desktop/sito Jagannah/static/js/nprogress.js",
+		"/Users/federico/Desktop/sito Jagannah/static/css/nprogress.css",
+		"/Users/federico/Desktop/sito Jagannah/static/js/jquery.html5Loader.min.js",
+		"/Users/federico/Desktop/gone driver/sito/templates/index.html",
+		"/Users/federico/Desktop/gone driver/sito/static/css/style.css",
+		"/Users/federico/Desktop/s.py",
+		"/Users/federico/Desktop/strutil.py",
+		"/Users/federico/Downloads/vision of the future/download.py",
+		"/Users/federico/Sofia_2/brain.py",
+		"/Users/federico/Desktop/fella.csv",
+		"/Users/federico/GitHub/BMS3/engine/DataEngine.py",
+		"/Users/federico/Desktop/mail.py",
+		"/Users/federico/Desktop/get_gmail/me.py",
+		"/Users/federico/Desktop/get_gmail/download.py",
+		"/Users/federico/Desktop/try/index.html",
+		"/Users/federico/Desktop/try/style.css",
+		"/Users/federico/Desktop/sitoekidna/templates/base.html",
+		"/Users/federico/Desktop/gone driver/sito/webapp.py",
+		"/Users/federico/Desktop/sitoekidna/static/css/style.css",
+		"/Users/federico/Desktop/gone driver/sito/static/css/glitch.css",
+		"/Users/federico/Desktop/gone driver/sito/static/js/glitch.jquery.js",
+		"/Users/federico/Desktop/gone driver/sito/templates/glitch.html",
+		"/Users/federico/Desktop/sitoekidna/webapp.py",
+		"/Users/federico/Desktop/dronebot.py",
+		"/Users/federico/Desktop/sitoekidna/static/style.css",
+		"/Users/federico/Desktop/sitoekidna/templates/index.htm",
+		"/Users/federico/Desktop/sitoekidna/templates/home.html",
+		"/Users/federico/Desktop/sitoekidna/templates/layout.html",
+		"/Users/federico/Desktop/sitoekidna/static/two-up/index.html",
+		"/Users/federico/TS/static/js/map.js",
+		"/Users/federico/TS/templates/layout.html",
+		"/Users/federico/TS/static/style.css",
+		"/Users/federico/TS/templates/play.html",
+		"/Users/federico/TS/engine.py",
+		"/Users/federico/TS/webapp.py",
+		"/Users/federico/TS/data/data2.json",
+		"/Users/federico/TS/static/js/jquery-machine.js",
+		"/Users/federico/TS/templates/home.html",
+		"/Users/federico/TS/get_card/cards.py",
+		"/Users/federico/TS/templates/deck.html",
+		"/Users/federico/TS/templates/map.html",
+		"/Users/federico/TS/state_pos.py",
+		"/Users/federico/TS/static/js/control.js",
+		"/Users/federico/TS/js/map.js",
+		"/Users/federico/Desktop/bot.py",
+		"/Users/federico/Desktop/l.py",
+		"/Users/federico/Desktop/bennysongs/search.py",
+		"/Users/federico/Desktop/bennysongs/songs.py",
+		"/Users/federico/Desktop/MEGARISK/NEWGOOGLEMAPS/tokens/makecards.py",
+		"/Users/federico/Desktop/test.html",
+		"/Users/federico/yellow_generator/yellow.py",
+		"/Users/federico/Desktop/benny_song/serio/canzoni.txt"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			"<current file>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"_yield_items",
+			"before",
+			"append",
+			"TokenStream",
+			"print",
+			"TagError",
+			"\\(Void",
+			"\\t",
+			", ",
+			"consol",
+			"delta",
+			"console",
+			"#content",
+			"\\#content",
+			"z-in",
+			">\n",
+			"(?<=facebook.com/).*(?=(/|\\?))",
+			"id",
+			"95",
+			"3em",
+			"{\n",
+			"style",
+			" \\)",
+			"\\) ",
+			"\\( ",
+			";",
+			"element",
+			".methods",
+			"total_instances",
+			"\n            ",
+			"[ ]{2,}",
+			"\\t",
+			"\t\t\t\t    $(",
+			"#player_op",
+			"player_op",
+			"\">\n",
+			"}\n",
+			"\\t",
+			"map",
+			"\\n-",
+			"\\)",
+			"\\(",
+			"\\(\\d{4}\\)",
+			"cardfile",
+			"CARD_WIDTH",
+			"CARD_HEIGHT",
+			"\\\\u2026",
+			"\\\\u2018",
+			"\\\\u2013",
+			"\\\\u201c",
+			"\\\\u201d",
+			"\\\\u201c",
+			"\\\\u2019",
+			"Independent Reds*",
+			"\"apply\"",
+			"OrientDb",
+			"dbapi",
+			"_close",
+			")\n",
+			"')\n",
+			"zone",
+			"0.001",
+			"\\t",
+			"cod_ciclo",
+			"\\{0\\}",
+			"\\{5\\}",
+			"\\{4\\}",
+			"\\{3\\}",
+			"\\{1\\}",
+			"\" \\+",
+			"                                    \"",
+			"\" \\+",
+			"                                    \"",
+			"\" \\+",
+			"                                    \"",
+			" \\+",
+			"  +",
+			"\" ",
+			"                                    ",
+			"  ",
+			"\\n",
+			"QPAP",
+			"eng",
+			"iteritems",
+			"subprocess",
+			"\\$current_language_PRDQBS\\$",
+			"$current_language_PRDQBS$",
+			" AND ",
+			", ",
+			" , ",
+			"print",
+			"declare",
+			"QOTCFO",
+			";",
+			"PROCESSCODE_Custom",
+			"\\n\\n",
+			"'"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"(VoidTag",
+			"    ",
+			"\\n",
+			".content",
+			")",
+			"(",
+			"",
+			".used_methods",
+			"instances_count",
+			";",
+			"    ",
+			"\\n",
+			"",
+			"- ",
+			"",
+			"tokenfile",
+			"TOKEN_WIDTH",
+			"TOKEN_HEIGHT",
+			"..",
+			"",
+			"\\\\\"",
+			"\\\"",
+			"'",
+			"\"function\"",
+			"0.5",
+			"    ",
+			"PRDAUD-0015",
+			"eng",
+			"QPAP",
+			" ",
+			"$azienda$",
+			"$current_language_$",
+			"items",
+			"eng",
+			"\\n\\t AND ",
+			"\\n\\t , ",
+			"PRINT",
+			"DECLARE",
+			";\\n",
+			"Suplnc_Custom",
+			"\\n",
+			"\""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/Users/federico/GitHub/pyquery/test.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 551,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								551,
+								551
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"git_gutter_is_enabled": false,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 32.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 440.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 98.0
+	},
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
+	"project": "tempy.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 392.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 265.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
