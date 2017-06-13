@@ -20,8 +20,10 @@ class DOMElement():
     """
     def __init__(self):
         super().__init__()
+        self._own_index = None
         self.childs = []
         self.parent = None
+        self.content_data = {}
 
     def _yield_items(self, items, kwitems):
         unnamed = (ChildElement(None, item) for item in items)
@@ -59,12 +61,25 @@ class DOMElement():
         else:
             idx = idx if idx is not None else len(self.childs)
         self.childs.insert(idx, child)
-        if isinstance(child, Tag):
+        if isinstance(child, DOMElement):
             child.parent = self
             child._tab_count = self._tab_count + 1
             child._own_index = self.childs.index(child)
         if name:
             setattr(self, name, child)
+
+    def _find_content(self, cont_name):
+        try:
+            return self.content_data[cont_name]
+        except KeyError:
+            if self.parent:
+                return self.parent._find_content(cont_name)
+            else:
+                # TODO: raise no content exception?
+                return None
+
+    def inject(self, contents):
+        self.content_data.update(contents)
 
     def __getitem__(self, i):
         return self.childs[i]
@@ -228,7 +243,6 @@ class Tag(DOMElement):
     _void = False
 
     def __init__(self, **kwargs):
-        self._own_index = None
         self.attrs = TagAttrs()
         self.data = {}
         if self._needed and not set(self._needed).issubset(set(kwargs)):
@@ -241,6 +255,7 @@ class Tag(DOMElement):
     def length(self):
         return len(self.childs)
 
+    @property
     def index(self):
         return self._own_index
 
@@ -327,7 +342,7 @@ class Tag(DOMElement):
         return template.format(**tag_data)
 
     def _render_childs(self, pretty):
-        return ''.join(child.render(pretty) if isinstance(child, Tag) else str(child) for child in self.childs)
+        return ''.join(child.render(pretty) if isinstance(child, DOMElement) else str(child) for child in self.childs)
 
     def is_a(self, pattern):
         # TODO
@@ -336,5 +351,26 @@ class Tag(DOMElement):
 
 
 class VoidTag(Tag):
+    """ A void tag, as described in W3C reference: https://www.w3.org/TR/html51/syntax.html#void-elements
+    """
     _void = True
     _template = '<{tag}{attrs}/>'
+
+class Content(DOMElement):
+    """
+    Provides the ability to use a simil-tag object as content placeholder
+    """
+    def __init__(self, name):
+        self.name = name
+        super().__init__()
+
+    @property
+    def content(self):
+        return self.parent._find_content(self.name)
+
+    @property
+    def length(self):
+        return len(self.content)
+
+    def render(self, pretty=False):
+        return self.content
