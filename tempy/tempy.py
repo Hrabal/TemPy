@@ -5,7 +5,7 @@
 from copy import deepcopy
 from functools import wraps
 from itertools import chain
-from collections import Mapping, namedtuple
+from collections import Mapping, namedtuple, OrderedDict
 from types import GeneratorType
 
 from .exceptions import TagError
@@ -47,7 +47,10 @@ class DOMElement():
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, tag in inst._yield_items(tags, kwtags):
+                contents = (tags, kwtags)
+                if reverse:
+                    contents = tags[::-1], OrderedDict(list(kwtags.items())[::-1])
+                for i, tag in inst._yield_items(*contents):
                     func(inst, i, tag)
                 return inst
             return wrapped
