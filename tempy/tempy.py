@@ -359,17 +359,19 @@ class VoidTag(Tag):
     _void = True
     _template = '<{tag}{attrs}/>'
 
-class Content(DOMElement):
+class Content():
     """
     Provides the ability to use a simil-tag object as content placeholder
     """
-    def __init__(self, name):
+    def __init__(self, name, content=None):
         self.name = name
+        self.parent = None
+        self._fixed_content = content
         super().__init__()
 
     @property
     def content(self):
-        return self.parent._find_content(self.name)
+        return self._fixed_content or self.parent._find_content(self.name)
 
     @property
     def length(self):
