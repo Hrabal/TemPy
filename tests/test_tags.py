@@ -39,16 +39,15 @@ class TestTag(unittest.TestCase):
         self.is_tag(body)
         self.assertEqual(len(self.page.childs), 2)
         self.assertEqual(self.page.length, 2)
-        print '*'*100
-        print self.page.childs
-        print '*'*100
         self.assertEqual(self.page.childs[0], head)
         self.assertEqual(self.page.childs[1], body)
         self.assertEqual(self.page.first(), head)
         self.assertEqual(self.page.last(), body)
 
     def test_create_call_iterable(self):
+        self.page([Head(), Body()])
         divs = [Div() for _ in range(10)]
+        print(self.page.childs)
         self.page.childs[1](divs)
         body = self.page.childs[1]
         self.is_tag(self.page.childs[1][1])

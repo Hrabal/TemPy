@@ -2,48 +2,57 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
-import types
 from copy import deepcopy
-from collections import Mapping
+from functools import wraps
+from itertools import chain
+from collections import Mapping, namedtuple
+from types import GeneratorType
 
-from exceptions import TagError
+from .exceptions import TagError
+
+ChildElement = namedtuple('ChildElement', ['name', 'obj'])
 
 
-class DOMElement(object):
+class DOMElement():
     """
     Takes care of the tree structure using the "childs" and "parent" attributes
     and manages the DOM manipulation with proper valorization of those two.
     """
     def __init__(self):
-        super(DOMElement, self).__init__()
+        super().__init__()
         self.childs = []
         self.parent = None
 
-    def __call__(self, *args):
-        return self.append(args)
-
-    def _yield_items(self, items):
-        if isinstance(items, DOMElement):
-            yield items
-        for item in items:
-            if type(item) in (
-                types.ListType,
-                types.TupleType,
-                types.GeneratorType,
-            ):
-                for subitem in item:
-                    yield subitem
+    def _yield_items(self, items, kwitems):
+        unnamed = (ChildElement(None, item) for item in items)
+        named = (ChildElement(k, v) for k, v in kwitems.items())
+        for i, item in enumerate(chain(unnamed, named)):
+            if type(item.obj) in (list, tuple, GeneratorType):
+                if item.name:
+                    # TODO: implement tag named containers
+                    # Happens when iterable in kwitems
+                    # i.e: d = Div(paragraphs=[P() for _ in range(5)])
+                    # d.paragraphs -> [P(), P(), P()...]
+                    yield i, item
+                else:
+                    yield from self._yield_items(item.obj, {})
+            elif isinstance(item.obj, DOMElement):
+                yield i, item
             else:
-                yield item
+                yield i, item
 
-    def __getitem__(self, i):
-        return self.childs[i]
+    def content_receiver(reverse=False):
+        def _receiver(func):
+            @wraps(func)
+            def wrapped(inst, *tags, **kwtags):
+                for i, tag in inst._yield_items(tags, kwtags):
+                    func(inst, i, tag)
+                return inst
+            return wrapped
+        return _receiver
 
-    def __iter__(self):
-        return iter(self.childs)
-
-    def _insert(self, child, idx=None, prepend=False):
-        if idx < 0:
+    def _insert(self, name, child, idx=None, prepend=False):
+        if idx and idx < 0:
             idx = 0
         if prepend:
             idx = 0
@@ -54,32 +63,61 @@ class DOMElement(object):
             child.parent = self
             child._tab_count = self._tab_count + 1
             child._own_index = self.childs.index(child)
+        if name:
+            setattr(self, name, child)
 
-    def after(self, *siblings):
-        for i, sibling in enumerate(self._yield_items(*siblings)):
-            self.parent._insert(sibling, idx=self._own_index + i + 1)
-        return self
+    def __getitem__(self, i):
+        return self.childs[i]
 
-    def before(self, *siblings):
-        for i, sibling in enumerate(self._yield_items(*siblings)):
-            self.parent._insert(sibling, idx=self._own_index - i - 1)
-        return self
+    def __iter__(self):
+        return iter(self.childs)
 
-    def prepend(self, *childs):
-        for child in self._yield_items(*reversed(childs)):
-            self._insert(child, prepend=True)
-        return self
+    @content_receiver()
+    def __call__(self, _, tag):
+        self._insert(*tag)
 
+    @content_receiver()
+    def after(self, i, tag):
+        self.parent._insert(*tag, idx=self._own_index + 1 + i)
+
+    @content_receiver(reverse=True)
+    def before(self, i, tag):
+        self.parent._insert(*tag, idx=self._own_index - i)
+
+    @content_receiver(reverse=True)
+    def prepend(self, tag):
+        self._insert(child, prepend=True)
+
+    @content_receiver()
     def prepend_to(self, father):
-        return father.prepend(self)
+        father.prepend(self)
 
-    def append(self, *childs):
-        for child in self._yield_items(*childs):
-            self._insert(child)
-        return self
+    @content_receiver()
+    def append(self, tag):
+        self._insert(tag)
 
+    @content_receiver()
     def append_to(self, father):
-        return father.append(self)
+        father.append(self)
+
+    def wrap(self, other):
+        # TODO: make multiple with content_receiver
+        if self.parent:
+            self.before(other)
+            self.parent.pop(self._own_index)
+        return other.append(self)
+
+    def wrap_inner(self, other):
+        # TODO
+        pass
+
+    def replace_with(self, other):
+        # TODO: make multiple with content_receiver
+        if isinstance(other, Tag):
+            self = other
+        else:
+            raise TagError()
+        return self
 
     def remove(self):
         self.parent.pop(i=self._own_index)
@@ -124,26 +162,10 @@ class DOMElement(object):
     def clone(self):
         return deepcopy(self)
 
-    def replace_with(self, other):
-        if isinstance(other, Tag):
-            self = other
-        else:
-            raise TagError()
-        return self
-
     def has(self, pattern):
         # TODO
         # return pattern in self.childs
         pass
-
-    def wrap(self, other):
-        if self.parent:
-            self.before(other)
-            self.parent.pop(self._own_index)
-        return other.append(self)
-
-    def wrap_inner(self, other):
-        self.childs
 
     def find(self, id=None, klass=None, tag=None):
         pass
@@ -167,7 +189,7 @@ class TagAttrs(dict):
         'typ': 'type'
     }
     FORMAT = {
-        'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.iteritems()),
+        'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
         'typ': lambda x: ' '.join(x)
     }
@@ -175,26 +197,26 @@ class TagAttrs(dict):
     def __setitem__(self, key, value):
         if key in self.MULTI_VALUES_ATTRS:
             if key not in self:
-                super(TagAttrs, self).__setitem__(key, [])
+                super().__setitem__(key, [])
             self[key].append(value)
         elif key in self.MAPPING_ATTRS:
             if key not in self:
-                super(TagAttrs, self).__setitem__(key, {})
+                super().__setitem__(key, {})
             self[key].update(value)
         else:
-            super(TagAttrs, self).__setitem__(key, value)
+            super().__setitem__(key, value)
 
     def update(self, attrs=None, **kwargs):
         if attrs is not None:
-            for k, v in attrs.iteritems() if isinstance(attrs, Mapping) else attrs:
+            for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
                 self[k] = v
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             self[k] = v
 
     def render(self):
         return ''.join(' {}="{}"'.format(self.SPECIALS.get(k, k),
                                          self.FORMAT.get(k, lambda x: x)(v))
-                       for k, v in self.iteritems() if v)
+                       for k, v in self.items() if v)
 
 
 class Tag(DOMElement):
@@ -213,7 +235,7 @@ class Tag(DOMElement):
             raise TagError()
         self.attr(**kwargs)
         self._tab_count = 0
-        super(Tag, self).__init__()
+        super().__init__()
 
     @property
     def length(self):

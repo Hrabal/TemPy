@@ -2,7 +2,7 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
-from tempy import Tag, VoidTag
+from .tempy import Tag, VoidTag
 
 
 class Html(Tag):
