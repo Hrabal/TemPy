@@ -18,7 +18,7 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 
 ## Basic Templating
 
-TemPy offers a rather clean syntax for building pages in just python:
+TemPy offers a rather clean syntax for building pages in pure python:
 ```
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 page = Html()(
@@ -55,14 +55,15 @@ You can also create blocks and put them togheter using the manipulation api:
 from somewhere import links, foot_imgs
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
 footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
-page = Html()(Head(), Body()(menu, Div(klass='container'), footer))
+page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
 ...
 # my_controller.py
+from tempy.tags import Div
 from basic_template import page
 @controller_framework_decorator
 def mycontroller():
     content = Div()('This is my content!')
-    return page.find('.container').append(content)
+    return page.container.append(content)
 ```
 
 ## Elements creation and removal
@@ -109,7 +110,7 @@ div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but witho
 
 a = A(klass='someHtmlClass')('text of this link')
 a.attr(id='another_dom_id')
-a.prop(href='www.thisisalink.com')
+a.attr({'href': 'www.thisisalink.com'})
 >>> <a id="another_dom_id" class="someHtmlClass" href="www.thisisalink.com">text of this link</a>
 ```
 
@@ -157,6 +158,16 @@ container_div[0][4].attr(id='pId')
 >>>     <div id="divId9"></div>
 >>> </div>
 ```
+
+..or if you give a name to the element when adding it to his container you can access it by name, as if it's a container's attribute:
+```
+container_div = Div()
+container_div(content_div=Div())
+
+container_div.content_div('Some content')
+>>> <div><div>Some content</div></div>
+```
+
 
 ..or if you feel jQuery-ish you can use:
 ```
