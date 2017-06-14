@@ -6,7 +6,7 @@ Build HTML without writing a single tag.
 TemPy lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also "navigating the DOM" and manipulating tags is possible in a Python or jQuery friendly sintax.
 
 ### Why?
-HTML is like coffee (..and SQL): we all use it, we know it works, we all recognize it's important, but our biggest dream is to never use it anymore.
+HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never use it anymore. For SQL we have ORM's, for HTML we're not there yet.
 Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
 ..so the idea of TemPy.
 
