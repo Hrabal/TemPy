@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from tempy.tags import Html, Head, Body, Link, Div
+from tempy.tags import Html, Head, Body, Link, Div, Comment, Doctype
 from tempy.tempy import Content
 
 page = Html()(Head(), body=Body())
@@ -22,3 +22,6 @@ page.body(Content('title2'))
 print(page.render())
 page.body([Div(id=i) for i in range(10)])
 print(page.body[1:4])
+page.body(Comment('This is my comment'))
+print(page.render())
+print(Doctype().render())

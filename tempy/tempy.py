@@ -18,6 +18,7 @@ class DOMElement():
     Takes care of the tree structure using the "childs" and "parent" attributes
     and manages the DOM manipulation with proper valorization of those two.
     """
+    t = False
     def __init__(self):
         super().__init__()
         self.childs = []
@@ -286,7 +287,8 @@ class TagAttrs(dict):
     _FORMAT = {
         'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
-        'typ': lambda x: ' '.join(x)
+        'typ': lambda x: ' '.join(x),
+        'comment': lambda x: x
     }
 
     def __setitem__(self, key, value):
@@ -311,9 +313,13 @@ class TagAttrs(dict):
 
     def render(self):
         """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        return ''.join(' {}="{}"'.format(self._SPECIALS.get(k, k),
-                                         self._FORMAT.get(k, lambda x: x)(v))
-                       for k, v in self.items() if v)
+        if hasattr(self, '_comment'):
+            # Special case for the comment tag
+            return self._comment
+        else:
+            return ''.join(' {}="{}"'.format(self._SPECIALS.get(k, k),
+                                             self._FORMAT.get(k, lambda x: x)(v))
+                           for k, v in self.items() if v)
 
 
 class Tag(DOMElement):
@@ -438,6 +444,8 @@ class Tag(DOMElement):
         if not self._void:
             tag_data['inner'] = self._render_childs(pretty)
         template = self._template + prettying if pretty else self._template
+        if self.t:
+            print(tag_data)
         return template.format(**tag_data)
 
     def _render_childs(self, pretty):
