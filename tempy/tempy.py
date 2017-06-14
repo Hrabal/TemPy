@@ -101,12 +101,14 @@ class DOMElement():
                 # Fallback for no content (Raise NoContent?)
                 return ''
 
-    def inject(self, contents, **kwargs):
+    def inject(self, contents=None, **kwargs):
         """
         Adds content data in this element. This will be used in the rendering of this element's childs.
         Multiple injections on the same key will override the content (dict.update behavior).
         """
-        if contents and kwargs:
+        if not contents:
+            contents = {}
+        if kwargs:
             contents.update(kwargs)
         self.content_data.update(contents)
 
