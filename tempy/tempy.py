@@ -18,7 +18,6 @@ class DOMElement():
     Takes care of the tree structure using the "childs" and "parent" attributes
     and manages the DOM manipulation with proper valorization of those two.
     """
-    t = False
     def __init__(self):
         super().__init__()
         self.childs = []
@@ -444,8 +443,6 @@ class Tag(DOMElement):
         if not self._void:
             tag_data['inner'] = self._render_childs(pretty)
         template = self._template + prettying if pretty else self._template
-        if self.t:
-            print(tag_data)
         return template.format(**tag_data)
 
     def _render_childs(self, pretty):
