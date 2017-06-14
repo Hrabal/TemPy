@@ -213,6 +213,10 @@ class DOMElement():
         """Returns Tags and Content Placehorlders childs of this element."""
         return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
+    def contents(self):
+        """Returns this elements childs list, unfiltered."""
+        return self.childs
+
     def first(self):
         """Returns the first child"""
         return self.childs[0]
@@ -236,7 +240,6 @@ class DOMElement():
     def prev_all(self):
         """Returns all the previous siblings as a list."""
         return self.parent.child[:self._own_index - 1]
-
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
@@ -274,24 +277,24 @@ class TagAttrs(dict):
 
     TagAttrs.render formats all the attributes in the proper html format.
     """
-    MAPPING_ATTRS = ('style', )
-    MULTI_VALUES_ATTRS = ('klass', 'typ', )
-    SPECIALS = {
+    _MAPPING_ATTRS = ('style', )
+    _MULTI_VALUES_ATTRS = ('klass', 'typ', )
+    _SPECIALS = {
         'klass': 'class',
         'typ': 'type'
     }
-    FORMAT = {
+    _FORMAT = {
         'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
         'typ': lambda x: ' '.join(x)
     }
 
     def __setitem__(self, key, value):
-        if key in self.MULTI_VALUES_ATTRS:
+        if key in self._MULTI_VALUES_ATTRS:
             if key not in self:
                 super().__setitem__(key, [])
             self[key].append(value)
-        elif key in self.MAPPING_ATTRS:
+        elif key in self._MAPPING_ATTRS:
             if key not in self:
                 super().__setitem__(key, {})
             self[key].update(value)
@@ -299,6 +302,7 @@ class TagAttrs(dict):
             super().__setitem__(key, value)
 
     def update(self, attrs=None, **kwargs):
+
         if attrs is not None:
             for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
                 self[k] = v
@@ -306,8 +310,9 @@ class TagAttrs(dict):
             self[k] = v
 
     def render(self):
-        return ''.join(' {}="{}"'.format(self.SPECIALS.get(k, k),
-                                         self.FORMAT.get(k, lambda x: x)(v))
+        """Renders the tag's attributes using the formats and performing special attributes name substitution."""
+        return ''.join(' {}="{}"'.format(self._SPECIALS.get(k, k),
+                                         self._FORMAT.get(k, lambda x: x)(v))
                        for k, v in self.items() if v)
 
 
@@ -330,39 +335,39 @@ class Tag(DOMElement):
 
     @property
     def length(self):
+        """Returns the number of childs."""
         return len(self.childs)
 
     @property
     def index(self):
+        """
+        Returns the position of this element in the parent's childs list.
+        If the element have no parent, returns None.
+        """
         return self._own_index
 
     def attr(self, attrs=None, **kwargs):
+        """Add an attribute to the element"""
         self.attrs.update(attrs or kwargs)
         return self
 
-    def prop(self, other=None, **kwargs):
-        return self.attr(other, **kwargs)
-
     def remove_attr(self, attr):
-        self.attrs.pop(attr, None)
-        return self
-
-    def remove_prop(self, attr):
+        """Removes an attribute."""
         self.attrs.pop(attr, None)
         return self
 
     def add_class(self, cssclass):
+        """Adds a css class to this element."""
         self.attrs['klass'].append(cssclass)
         return self
 
     def remove_class(self, cssclass):
+        """Removes the given class from this element."""
         self.attrs['klass'].remove(cssclass)
         return self
 
-    def contents(self):
-        return self.childs
-
     def css(self, *props, **kwprops):
+        """Adds css properties tho this element."""
         styles = {}
         if props:
             if len(props) == 1 and isinstance(props[0], Mapping):
@@ -378,17 +383,21 @@ class Tag(DOMElement):
         return self.attr(attrs={'style': styles})
 
     def hide(self):
+        """Adds the "display: none" style attribute."""
         self.attrs['style']['display'] = None
         return self
 
     def show(self):
+        """Removes the display style attribute."""
         self.attrs['style'].pop('display')
         return self
 
     def toggle(self):
+        """Same as jQuery's toggle, toggles the display attribute of this element."""
         return self.show() if self.attrs['style']['display'] == None else self.hide()
 
     def data(self, key, value=None):
+        """Adds extra data to this element, this data will not be rendered."""
         if value:
             self.data[key] = value
             return self
@@ -396,18 +405,31 @@ class Tag(DOMElement):
             return self.data[key]
 
     def has_class(self, csscl):
+        """Checks if this element have the given css class."""
         return csscl in self.attrs['klass']
 
     def toggle_class(self, csscl):
+        """Same as jQuery's toggleClass function. It toggles the css class on this element."""
         return self.remove_class(csscl) if self.has_class(csscl) else self.add_class(csscl)
 
     def html(self):
+        """Renders the inner html of this element."""
         return self._render_childs()
 
     def text(self):
-        return ''.join(child.text() if isinstance(child, Tag) else child for child in self.childs)
+        """Renders the contents inside this element, without html tags."""
+        texts = []
+        for child in self.childs:
+            if isinstance(child, Tag):
+                texts.append(child.text())
+            elif isinstance(child, Content):
+                texts.append(child.render())
+            else:
+                texts.append(child)
+        return ''.join(texts)
 
     def render(self, pretty=False):
+        """Renders the element and all his childrens."""
         prettying = '\t' * self._tab_count + '\n'  # TODO: we're ugly, prettifying don't work
         tag_data = {
             'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
