@@ -20,14 +20,26 @@ class DOMElement():
     """
     def __init__(self):
         super().__init__()
-        self._own_index = None
         self.childs = []
         self.parent = None
         self.content_data = {}
 
-    def _yield_items(self, items, kwitems):
+    @property
+    def _own_index(self):
+        if self.parent:
+            return self.parent.childs.index(self)
+        return None
+    
+    def _yield_items(self, items, kwitems, reverse=None):
+        """
+        Recursive generator, flattens the given items/kwargs. Returns index after flattening and a ChildElement.
+        reverse parameter inverts the yielding.
+        """
         unnamed = (ChildElement(None, item) for item in items)
         named = (ChildElement(k, v) for k, v in kwitems.items())
+        contents = (items, kwitems)
+        if reverse:
+            contents = (OrderedDict(list(kwitems.items())[::-1]), items[::-1])
         for i, item in enumerate(chain(unnamed, named)):
             if type(item.obj) in (list, tuple, GeneratorType):
                 if item.name:
@@ -44,19 +56,27 @@ class DOMElement():
                 yield i, item
 
     def content_receiver(reverse=False):
+        """
+        Decorator for content adding methods.
+        Takes args and kwargs and calls the decorated method one time for each argument provided.
+        The reverse parameter should be used for prepending (relative to self) methods.
+        """
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                contents = (tags, kwtags)
-                if reverse:
-                    contents = tags[::-1], OrderedDict(list(kwtags.items())[::-1])
-                for i, tag in inst._yield_items(*contents):
+                for i, tag in inst._yield_items(tags, kwtags, reverse):
                     func(inst, i, tag)
                 return inst
             return wrapped
         return _receiver
 
     def _insert(self, name, child, idx=None, prepend=False):
+        """
+        Inserts something inside this element.
+        If provided at the given index, if prepend at the start of the childs list, by default at the end.
+        If the child is a DOMElement, correctly links the child.
+        If a name is provided, an attribute containing the child is created in this instance.
+        """
         if idx and idx < 0:
             idx = 0
         if prepend:
@@ -67,21 +87,27 @@ class DOMElement():
         if isinstance(child, DOMElement):
             child.parent = self
             child._tab_count = self._tab_count + 1
-            child._own_index = self.childs.index(child)
         if name:
             setattr(self, name, child)
 
     def _find_content(self, cont_name):
+        """Search for a content_name in the content data, if not found the parent is searched."""
         try:
             return self.content_data[cont_name]
         except KeyError:
             if self.parent:
                 return self.parent._find_content(cont_name)
             else:
-                # TODO: raise no content exception?
-                return None
+                # Fallback for no content (Raise NoContent?)
+                return ''
 
-    def inject(self, contents):
+    def inject(self, contents, **kwargs):
+        """
+        Adds content data in this element. This will be used in the rendering of this element's childs.
+        Multiple injections on the same key will override the content (dict.update behavior).
+        """
+        if contents and kwargs:
+            contents.update(kwargs)
         self.content_data.update(contents)
 
     def __getitem__(self, i):
@@ -90,36 +116,55 @@ class DOMElement():
     def __iter__(self):
         return iter(self.childs)
 
+    def __len__(self):
+        return len(self.childs)
+
+    def __contains__(self, x):
+        return x in self.childs
+    
+    def __copy__(self):
+        return deepcopy(self)
+
     @content_receiver()
     def __call__(self, _, tag):
+        """Calling the object will add the given parameters as childs"""
         self._insert(*tag)
 
     @content_receiver()
     def after(self, i, tag):
+        """Adds siblings after the current tag."""
         self.parent._insert(*tag, idx=self._own_index + 1 + i)
 
     @content_receiver(reverse=True)
     def before(self, i, tag):
+        """Adds siblings before the current tag."""
         self.parent._insert(*tag, idx=self._own_index - i)
 
     @content_receiver(reverse=True)
     def prepend(self, tag):
+        """Adds childs tho this tag, starting from the first position."""
         self._insert(child, prepend=True)
 
     @content_receiver()
     def prepend_to(self, father):
+        """Adds this tag to a father, at the beginning."""
         father.prepend(self)
 
     @content_receiver()
     def append(self, tag):
+        """Adds childs tho this tag, after the current existing childs."""
         self._insert(tag)
 
     @content_receiver()
     def append_to(self, father):
+        """Adds this tag to a parent, after the current existing childs."""
         father.append(self)
 
     def wrap(self, other):
+        """Wraps this element inside another empty tag."""
         # TODO: make multiple with content_receiver
+        if other.childs:
+            raise TagError
         if self.parent:
             self.before(other)
             self.parent.pop(self._own_index)
@@ -130,55 +175,84 @@ class DOMElement():
         pass
 
     def replace_with(self, other):
+        """Replace this element with the given DOMElement."""
         # TODO: make multiple with content_receiver
-        if isinstance(other, Tag):
+        if isinstance(other, DOMElement):
             self = other
         else:
             raise TagError()
         return self
 
     def remove(self):
+        """Detach this element from his father."""
         self.parent.pop(i=self._own_index)
         return self
 
-    def pop(self, i=0):
-        self.childs.pop(i).parent = None
+    def move(self, new_father, idx=None, prepend=None):
+        """Moves this element from his father to the given one."""
+        self.parent.pop(i=self._own_index)
+        new_father._insert(self.name, self, idx, prepend)
         return self
+
+    def pop(self, idx=None):
+        """Removes the child at given position, if no position is given removes the last."""
+        if not idx:
+            idx = len(self.childs) - 1
+        elem = self.childs.pop(idx)
+        if isinstance(elem, DOMElement):
+            elem.parent = None
+        return elem
 
     def empty(self):
-        for child in self.childs:
-            self.childs.remove()
+        """Remove all this tag's childs."""
+        map(lambda child: self.pop(child._own_index), self.childs)
         return self
 
-    def children(self):
-        return filter(lambda x: isinstance(x, Tag), self.childs)
+    # TODO: Make all the following properties?
+    def childrens(self):
+        """Returns Tags and Content Placehorlders childs of this element."""
+        return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
     def first(self):
+        """Returns the first child"""
         return self.childs[0]
 
     def last(self):
+        """Returns the last child"""
         return self.childs[-1]
 
     def next(self):
+        """Returns the next sibling."""
         return self.parent.child[self._own_index + 1]
 
+    def next_all(self):
+        """Returns all the next siblings as a list."""
+        return self.parent.child[self._own_index + 1:]
+
     def prev(self):
+        """Returns the previous sibling."""
         return self.parent.child[self._own_index - 1]
 
     def prev_all(self):
+        """Returns all the previous siblings as a list."""
         return self.parent.child[:self._own_index - 1]
 
-    def parent(self):
-        return self.parent
 
     def siblings(self):
-        return filter(lambda x: isinstance(x, Tag), self.parent.childs)
+        """Returns all the siblings of this element as a list."""
+        return filter(lambda x: x != self, self.parent.childs)
 
-    def slice(self, start, end):
-        return self.childs[start:end]
+    def parent(self):
+        """Returns this element's father"""
+        return self.parent
+
+    def slice(self, start=None, end=None, step=None):
+        """Slice of this element's childs as childs[start:end:step]"""
+        return self.childs[start:end:step]
 
     def clone(self):
-        return deepcopy(self)
+        """Returns a deepcopy of this element."""
+        return self.__copy__()
 
     def has(self, pattern):
         # TODO
@@ -324,7 +398,7 @@ class Tag(DOMElement):
     def has_class(self, csscl):
         return csscl in self.attrs['klass']
 
-    def toggleClass(self, csscl):
+    def toggle_class(self, csscl):
         return self.remove_class(csscl) if self.has_class(csscl) else self.add_class(csscl)
 
     def html(self):
@@ -354,14 +428,19 @@ class Tag(DOMElement):
 
 
 class VoidTag(Tag):
-    """ A void tag, as described in W3C reference: https://www.w3.org/TR/html51/syntax.html#void-elements
+    """
+    A void tag, as described in W3C reference: https://www.w3.org/TR/html51/syntax.html#void-elements
     """
     _void = True
     _template = '<{tag}{attrs}/>'
 
-class Content():
+
+class Content(DOMElement):
     """
-    Provides the ability to use a simil-tag object as content placeholder
+    Provides the ability to use a simil-tag object as content placeholder.
+    At render time, a content with the same name is searched in parents, the nearest one is used.
+    If no content with the same name is used, an empty string is rendered.
+    If instantiated with the named attribute content, this will override all the content injection on parents.
     """
     def __init__(self, name, content=None):
         self.name = name
