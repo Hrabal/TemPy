@@ -2,7 +2,8 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
-from copy import deepcopy
+from uuid import uuid4
+from copy import copy
 from functools import wraps
 from itertools import chain
 from collections import Mapping, namedtuple, OrderedDict
@@ -23,6 +24,13 @@ class DOMElement():
         self.childs = []
         self.parent = None
         self.content_data = {}
+        self.uuid = uuid4()
+
+    def __hash__(self):
+        return self.uuid
+
+    def __eq__(self, other):
+        return self.uuid == other.uuid
 
     @property
     def _own_index(self):
@@ -111,6 +119,7 @@ class DOMElement():
         if kwargs:
             contents.update(kwargs)
         self.content_data.update(contents)
+        return self
 
     def __getitem__(self, i):
         return self.childs[i]
@@ -123,9 +132,16 @@ class DOMElement():
 
     def __contains__(self, x):
         return x in self.childs
-    
+
     def __copy__(self):
-        return deepcopy(self)
+        new = self.__class__()(child.clone() if isinstance(child, DOMElement) else child for child in self.childs).remove()
+        if hasattr(new, 'attrs'):
+            new.attrs = self.attrs
+        return new
+
+    def clone(self):
+        """Returns a deepcopy of this element."""
+        return copy(self)
 
     @content_receiver()
     def __call__(self, _, tag):
@@ -187,7 +203,8 @@ class DOMElement():
 
     def remove(self):
         """Detach this element from his father."""
-        self.parent.pop(i=self._own_index)
+        if self._own_index and self.parent:
+            self.parent.pop(i=self._own_index)
         return self
 
     def move(self, new_father, idx=None, prepend=None):
@@ -254,10 +271,6 @@ class DOMElement():
     def slice(self, start=None, end=None, step=None):
         """Slice of this element's childs as childs[start:end:step]"""
         return self.childs[start:end:step]
-
-    def clone(self):
-        """Returns a deepcopy of this element."""
-        return self.__copy__()
 
     def has(self, pattern):
         # TODO
