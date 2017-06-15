@@ -18,9 +18,9 @@ class _ChildElement():
     """
     def __init__(self, name, obj):
         super().__init__()
-        if not name:
-            name = obj.name
-        self.name = name
+        if not name and isinstance(obj, (DOMElement, Content)):
+            name = obj._name
+        self._name = name
         self.obj = obj
         
 
@@ -31,6 +31,7 @@ class DOMElement():
     """
     def __init__(self):
         super().__init__()
+        self._name = None
         self.childs = []
         self.parent = None
         self.content_data = {}
@@ -78,7 +79,7 @@ class DOMElement():
             contents = (OrderedDict(list(kwitems.items())[::-1]), items[::-1])
         for i, item in enumerate(chain(unnamed, named)):
             if type(item.obj) in (list, tuple, GeneratorType):
-                if item.name:
+                if item._name:
                     # TODO: implement tag named containers
                     # Happens when iterable in kwitems
                     # i.e: d = Div(paragraphs=[P() for _ in range(5)])
@@ -123,8 +124,8 @@ class DOMElement():
         if isinstance(child.obj, (DOMElement, Content)):
             child.obj.parent = self
             child.obj._tab_count = self._tab_count + 1
-        if child.name:
-            setattr(self, child.name, child.obj)
+        if child._name:
+            setattr(self, child._name, child.obj)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -218,7 +219,7 @@ class DOMElement():
     def move(self, new_father, idx=None, prepend=None):
         """Moves this element from his father to the given one."""
         self.parent.pop(i=self._own_index)
-        new_father._insert(self.name, self, idx, prepend)
+        new_father._insert(self._name, self, idx, prepend)
         return self
 
     def pop(self, idx=None):
@@ -497,7 +498,7 @@ class Content():
         self._tab_count = 0
         if not name and not content:
             raise TagError
-        self.name = name
+        self._name = name
         if content:
             if type(content) in (list, tuple, GeneratorType): 
                 self._fixed_content = content
@@ -507,11 +508,11 @@ class Content():
             self._fixed_content = None
 
     def __copy__(self):
-        return self.__class__(self.name, self._fixed_content)
+        return self.__class__(self._name, self._fixed_content)
 
     @property
     def content(self):
-        return self._fixed_content or self.parent._find_content(self.name)
+        return self._fixed_content or self.parent._find_content(self._name)
 
     @property
     def length(self):
