@@ -1,27 +1,33 @@
 # -*- coding: utf-8 -*-
+import os
+import json
+import cProfile, pstats, io
+from flask import Flask, render_template
+from playground_templates.sw import page, character
 
-from tempy.tags import Html, Head, Body, Link, Div, Comment, Doctype
-from tempy.tempy import Content
 
-page = Html()(Head(), body=Body())
+app = Flask(__name__)
 
-print(page.render())
-page[0](style=Link())
-print(page[0].style)
-print(page.render())
-page.body.after('After the body')
-print(page.render())
-page.body.before('Before body')
-print(page.render())
-page.body(Content('title'))
-page.inject({'title': 'That\'s my title!'})
-print(page.render())
-page.body.inject({'title': 'That\'s my new title!'})
-print(page.render())
-page.body(Content('title2'))
-print(page.render())
-page.body([Div(id=i) for i in range(10)])
-print(page.body[1:4])
-page.body(Comment('This is my comment'))
-print(page.render())
-print(Doctype().render())
+with open('sw-people.json', 'r') as f:
+    people = json.load(f)
+
+@app.route('/tempy')
+def tempy_handler():
+    # pr = cProfile.Profile()
+    # pr.enable()
+    page.body(character(people))
+    rend = page.render()
+    # pr.disable()
+    # s = io.StringIO()
+    # sortby = 'cumulative'
+    # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    # ps.print_stats()
+    # print(s.getvalue())
+    return rend
+
+@app.route('/j2')
+def j2_handler():
+    return render_template('characters.html', people=people)
+
+if __name__ == '__main__':
+    app.run(port=8888, debug=False)
