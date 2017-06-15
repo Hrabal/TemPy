@@ -11,8 +11,18 @@ from types import GeneratorType
 
 from .exceptions import TagError
 
-ChildElement = namedtuple('ChildElement', ['name', 'obj'])
 
+class _ChildElement():
+    """
+    Wrapper used to manage element insertion.
+    """
+    def __init__(self, name, obj):
+        super().__init__()
+        if not name:
+            name = obj.name
+        self.name = name
+        self.obj = obj
+        
 
 class DOMElement():
     """
@@ -32,6 +42,24 @@ class DOMElement():
     def __eq__(self, other):
         return self.uuid == other.uuid
 
+    def __getitem__(self, i):
+        return self.childs[i]
+
+    def __iter__(self):
+        return iter(self.childs)
+
+    def __len__(self):
+        return len(self.childs)
+
+    def __contains__(self, x):
+        return x in self.childs
+
+    def __copy__(self):
+        new = self.__class__()(child.clone() if isinstance(child, DOMElement) else child for child in self.childs).remove()
+        if hasattr(new, 'attrs'):
+            new.attrs = self.attrs
+        return new
+
     @property
     def _own_index(self):
         if self.parent:
@@ -40,11 +68,11 @@ class DOMElement():
     
     def _yield_items(self, items, kwitems, reverse=None):
         """
-        Recursive generator, flattens the given items/kwargs. Returns index after flattening and a ChildElement.
+        Recursive generator, flattens the given items/kwargs. Returns index after flattening and a _ChildElement.
         reverse parameter inverts the yielding.
         """
-        unnamed = (ChildElement(None, item) for item in items)
-        named = (ChildElement(k, v) for k, v in kwitems.items())
+        unnamed = (_ChildElement(None, item) for item in items)
+        named = (_ChildElement(k, v) for k, v in kwitems.items())
         contents = (items, kwitems)
         if reverse:
             contents = (OrderedDict(list(kwitems.items())[::-1]), items[::-1])
@@ -78,7 +106,7 @@ class DOMElement():
             return wrapped
         return _receiver
 
-    def _insert(self, name, child, idx=None, prepend=False):
+    def _insert(self, child, idx=None, prepend=False):
         """
         Inserts something inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
@@ -121,59 +149,39 @@ class DOMElement():
         self.content_data.update(contents)
         return self
 
-    def __getitem__(self, i):
-        return self.childs[i]
-
-    def __iter__(self):
-        return iter(self.childs)
-
-    def __len__(self):
-        return len(self.childs)
-
-    def __contains__(self, x):
-        return x in self.childs
-
-    def __copy__(self):
-        new = self.__class__()(child.clone() if isinstance(child, DOMElement) else child for child in self.childs).remove()
-        if hasattr(new, 'attrs'):
-            new.attrs = self.attrs
-        return new
-
     def clone(self):
         """Returns a deepcopy of this element."""
         return copy(self)
 
     @content_receiver()
-    def __call__(self, _, tag):
+    def __call__(self, _, child):
         """Calling the object will add the given parameters as childs"""
-        self._insert(*tag)
+        self._insert(child)
 
     @content_receiver()
-    def after(self, i, tag):
+    def after(self, i, child):
         """Adds siblings after the current tag."""
-        self.parent._insert(*tag, idx=self._own_index + 1 + i)
+        self.parent._insert(child, idx=self._own_index + 1 + i)
 
     @content_receiver(reverse=True)
-    def before(self, i, tag):
+    def before(self, i, child):
         """Adds siblings before the current tag."""
-        self.parent._insert(*tag, idx=self._own_index - i)
+        self.parent._insert(child, idx=self._own_index - i)
 
     @content_receiver(reverse=True)
-    def prepend(self, tag):
+    def prepend(self, child):
         """Adds childs tho this tag, starting from the first position."""
         self._insert(child, prepend=True)
 
-    @content_receiver()
     def prepend_to(self, father):
         """Adds this tag to a father, at the beginning."""
         father.prepend(self)
 
     @content_receiver()
-    def append(self, tag):
-        """Adds childs tho this tag, after the current existing childs."""
-        self._insert(tag)
+    def append(self, child):
+        """Adds childs to this tag, after the current existing childs."""
+        self._insert(child)
 
-    @content_receiver()
     def append_to(self, father):
         """Adds this tag to a parent, after the current existing childs."""
         father.append(self)
