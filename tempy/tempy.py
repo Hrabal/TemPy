@@ -91,12 +91,12 @@ class DOMElement():
             idx = 0
         else:
             idx = idx if idx is not None else len(self.childs)
-        self.childs.insert(idx, child)
-        if isinstance(child, DOMElement):
-            child.parent = self
-            child._tab_count = self._tab_count + 1
-        if name:
-            setattr(self, name, child)
+        self.childs.insert(idx, child.obj)
+        if isinstance(child.obj, (DOMElement, Content)):
+            child.obj.parent = self
+            child.obj._tab_count = self._tab_count + 1
+        if child.name:
+            setattr(self, child.name, child.obj)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -318,7 +318,6 @@ class TagAttrs(dict):
             super().__setitem__(key, value)
 
     def update(self, attrs=None, **kwargs):
-
         if attrs is not None:
             for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
                 self[k] = v
@@ -461,7 +460,7 @@ class Tag(DOMElement):
         return template.format(**tag_data)
 
     def _render_childs(self, pretty):
-        return ''.join(child.render(pretty) if isinstance(child, DOMElement) else str(child) for child in self.childs)
+        return ''.join(child.render(pretty) if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs)
 
     def is_a(self, pattern):
         # TODO
@@ -477,18 +476,30 @@ class VoidTag(Tag):
     _template = '<{tag}{attrs}/>'
 
 
-class Content(DOMElement):
+class Content():
     """
     Provides the ability to use a simil-tag object as content placeholder.
     At render time, a content with the same name is searched in parents, the nearest one is used.
     If no content with the same name is used, an empty string is rendered.
     If instantiated with the named attribute content, this will override all the content injection on parents.
     """
-    def __init__(self, name, content=None):
-        self.name = name
-        self.parent = None
-        self._fixed_content = content
+    def __init__(self, name=None, content=None):
         super().__init__()
+        self.parent = None
+        self._tab_count = 0
+        if not name and not content:
+            raise TagError
+        self.name = name
+        if content:
+            if type(content) in (list, tuple, GeneratorType): 
+                self._fixed_content = content
+            else:
+                self._fixed_content = (content, )
+        else:
+            self._fixed_content = None
+
+    def __copy__(self):
+        return self.__class__(self.name, self._fixed_content)
 
     @property
     def content(self):
@@ -499,4 +510,4 @@ class Content(DOMElement):
         return len(self.content)
 
     def render(self, pretty=False):
-        return self.content
+        return ' '.join(child.render(pretty) if isinstance(child, DOMElement) else str(child) for child in self.content) 
