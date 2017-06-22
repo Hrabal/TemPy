@@ -14,16 +14,17 @@ with open('sw-people.json', 'r') as f:
 
 @app.route('/tempy')
 def tempy_handler():
-    # pr = cProfile.Profile()
-    # pr.enable()
-    page.body.inject(charachters = people.values())
-    rend = page.render()
-    # pr.disable()
-    # s = io.StringIO()
-    # sortby = 'cumulative'
-    # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-    # ps.print_stats()
-    # print(s.getvalue())
+    pr = cProfile.Profile()
+    pr.enable()
+
+    rend = page.render(characters=people.values())
+
+    pr.disable()
+    s = io.StringIO()
+    sortby = 'cumulative'
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    ps.print_stats()
+    print(s.getvalue())
     return rend
 
 @app.route('/j2')
