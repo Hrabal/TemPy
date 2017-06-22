@@ -6,29 +6,28 @@ from uuid import uuid4
 from copy import copy
 from functools import wraps
 from itertools import chain
-from collections import Mapping, namedtuple, OrderedDict
-from types import GeneratorType
+from collections import Mapping, namedtuple, OrderedDict, Iterable
+from types import GeneratorType, MappingProxyType
 
 from .exceptions import TagError
 
 
 class _ChildElement():
-    """
-    Wrapper used to manage element insertion.
-    """
+    """Wrapper used to manage element insertion."""
+
     def __init__(self, name, obj):
         super().__init__()
         if not name and isinstance(obj, (DOMElement, Content)):
             name = obj._name
         self._name = name
         self.obj = obj
-        
+
 
 class DOMElement():
-    """
-    Takes care of the tree structure using the "childs" and "parent" attributes
+    """Takes care of the tree structure using the "childs" and "parent" attributes
     and manages the DOM manipulation with proper valorization of those two.
     """
+
     def __init__(self):
         super().__init__()
         self._name = None
@@ -66,7 +65,7 @@ class DOMElement():
         if self.parent:
             return self.parent.childs.index(self)
         return None
-    
+
     def _yield_items(self, items, kwitems, reverse=None):
         """
         Recursive generator, flattens the given items/kwargs. Returns index after flattening and a _ChildElement.
@@ -130,7 +129,8 @@ class DOMElement():
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
         try:
-            return self.content_data[cont_name]
+            a = self.content_data[cont_name]
+            return a
         except KeyError:
             if self.parent:
                 return self.parent._find_content(cont_name)
@@ -492,31 +492,45 @@ class Content():
     If no content with the same name is used, an empty string is rendered.
     If instantiated with the named attribute content, this will override all the content injection on parents.
     """
-    def __init__(self, name=None, content=None):
+    def __init__(self, name=None, content=None, template=None):
         super().__init__()
         self.parent = None
         self._tab_count = 0
         if not name and not content:
             raise TagError
         self._name = name
-        if content:
-            if type(content) in (list, tuple, GeneratorType): 
-                self._fixed_content = content
-            else:
-                self._fixed_content = (content, )
-        else:
-            self._fixed_content = None
+        self._fixed_content = content
+        self._template = template
 
     def __copy__(self):
-        return self.__class__(self._name, self._fixed_content)
+        return self.__class__(self._name, self._fixed_content, self._template)
 
     @property
     def content(self):
-        return self._fixed_content or self.parent._find_content(self._name)
+        content = self._fixed_content or self.parent._find_content(self._name)
+        if content:
+            if type(content) in (list, tuple, GeneratorType) or (isinstance(content,Iterable) and content is not str):
+                return list(content)
+            elif type(content) in (MappingProxyType, ):
+                return list(content.values())
+            else:
+                return (content, )
+        else:
+            raise StopIteration
 
     @property
     def length(self):
         return len(self.content)
 
     def render(self, pretty=False):
-        return ' '.join(child.render(pretty) if isinstance(child, DOMElement) else str(child) for child in self.content) 
+        ret = []
+        for content in self.content:
+            if isinstance(content, DOMElement):
+                ret.append(content.render(pretty))
+            else:
+                if self._template:
+                    self._template.inject(content)
+                    ret.append(self._template.inject(content).render())
+                else:
+                    ret.append(str(content))
+        return ''.join(ret)
