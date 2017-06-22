@@ -186,11 +186,12 @@ container_div.slice()
 Any contribution is welcome. Fork and PR if you have some ideas you want to code in.
 PM me if you want to help maintaining or coding.
 Next steps of development:
+- Performance.
 - Implement math operators for DOMElement i.e: Div() += Div() add the latter as a child.
 - Writing more tests.
-- Improve .find method.
-- Pretty print
-- To make everything an xml and use lxml.cssselect or to not change everything, here's the dilemma.
+- Adding .find method?
+- Pretty printing?
+- Content retrival caching?
 - New module: "css builder" extracts the style properties from content, and creates the css file with the correct selector.
 - Cache for css builder module
 - Any suggestion?
