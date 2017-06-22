@@ -2,8 +2,9 @@
 import os
 import json
 import cProfile, pstats, io
+from pprint import pprint
 from flask import Flask, render_template
-from playground_templates.sw import page, character
+from playground_templates.sw import page
 
 
 app = Flask(__name__)
@@ -15,7 +16,7 @@ with open('sw-people.json', 'r') as f:
 def tempy_handler():
     # pr = cProfile.Profile()
     # pr.enable()
-    page.body(character(people))
+    page.body.inject(charachters = people.values())
     rend = page.render()
     # pr.disable()
     # s = io.StringIO()
