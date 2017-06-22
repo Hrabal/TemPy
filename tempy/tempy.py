@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-@author: Federico Cerchiari <federicocerchiari@gmail.com>
-"""
+# @author: Federico Cerchiari <federicocerchiari@gmail.com>
 from uuid import uuid4
 from copy import copy
 from functools import wraps
@@ -24,8 +22,8 @@ class _ChildElement():
 
 
 class DOMElement():
-    """Takes care of the tree structure using the "childs" and "parent" attributes
-    and manages the DOM manipulation with proper valorization of those two.
+    """Takes care of the tree structure using the "childs" and "parent" attributes.
+    Manages the DOM manipulation with proper valorization of those two.
     """
 
     def __init__(self):
@@ -55,7 +53,7 @@ class DOMElement():
         return x in self.childs
 
     def __copy__(self):
-        new = self.__class__()(child.clone() if isinstance(child, DOMElement) else child for child in self.childs).remove()
+        new = self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
         if hasattr(new, 'attrs'):
             new.attrs = self.attrs
         return new
@@ -68,8 +66,9 @@ class DOMElement():
 
     def _yield_items(self, items, kwitems, reverse=None):
         """
-        Recursive generator, flattens the given items/kwargs. Returns index after flattening and a _ChildElement.
-        reverse parameter inverts the yielding.
+        Recursive generator, flattens the given items/kwargs.
+        Returns index after flattening and a _ChildElement.
+        "reverse" parameter inverts the yielding.
         """
         unnamed = (_ChildElement(None, item) for item in items)
         named = (_ChildElement(k, v) for k, v in kwitems.items())
@@ -456,9 +455,18 @@ class Tag(DOMElement):
                 texts.append(child)
         return ''.join(texts)
 
-    def render(self, pretty=False):
+    def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
-        prettying = '\t' * self._tab_count + '\n'  # TODO: we're ugly, prettifying don't work
+        pretty = kwargs.pop('pretty', None)
+        prettying = '\t' * self._tab_count + '\n'
+
+        # args kwargs API provided for last minute content injection
+        for arg in args:
+            if isinstance(arg, dict):
+                self.inject(arg)
+        if kwargs:
+            self.inject(kwargs)
+
         tag_data = {
             'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
             'attrs': self.attrs.render()
@@ -509,7 +517,7 @@ class Content():
     def content(self):
         content = self._fixed_content or self.parent._find_content(self._name)
         if content:
-            if type(content) in (list, tuple, GeneratorType) or (isinstance(content,Iterable) and content is not str):
+            if type(content) in (list, tuple, GeneratorType) or (isinstance(content, Iterable) and content is not str):
                 return list(content)
             elif type(content) in (MappingProxyType, ):
                 return list(content.values())
