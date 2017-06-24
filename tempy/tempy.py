@@ -34,6 +34,15 @@ class DOMElement():
         self.content_data = {}
         self.uuid = uuid4()
 
+    def __repr__(self):
+        return '<{0}.{1} {2}. Son of {3}. Childs: {4}. Named \'{5}\'>'.format(
+            self.__module__,
+            type(self).__name__,
+            self.uuid,
+            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
+            len(self.childs),
+            self._name) 
+
     def __hash__(self):
         return self.uuid
 
@@ -360,6 +369,13 @@ class Tag(DOMElement):
         self._tab_count = 0
         super().__init__()
 
+    def __repr__(self):
+        css_repr = '{}{}'.format(
+            ' .css_class {}'.format(self.attrs['klass']) if 'klass' in self.attrs else '',
+            ' .css_id {}'.format(self.attrs['id']) if 'id' in self.attrs else '',
+            )
+        return super().__repr__()[:-1] + '{}>'.format(css_repr)
+
     @property
     def length(self):
         """Returns the number of childs."""
@@ -509,6 +525,15 @@ class Content():
         self._name = name
         self._fixed_content = content
         self._template = template
+        self.uuid = uuid4()
+
+    def __repr__(self):
+        return '<{0}.{1} {2}. Son of {3}. Named \'{4}\'>'.format(
+            self.__module__,
+            type(self).__name__,
+            self.uuid,
+            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
+            self._name) 
 
     def __copy__(self):
         return self.__class__(self._name, self._fixed_content, self._template)
