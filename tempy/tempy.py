@@ -102,9 +102,22 @@ class DOMElement:
             else:
                 yield i, item
 
-    def content_receiver(reverse=False):
+    def modifier(self):
+        """Decorator for content adding methods.
+        Takes args and kwargs and calls the decorated method one time for each argument provided.
+        The reverse parameter should be used for prepending (relative to self) methods.
         """
-        Decorator for content adding methods.
+        def _modify(func):
+            @wraps(func)
+            def wrapped(inst, *args, **kwargs):
+                ret = func(*args, **kwargs)
+                inst._stable = False
+                return ret
+            return wrapped
+        return _modify
+
+    def content_receiver(reverse=False):
+        """Decorator for content adding methods.
         Takes args and kwargs and calls the decorated method one time for each argument provided.
         The reverse parameter should be used for prepending (relative to self) methods.
         """
@@ -118,8 +131,7 @@ class DOMElement:
         return _receiver
 
     def _insert(self, child, idx=None, prepend=False):
-        """
-        Inserts something inside this element.
+        """Inserts something inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
         If the child is a DOMElement, correctly links the child.
         If a name is provided, an attribute containing the child is created in this instance.
@@ -387,6 +399,7 @@ class Tag(DOMElement):
             raise TagError()
         self.attr(**kwargs)
         self._tab_count = 0
+        self._stable = True
         super().__init__()
 
     def __repr__(self):
@@ -403,11 +416,18 @@ class Tag(DOMElement):
 
     @property
     def index(self):
-        """
-        Returns the position of this element in the parent's childs list.
+        """Returns the position of this element in the parent's childs list.
         If the element have no parent, returns None.
         """
         return self._own_index
+
+    @property
+    def stable(self):
+        if min(c.stable for c in self.childs) and self._stable:
+            return self._stable
+        else:
+            self._stable = False
+            return self._stable
 
     def attr(self, attrs=None, **kwargs):
         """Add an attribute to the element"""
@@ -493,9 +513,6 @@ class Tag(DOMElement):
 
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
-        pretty = kwargs.pop('pretty', None)
-        prettying = '\t' * self._tab_count + '\n'
-
         # args kwargs API provided for last minute content injection
         for arg in args:
             if isinstance(arg, dict):
@@ -503,22 +520,23 @@ class Tag(DOMElement):
         if kwargs:
             self.inject(kwargs)
 
+        # If the tag or his contents are not changed, we skip work
+        if self._stable and self._render:
+            return self._render
+
         tag_data = {
             'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
             'attrs': self.attrs.render()
         }
-        if not self._void:
-            tag_data['inner'] = self._render_childs(pretty)
-        template = self._template + prettying if pretty else self._template
-        return template.format(**tag_data)
+        if not self._void and self.childs:
+            tag_data['inner'] = self._get_child_renders()
 
-    def _render_childs(self, pretty):
-        return ''.join(child.render(pretty) if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs)
+        # We declare the tag is stable and have an official render:
+        self._render = self._template.format(**tag_data)
+        return self._render
 
-    def is_a(self, pattern):
-        # TODO
-        # return true if self == pattern
-        pass
+    def _get_child_renders(self):
+        return ''.join(child.render() if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs)
 
 
 class VoidTag(Tag):
@@ -546,6 +564,7 @@ class Content:
         self._fixed_content = content
         self._template = template
         self.uuid = uuid4()
+        self.stable = True
 
     def __repr__(self):
         return '<{0}.{1} {2}. Son of {3}. Named \'{4}\'>'.format(
