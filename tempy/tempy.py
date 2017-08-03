@@ -4,13 +4,15 @@ from uuid import uuid4
 from copy import copy
 from functools import wraps
 from itertools import chain
-from collections import Mapping, namedtuple, OrderedDict, Iterable
+from collections import Mapping, OrderedDict, Iterable
 from types import GeneratorType, MappingProxyType
+
+from networkx import DiGraph
 
 from .exceptions import TagError
 
 
-class _ChildElement():
+class _ChildElement:
     """Wrapper used to manage element insertion."""
 
     def __init__(self, name, obj):
@@ -21,7 +23,7 @@ class _ChildElement():
         self.obj = obj
 
 
-class DOMElement():
+class DOMElement:
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
@@ -33,6 +35,7 @@ class DOMElement():
         self.parent = None
         self.content_data = {}
         self.uuid = uuid4()
+
 
     def __repr__(self):
         return '<{0}.{1} {2}. Son of {3}. Childs: {4}. Named \'{5}\'>'.format(
@@ -289,13 +292,30 @@ class DOMElement():
         """Slice of this element's childs as childs[start:end:step]"""
         return self.childs[start:end:step]
 
-    def has(self, pattern):
-        # TODO
-        # return pattern in self.childs
-        pass
-
-    def find(self, id=None, klass=None, tag=None):
-        pass
+    def _dfs_tags(self):
+        """Iterate the element inner content, in reverse depth-first.
+         Used to render the tags from the childmost ones to the root.
+        """
+        # Based on http://www.ics.uci.edu/~eppstein/PADS/DFS.py
+        # by D. Eppstein, July 2004.
+        visited = set()
+        for start in self.childs:
+            if start not in visited:
+                visited.add(start)
+                stack = [(start, start.childs)]
+                while stack:
+                    parent, children = stack[-1]
+                    try:
+                        child = next(children)
+                        if child not in visited:
+                            visited.add(child)
+                            stack.append((child, child.childs))
+                    except StopIteration:
+                        stack.pop()
+                        if stack:
+                            yield stack[-1][0]
+                yield start
+        yield self
 
 
 class TagAttrs(dict):
@@ -509,7 +529,7 @@ class VoidTag(Tag):
     _template = '<{tag}{attrs}/>'
 
 
-class Content():
+class Content:
     """
     Provides the ability to use a simil-tag object as content placeholder.
     At render time, a content with the same name is searched in parents, the nearest one is used.
