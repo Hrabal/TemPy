@@ -7,8 +7,6 @@ from itertools import chain
 from collections import Mapping, OrderedDict, Iterable
 from types import GeneratorType, MappingProxyType
 
-from networkx import DiGraph
-
 from .exceptions import TagError
 
 
@@ -310,23 +308,20 @@ class DOMElement:
         """
         # Based on http://www.ics.uci.edu/~eppstein/PADS/DFS.py
         # by D. Eppstein, July 2004.
-        visited = set()
-        for start in self.childs:
-            if start not in visited:
-                visited.add(start)
-                stack = [(start, start.childs)]
-                while stack:
-                    parent, children = stack[-1]
-                    try:
-                        child = next(children)
-                        if child not in visited:
-                            visited.add(child)
-                            stack.append((child, child.childs))
-                    except StopIteration:
-                        stack.pop()
-                        if stack:
-                            yield stack[-1][0]
-                yield start
+        given = set()
+        stack = copy(self.childs)
+        while stack:
+            # print(stack)
+            tag = stack.pop()
+            if not tag.childs:
+                given.add(tag)
+                yield tag
+            else:
+                if set(tag.childs).issubset(given):
+                    given.add(tag)
+                    yield tag
+                else:
+                    stack += list(set(tag.childs) - given)
         yield self
 
 
