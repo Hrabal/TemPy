@@ -224,9 +224,10 @@ class DOMElement:
 
     def replace_with(self, other):
         """Replace this element with the given DOMElement."""
-        # TODO: make multiple with content_receiver
         if isinstance(other, DOMElement):
             self = other
+        elif isinstance(other, (GeneratorType, Iterable)):
+            self.parent.childs[self._own_index: self._own_index + 1] = list(other)
         else:
             raise TagError()
         return self
