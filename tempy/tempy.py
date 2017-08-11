@@ -606,3 +606,59 @@ class Content:
                 else:
                     ret.append(str(content))
         return ''.join(ret)
+
+
+class Css(Tag):
+    """Special class for the style tag.
+    Css attributes can be altered with the .attr Tag api. At render time the attr dict is transformed in valid css:
+    Css({'html': {
+            'body': {
+                'color': 'red',
+                'div': {
+                    'color': 'green',
+                    'border': '1px'
+                }
+            }
+        },
+        '#myid': {'color': 'blue'}
+    }
+    translates to:
+    <style>
+    html body {
+        color: red;
+    }
+
+    html body div {
+        color: green;
+        border: 1px;
+    }
+    #myid {
+        'color': 'blue';
+    }
+    </style>
+    """
+    _template = '<style>{css}</style>'
+
+    def render(self, *args, **kwargs):
+        pretty = kwargs.pop('pretty', False)
+        result = []
+        nodes_to_parse = [([], self.attrs)]
+
+        while nodes_to_parse:
+            parents, node = nodes_to_parse.pop(0)
+            if parents:
+                result.append("%s { " % " ".join(parents))
+            else:
+                parents = []
+
+            for key, value in node.items():
+                if value.__class__.__name__ in ('str', 'unicode'):
+                    result.append('%s: %s; %s' % (key, value, "\n" if pretty else ""))
+                elif value.__class__.__name__ == 'function':
+                   result.append('%s: %s; %s' % (key, value(),"\n" if pretty else ""))
+                elif value.__class__.__name__ == 'dict':
+                    nodes_to_parse.append(([p for p in parents ] + [key], value))
+            if result:
+                result.append("}" + "\n\n" if pretty else "")
+
+        return self._template.format(css=''.join(result))
