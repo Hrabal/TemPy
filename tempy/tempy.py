@@ -34,7 +34,6 @@ class DOMElement:
         self.content_data = {}
         self.uuid = uuid4()
 
-
     def __repr__(self):
         return '<{0}.{1} {2}. Son of {3}. Childs: {4}. Named \'{5}\'>'.format(
             self.__module__,
@@ -74,31 +73,30 @@ class DOMElement:
             return self.parent.childs.index(self)
         return None
 
-    def _yield_items(self, items, kwitems, reverse=None):
+    def _yield_items(self, items, kwitems, reverse=False):
         """
-        Recursive generator, flattens the given items/kwargs.
+        Recursive generator, flattens the given items/kwitems.
         Returns index after flattening and a _ChildElement.
         "reverse" parameter inverts the yielding.
         """
-        unnamed = (_ChildElement(None, item) for item in items)
-        named = (_ChildElement(k, v) for k, v in kwitems.items())
-        contents = (items, kwitems)
-        if reverse:
-            contents = (OrderedDict(list(kwitems.items())[::-1]), items[::-1])
-        for i, item in enumerate(chain(unnamed, named)):
+        verse = (1,0)[reverse]
+        unnamed = (_ChildElement(None, item) for item in items[::verse])
+        named = (_ChildElement(k, v) for k, v in list(kwitems.items())[::verse])
+        contents = (unnamed, named)[::verse]
+        for i, item in enumerate(chain(*contents)):
             if type(item.obj) in (list, tuple, GeneratorType):
                 if item._name:
                     # TODO: implement tag named containers
                     # Happens when iterable in kwitems
                     # i.e: d = Div(paragraphs=[P() for _ in range(5)])
                     # d.paragraphs -> [P(), P(), P()...]
-                    yield i, item
+                    yield i, item.obj
                 else:
                     yield from self._yield_items(item.obj, {})
             elif isinstance(item.obj, DOMElement):
-                yield i, item
+                yield i, item.obj
             else:
-                yield i, item
+                yield i, item.obj
 
     def modifier(self):
         """Decorator for content adding methods.
@@ -140,12 +138,11 @@ class DOMElement:
             idx = 0
         else:
             idx = idx if idx is not None else len(self.childs)
-        self.childs.insert(idx, child.obj)
-        if isinstance(child.obj, (DOMElement, Content)):
-            child.obj.parent = self
-            child.obj._tab_count = self._tab_count + 1
-        if child._name:
-            setattr(self, child._name, child.obj)
+        self.childs.insert(idx, child)
+        if isinstance(child, (DOMElement, Content)):
+            child.parent = self
+            if child._name:
+                setattr(self, child._name, child)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -312,7 +309,6 @@ class DOMElement:
         given = set()
         stack = copy(self.childs)
         while stack:
-            # print(stack)
             tag = stack.pop()
             if not tag.childs:
                 given.add(tag)
@@ -322,8 +318,13 @@ class DOMElement:
                     given.add(tag)
                     yield tag
                 else:
+                    stack.append(tag)
                     stack += list(set(tag.childs) - given)
         yield self
+
+    def render(self, *args, **kwargs):
+        """Placeholder for subclass implementation"""
+        raise NotImplementedError
 
 
 class TagAttrs(dict):
@@ -344,7 +345,7 @@ class TagAttrs(dict):
         'typ': 'type'
     }
     _FORMAT = {
-        'style': lambda x: ' '.join('{}: {};'.format(k, v) for k, v in x.items()),
+        'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
         'typ': lambda x: ' '.join(x),
         'comment': lambda x: x
@@ -375,8 +376,7 @@ class TagAttrs(dict):
             # Special case for the comment tag
             return self._comment
         else:
-            return ''.join(' {}="{}"'.format(self._SPECIALS.get(k, k),
-                                             self._FORMAT.get(k, lambda x: x)(v))
+            return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))
                            for k, v in self.items() if v)
 
 
@@ -385,18 +385,21 @@ class Tag(DOMElement):
     Provides an api for tag inner manipulation and for rendering.
     """
     _template = '<{tag}{attrs}>{inner}</{tag}>'
-    _needed = None
+    _needed_kwargs = None
     _void = False
 
     def __init__(self, **kwargs):
         self.attrs = TagAttrs()
         self.data = {}
-        if self._needed and not set(self._needed).issubset(set(kwargs)):
+        if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
             raise TagError()
         self.attr(**kwargs)
         self._tab_count = 0
-        self._stable = True
+        self._render = None
+        self._stable = False
         super().__init__()
+        if self._void:
+            self._render = self.render()
 
     def __repr__(self):
         css_repr = '{}{}'.format(
@@ -419,7 +422,8 @@ class Tag(DOMElement):
 
     @property
     def stable(self):
-        if min(c.stable for c in self.childs) and self._stable:
+        if all(c.stable for c in self.childs) and self._stable:
+            self._stable = True
             return self._stable
         else:
             self._stable = False
@@ -493,7 +497,7 @@ class Tag(DOMElement):
 
     def html(self):
         """Renders the inner html of this element."""
-        return self._render_childs()
+        return self._get_child_renders()
 
     def text(self):
         """Renders the contents inside this element, without html tags."""
@@ -516,19 +520,19 @@ class Tag(DOMElement):
         if kwargs:
             self.inject(kwargs)
 
-        # If the tag or his contents are not changed, we skip work
+        # If the tag or his contents are not changed, we skip all the work
         if self._stable and self._render:
             return self._render
 
         tag_data = {
-            'tag': getattr(self, '_{}__tag'.format(self.__class__.__name__)),
+            'tag': getattr(self, '_%s__tag' % self.__class__.__name__),
             'attrs': self.attrs.render()
         }
-        if not self._void and self.childs:
-            tag_data['inner'] = self._get_child_renders()
+        tag_data['inner'] = self._get_child_renders()  if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
+        self._stable = True
         return self._render
 
     def _get_child_renders(self):
@@ -560,7 +564,7 @@ class Content:
         self._fixed_content = content
         self._template = template
         self.uuid = uuid4()
-        self.stable = True
+        self.stable = False
 
     def __repr__(self):
         return '<{0}.{1} {2}. Son of {3}. Named \'{4}\'>'.format(
