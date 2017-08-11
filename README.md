@@ -1,4 +1,4 @@
-# TemPy
+# **TemPy**
 ### Fast Object-Oriented Html templating with no html involved!
 
 ### What
@@ -16,10 +16,7 @@ See below for benchmarks.
 
 ## Build, manipulate, and navigate HTML documents. With no HTML involved.
 
-
-# Usage:
-
-
+# Usage
 ### Basic Templating
 
 TemPy offers a rather clean syntax for building pages in pure python:
@@ -191,5 +188,5 @@ Here are a few benchmarks of Tempy in action.
 
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.
-Any contribution is welcome. Please refer to [CONTRIBUTE.md](CONTRIBUTE.md).
+Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 ### Apache 2.0 license, see LICENSE for details.
