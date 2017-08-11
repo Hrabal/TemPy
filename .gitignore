@@ -1,5 +1,4 @@
 *.pyc
 *.sublime-*
-static_playground.py
-web_playground.py
+playground/*.*
 *.json
