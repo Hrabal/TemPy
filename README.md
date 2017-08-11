@@ -1,4 +1,4 @@
-# **TemPy**
+# TemPy
 ### Fast Object-Oriented Html templating with no html involved!
 
 ### What
@@ -14,7 +14,7 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 Tempy is also very fast compared to other templating engines. No parsing and a simple structure makes it fast.
 See below for benchmarks.
 
-## Build, manipulate, and navigate HTML documents. With no HTML involved.
+**Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
 # Usage
 ### Basic Templating
@@ -123,7 +123,7 @@ div2.css('background-color', 'blue')
 >>> <div id="another_dom_id" class="someHtmlClass comeOtherClass" style="width: 100px; float: left; height: 100em; background-color: blue"></div>
 ```
 
-### "Navigating the DOM"
+### DOM navigation
 
 Every TemPy Tag content is iterable and accessible just like a Python list:
 ```python
