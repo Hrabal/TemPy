@@ -185,11 +185,11 @@ container_div.parent()
 container_div.slice()
 ```
 
-## Performance
+# Performance
 Performance of a templating system varies considerably depending on the complexity of the rendered content, the amount of dynamic content on the page etc..
 Here are a few benchmarks of Tempy in action.
 
-## Made and Mantained by Federico Cerchiari / Hrabal
+## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.
 Any contribution is welcome. Please refer to [CONTRIBUTE.md](CONTRIBUTE.md).
 ### Apache 2.0 license, see LICENSE for details.
