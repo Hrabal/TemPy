@@ -1,5 +1,5 @@
 # TemPy
-### Html templating with no html involved!
+### Fast Object-Oriented Html templating with no html involved!
 
 ### What
 Build HTML without writing a single tag.
@@ -10,13 +10,17 @@ HTML is like SQL: we all use it, we know it works, we all recognize it's importa
 Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
 ..so the idea of TemPy.
 
+### Weeeeeeee!
+Tempy is also very fast compared to other templating engines. No parsing and a simple structure makes it fast.
+See below for banchmarks.
+
 ## Build, manipulate, and navigate HTML documents. With no HTML involved.
 
 
 # Usage:
 
 
-## Basic Templating
+### Basic Templating
 
 TemPy offers a rather clean syntax for building pages in pure python:
 ```
@@ -66,7 +70,7 @@ def mycontroller():
     return page.container.append(content)
 ```
 
-## Elements creation and removal
+### Elements creation and removal
 You can create a DOM elements instantiating tags:
 ```
 page = Html()
@@ -122,7 +126,7 @@ div2.css('background-color', 'blue')
 >>> <div id="another_dom_id" class="someHtmlClass comeOtherClass" style="width: 100px; float: left; height: 100em; background-color: blue"></div>
 ```
 
-## "Navigating the DOM"
+### "Navigating the DOM"
 
 Every TemPy Tag content is iterable and accessible just like a Python list:
 ```
@@ -181,11 +185,16 @@ container_div.parent()
 container_div.slice()
 ```
 
+## Performance
+Performance of a templating system varies considerably depending on the complexity of the rendered content, the amount of dynamic content on the page etc..
+Here are a few benchmarks of Tempy in action.
+
 ## Made and Mantained by Federico Cerchiari / Hrabal
 ### Contribute.
 Any contribution is welcome. Fork and PR if you have some ideas you want to code in.
 PM me if you want to help maintaining or coding.
 Next steps of development:
+- manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template)
 - Performance.
 - Implement math operators for DOMElement i.e: Div() += Div() add the latter as a child.
 - Writing more tests.
