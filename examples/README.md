@@ -6,7 +6,7 @@ python3 tempy_examples.py
 
 Links to each template code:
 - Simple examples
-  - **Hello World** - it is what it seems
+  - **Hello World** - It is what it seems, a complete html hello world page, whoa!
   - **Passing content** - Variables are good, let's use them!
   - **Rendering lists** - aka looping
   - **Content injection** - it's a bird, it's a context!
