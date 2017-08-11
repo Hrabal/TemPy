@@ -10,6 +10,7 @@ Open an Issue to ask for features, suggest ideas, or report a bug.
 
 ### Program
 Planned evolution of this project:
+- Better exception handling.
 - Python 2 compatibility.
 - Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
 - Make pretty formatting of the output html.
