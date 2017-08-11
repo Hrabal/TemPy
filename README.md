@@ -12,7 +12,7 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 
 ### Weeeeeeee!
 Tempy is also very fast compared to other templating engines. No parsing and a simple structure makes it fast.
-See below for banchmarks.
+See below for benchmarks.
 
 ## Build, manipulate, and navigate HTML documents. With no HTML involved.
 
@@ -23,7 +23,7 @@ See below for banchmarks.
 ### Basic Templating
 
 TemPy offers a rather clean syntax for building pages in pure python:
-```
+```python
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 page = Html()(
     Head()(
@@ -54,7 +54,7 @@ page = Html()(
 ```
 
 You can also create blocks and put them togheter using the manipulation api:
-```
+```python
 # basic_template.py
 from somewhere import links, foot_imgs
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
@@ -72,18 +72,18 @@ def mycontroller():
 
 ### Elements creation and removal
 You can create a DOM elements instantiating tags:
-```
+```python
 page = Html()
 >>> <html></html>
 ```
 
 You can then add elements or content calling them (just like a function)...
-```
+```python
 page(Head())
 >>> <html><head></head></html>
 ```
 ..or you can use one of the jQuery-like apis:
-```
+```python
 body = Body()
 page.append(body)
 >>> <html><head></head><body></body></html>
@@ -94,7 +94,7 @@ div.append('This is some content', Br(), 'And some Other')
 >>> <html><head></head><body><div>This is some content<br>And some Other</div></body></html>
 ```
 ..same for removing:
-```
+```python
 head.remove()
 >>> <html><body><div></div></body></html>
 body.empty()
@@ -108,7 +108,7 @@ All the main jQuery manipulating apis are provided.
 
 ## Attributes attribuition 
 You can add attributes to every element at definition time or later:
-```
+```python
 div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
 
@@ -119,7 +119,7 @@ a.attr({'href': 'www.thisisalink.com'})
 ```
 
 Also style is editable in the jQuery fashion:
-```
+```python
 div2.css(width='100px', float='left')
 div2.css({'height': '100em'})
 div2.css('background-color', 'blue')
@@ -129,7 +129,7 @@ div2.css('background-color', 'blue')
 ### "Navigating the DOM"
 
 Every TemPy Tag content is iterable and accessible just like a Python list:
-```
+```python
 divs = [Div(id=div, klass='inner') for div in range(10)]
 ps = (P() for _ in range(10))
 container_div = Div()(divs)
@@ -164,7 +164,7 @@ container_div[0][4].attr(id='pId')
 ```
 
 ..or if you give a name to the element when adding it to his container you can access it by name, as if it's a container's attribute:
-```
+```python
 container_div = Div()
 container_div(content_div=Div())
 
@@ -174,7 +174,7 @@ container_div.content_div('Some content')
 
 
 ..or if you feel jQuery-ish you can use:
-```
+```python
 container_div.children()
 container_div.first()
 container_div.last()
@@ -191,17 +191,5 @@ Here are a few benchmarks of Tempy in action.
 
 ## Made and Mantained by Federico Cerchiari / Hrabal
 ### Contribute.
-Any contribution is welcome. Fork and PR if you have some ideas you want to code in.
-PM me if you want to help maintaining or coding.
-Next steps of development:
-- manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template)
-- Performance.
-- Implement math operators for DOMElement i.e: Div() += Div() add the latter as a child.
-- Writing more tests.
-- Adding .find method?
-- Pretty printing?
-- Content retrival caching?
-- New module: "css builder" extracts the style properties from content, and creates the css file with the correct selector.
-- Cache for css builder module
-- Any suggestion?
+Any contribution is welcome. Please refer to [CONTRIBUTE.md](CONTRIBUTE.md).
 ### Apache 2.0 license, see LICENSE for details.
