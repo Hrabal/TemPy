@@ -34,7 +34,7 @@ page = Html()(
         ),
         (P()(text) for text in my_text_list)
     )
-).render(pretty=True)
+).render()
 >>> <html>
 >>>     <head>
 >>>         <meta charset="utf-8"/>
