@@ -1,26 +1,25 @@
 # TemPy
 ![TemPy Logo](tempy.png)
-### Fast Object-Oriented Html templating with no html involved!
+### Fast Object-Oriented HTML templating With Python!
 
 ### What
 Build HTML without writing a single tag.
-TemPy lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also navigating the DOM and manipulating tags is possible in a Python or jQuery-similar sintax.
+TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar sintax.
 
 ### Why?
-HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write asingle line of it anymore. For SQL we have ORM's, for HTML we're not there yet.
+HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
 Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
 ..so the idea of TemPy.
 
 ### Weeeeeeee!
-Tempy is also very fast compared to other templating engines. No parsing and a simple structure makes it fast.
-See below for benchmarks.
+No parsing and a simple structure makes TemPy fast. See below for benchmarks against other templating engines.
 
 **Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
 # Usage
 ### Basic Templating
 
-TemPy offers a rather clean syntax for building pages in pure python:
+TemPy offers clean syntax for building pages in pure python:
 ```python
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 page = Html()(
@@ -51,7 +50,7 @@ page = Html()(
 >>> </html>
 ```
 
-You can also create blocks and put them togheter using the manipulation api:
+You can also create blocks and put them together using the manipulation api:
 ```python
 # basic_template.py
 from somewhere import links, foot_imgs
@@ -69,18 +68,18 @@ def mycontroller():
 ```
 
 ### Elements creation and removal
-You can create a DOM elements instantiating tags:
+Create DOM elements by instantiating tags:
 ```python
 page = Html()
 >>> <html></html>
 ```
 
-You can then add elements or content calling them (just like a function)...
+Add elements or content by calling them like a function...
 ```python
 page(Head())
 >>> <html><head></head></html>
 ```
-..or you can use one of the jQuery-like apis:
+...or use one of the jQuery-like apis:
 ```python
 body = Body()
 page.append(body)
@@ -91,7 +90,7 @@ div = Div().append_to(body)
 div.append('This is some content', Br(), 'And some Other')
 >>> <html><head></head><body><div>This is some content<br>And some Other</div></body></html>
 ```
-..same for removing:
+...same for removing:
 ```python
 head.remove()
 >>> <html><body><div></div></body></html>
@@ -105,7 +104,7 @@ All the main jQuery manipulating apis are provided.
 
 
 ## Tag Attributes 
-You can add attributes to every element at definition time or later:
+Add attributes to every element at definition time or later:
 ```python
 div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
@@ -116,7 +115,7 @@ a.attr({'href': 'www.thisisalink.com'})
 >>> <a id="another_dom_id" class="someHtmlClass" href="www.thisisalink.com">text of this link</a>
 ```
 
-Also style is editable in the jQuery fashion:
+Styles are editable in the jQuery fashion:
 ```python
 div2.css(width='100px', float='left')
 div2.css({'height': '100em'})
@@ -126,7 +125,7 @@ div2.css('background-color', 'blue')
 
 ### DOM navigation
 
-Every TemPy Tag content is iterable and accessible just like a Python list:
+Every TemPy Tag content is iterable and accessible like a Python list:
 ```python
 divs = [Div(id=div, klass='inner') for div in range(10)]
 ps = (P() for _ in range(10))
@@ -161,7 +160,7 @@ container_div[0][4].attr(id='pId')
 >>> </div>
 ```
 
-..or if you give a name to the element when adding it to his container you can access it by name, as if it's a container's attribute:
+...or access elements inside a container as if it they were attributes:
 ```python
 container_div = Div()
 container_div(content_div=Div())
@@ -184,11 +183,11 @@ container_div.slice()
 ```
 
 # Performance
-Performance of a templating system varies considerably depending on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
+Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
 
-TemPy does not make any parsing, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks (i.e: Jinja2/Mako/etc).
+TemPy does parse, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
-Here are a few benchmarks of Tempy in action, rendering a template with a single for loop (see code [here](benchmarks))
+Here are a few benchmarks of TemPy in action, rendering a template with a single for loop (see code [here](benchmarks))
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
 
