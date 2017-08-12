@@ -1,4 +1,5 @@
 # TemPy
+![TemPy Logo](tempy.png)
 ### Fast Object-Oriented Html templating with no html involved!
 
 ### What
