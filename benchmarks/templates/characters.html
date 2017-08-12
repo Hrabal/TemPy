@@ -1,0 +1,19 @@
+{% extends "j2_sw.html" %}
+{% block content %}
+<div>
+{% for _, p in people.items() %}
+  <b>{{ p['name'] }}</b>
+	<p>height: {{ p['height'] }}</p>
+	<p>mass: {{ p['mass'] }}</p>
+	<p>hair_color: {{ p['hair_color'] }}</p>
+	<p>skin_color: {{ p['skin_color'] }}</p>
+	<p>eye_color: {{ p['eye_color'] }}</p>
+	<p>birth_year: {{ p['birth_year'] }}</p>
+	<p>gender: {{ p['gender'] }}</p>
+	<p>homeworld: {{ p['homeworld'] }}</p>
+	<p>created: {{ p['created'] }}</p>
+	<p>edited: {{ p['edited'] }}</p>
+	<p>url: {{ p['url'] }}</p>
+{% endfor %}
+</div>
+{% endblock %}
