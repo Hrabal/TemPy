@@ -188,7 +188,7 @@ Performance of a templating system varies considerably depending on the complexi
 
 TemPy does not make any parsing, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks (i.e: Jinja2/Mako/etc).
 
-Here are a few benchmarks of Tempy in action, rendering a template with a single for loop (see code [here]())
+Here are a few benchmarks of Tempy in action, rendering a template with a single for loop (see code [here](benchmarks))
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
 
