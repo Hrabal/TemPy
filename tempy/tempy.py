@@ -62,7 +62,7 @@ class DOMElement:
         return x in self.childs
 
     def __copy__(self):
-        new = self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
+        new = self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else cfor c in self.childs)
         if hasattr(new, 'attrs'):
             new.attrs = self.attrs
         return new
@@ -79,7 +79,7 @@ class DOMElement:
         Returns index after flattening and a _ChildElement.
         "reverse" parameter inverts the yielding.
         """
-        verse = (1,0)[reverse]
+        verse = (1, 0)[reverse]
         unnamed = (_ChildElement(None, item) for item in items[::verse])
         named = (_ChildElement(k, v) for k, v in list(kwitems.items())[::verse])
         contents = (unnamed, named)[::verse]
@@ -212,7 +212,7 @@ class DOMElement:
         if isinstance(other, DOMElement):
             self = other
         elif isinstance(other, (GeneratorType, Iterable)):
-            self.parent.childs[self._own_index: self._own_index + 1] = list(other)
+            self.parent.childs[self._own_index: self._own_index+1] = list(other)
         else:
             raise TagError()
         return self
@@ -367,7 +367,8 @@ class TagAttrs(dict):
             # Special case for the comment tag
             return self._comment
         else:
-            return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))
+            return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k),
+                                         self._FORMAT.get(k, lambda x: x)(v))
                            for k, v in self.items() if v)
 
 
@@ -393,9 +394,9 @@ class Tag(DOMElement):
             self._render = self.render()
 
     def __repr__(self):
-        css_repr = '{}{}'.format(
-            ' .css_class {}'.format(self.attrs['klass']) if 'klass' in self.attrs else '',
-            ' .css_id {}'.format(self.attrs['id']) if 'id' in self.attrs else '',
+        css_repr = '%s%s' % (
+            ' .css_class %s' % (self.attrs['klass']) if 'klass' in self.attrs else '',
+            ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
             )
         return super().__repr__()[:-1] + '{}>'.format(css_repr)
 
@@ -528,7 +529,7 @@ class Tag(DOMElement):
             'tag': getattr(self, '_%s__tag' % self.__class__.__name__),
             'attrs': self.attrs.render()
         }
-        tag_data['inner'] = self._get_child_renders()  if not self._void and self.childs else ''
+        tag_data['inner'] = self._get_child_renders() if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
@@ -655,9 +656,9 @@ class Css(Tag):
                 if value.__class__.__name__ in ('str', 'unicode'):
                     result.append('%s: %s; %s' % (key, value, "\n" if pretty else ""))
                 elif value.__class__.__name__ == 'function':
-                   result.append('%s: %s; %s' % (key, value(),"\n" if pretty else ""))
+                    result.append('%s: %s; %s' % (key, value(), "\n" if pretty else ""))
                 elif value.__class__.__name__ == 'dict':
-                    nodes_to_parse.append(([p for p in parents ] + [key], value))
+                    nodes_to_parse.append(([p for p in parents] + [key], value))
             if result:
                 result.append("}" + "\n\n" if pretty else "")
 
