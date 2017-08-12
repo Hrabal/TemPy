@@ -4,10 +4,10 @@
 
 ### What
 Build HTML without writing a single tag.
-TemPy lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also "navigating the DOM" and manipulating tags is possible in a Python or jQuery friendly sintax.
+TemPy lets you dynamically generate HTML and accessing it in pure Python or in a jQuery fashion. Also navigating the DOM and manipulating tags is possible in a Python or jQuery-similar sintax.
 
 ### Why?
-HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never use it anymore. For SQL we have ORM's, for HTML we're not there yet.
+HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write asingle line of it anymore. For SQL we have ORM's, for HTML we're not there yet.
 Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
 ..so the idea of TemPy.
 
@@ -32,7 +32,7 @@ page = Html()(
         Div(klass='linkBox')(
             A(href='www.foo.bar')
         ),
-        (P()(my_text_list[i]) for i in range(2))
+        (P()(text) for text in my_text_list)
     )
 ).render(pretty=True)
 >>> <html>
@@ -104,7 +104,7 @@ page.pop()
 All the main jQuery manipulating apis are provided.
 
 
-## Attributes attribuition 
+## Tag Attributes 
 You can add attributes to every element at definition time or later:
 ```python
 div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
