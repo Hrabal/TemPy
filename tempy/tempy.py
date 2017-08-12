@@ -41,7 +41,7 @@ class DOMElement:
             self.uuid,
             '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
             len(self.childs),
-            self._name) 
+            self._name)
 
     def __hash__(self):
         return self.uuid
@@ -98,20 +98,6 @@ class DOMElement:
             else:
                 yield i, item.obj
 
-    def modifier(self):
-        """Decorator for content adding methods.
-        Takes args and kwargs and calls the decorated method one time for each argument provided.
-        The reverse parameter should be used for prepending (relative to self) methods.
-        """
-        def _modify(func):
-            @wraps(func)
-            def wrapped(inst, *args, **kwargs):
-                ret = func(*args, **kwargs)
-                inst._stable = False
-                return ret
-            return wrapped
-        return _modify
-
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
         Takes args and kwargs and calls the decorated method one time for each argument provided.
@@ -121,6 +107,7 @@ class DOMElement:
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
                 for i, tag in inst._yield_items(tags, kwtags, reverse):
+                    inst._stable = False
                     func(inst, i, tag)
                 return inst
             return wrapped
@@ -161,6 +148,7 @@ class DOMElement:
         Adds content data in this element. This will be used in the rendering of this element's childs.
         Multiple injections on the same key will override the content (dict.update behavior).
         """
+        self._stable = False
         if not contents:
             contents = {}
         if kwargs:
@@ -239,10 +227,12 @@ class DOMElement:
         """Moves this element from his father to the given one."""
         self.parent.pop(i=self._own_index)
         new_father._insert(self._name, self, idx, prepend)
+        new_father._stable = False
         return self
 
     def pop(self, idx=None):
         """Removes the child at given position, if no position is given removes the last."""
+        self._stable = False
         if not idx:
             idx = len(self.childs) - 1
         elem = self.childs.pop(idx)
@@ -252,6 +242,7 @@ class DOMElement:
 
     def empty(self):
         """Remove all this tag's childs."""
+        self._stable = False
         map(lambda child: self.pop(child._own_index), self.childs)
         return self
 
@@ -431,26 +422,31 @@ class Tag(DOMElement):
 
     def attr(self, attrs=None, **kwargs):
         """Add an attribute to the element"""
+        self._stable = False
         self.attrs.update(attrs or kwargs)
         return self
 
     def remove_attr(self, attr):
         """Removes an attribute."""
+        self._stable = False
         self.attrs.pop(attr, None)
         return self
 
     def add_class(self, cssclass):
         """Adds a css class to this element."""
+        self._stable = False
         self.attrs['klass'].append(cssclass)
         return self
 
     def remove_class(self, cssclass):
         """Removes the given class from this element."""
+        self._stable = False
         self.attrs['klass'].remove(cssclass)
         return self
 
     def css(self, *props, **kwprops):
         """Adds css properties tho this element."""
+        self._stable = False
         styles = {}
         if props:
             if len(props) == 1 and isinstance(props[0], Mapping):
@@ -467,16 +463,19 @@ class Tag(DOMElement):
 
     def hide(self):
         """Adds the "display: none" style attribute."""
+        self._stable = False
         self.attrs['style']['display'] = None
         return self
 
     def show(self):
         """Removes the display style attribute."""
+        self._stable = False
         self.attrs['style'].pop('display')
         return self
 
     def toggle(self):
         """Same as jQuery's toggle, toggles the display attribute of this element."""
+        self._stable = False
         return self.show() if self.attrs['style']['display'] == None else self.hide()
 
     def data(self, key, value=None):
@@ -493,6 +492,7 @@ class Tag(DOMElement):
 
     def toggle_class(self, csscl):
         """Same as jQuery's toggleClass function. It toggles the css class on this element."""
+        self._stable = False
         return self.remove_class(csscl) if self.has_class(csscl) else self.add_class(csscl)
 
     def html(self):
@@ -572,7 +572,7 @@ class Content:
             type(self).__name__,
             self.uuid,
             '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
-            self._name) 
+            self._name)
 
     def __copy__(self):
         return self.__class__(self._name, self._fixed_content, self._template)
