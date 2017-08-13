@@ -14,7 +14,8 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 ..so the idea of TemPy.
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. See below for benchmarks against other templating engines.
+No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
+See below for benchmarks against other templating engines.
 
 **Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
@@ -78,8 +79,8 @@ footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
 
 # --- file: pages.py
 from base_elements import header, menu, footer
-# import the common blocks and use them inside your page
 
+# import the common blocks and use them inside your page
 home_page = Html()(Head(), Body()(header, menu, content='Hello world.', footer=footer))
 content_page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
 
@@ -136,7 +137,7 @@ All the main jQuery manipulating apis are provided.
 ## Tag Attributes 
 Add attributes to every element at definition time or later:
 ```python
-div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
+div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' because 'class' is a Python's buildin keyword
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
 
 a = A(klass='someHtmlClass')('text of this link')
@@ -162,7 +163,7 @@ ps = (P() for _ in range(10))
 container_div = Div()(divs)
 
 for i, div in enumerate(container_div):
-    div.attr(id='divId'+i)
+    div.attr(id='divId'+str(i))
 container_div[0].append(ps)
 container_div[0][4].attr(id='pId')
 >>> <div>
@@ -171,7 +172,7 @@ container_div[0][4].attr(id='pId')
 >>>         <p></p>
 >>>         <p></p>
 >>>         <p></p>
->>>         <p id="uniquePid"></p>
+>>>         <p id="pId"></p>
 >>>         <p></p>
 >>>         <p></p>
 >>>         <p></p>
@@ -215,7 +216,7 @@ container_div.slice()
 # Performance
 Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
 
-TemPy does parse, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
+TemPy does not parse strings, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
 Here are a few benchmarks of TemPy in action, rendering a template with a single for loop (see code [here](benchmarks))
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
