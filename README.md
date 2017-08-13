@@ -1,5 +1,7 @@
 # TemPy
+[![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) 
 ![TemPy Logo](tempy.png)
+
 ### Fast Object-Oriented HTML templating With Python!
 
 ### What
@@ -245,6 +247,6 @@ Transfer/sec:      3.63MB
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
 ## Python versions compatibility:
-Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy)
+Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy)
 
 ### Apache 2.0 license, see LICENSE for details.
