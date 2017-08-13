@@ -26,5 +26,7 @@ setup(name='tempy',
       license='LICENSE',
       packages=['tempy'],
       url='https://hrabal.github.io/TemPy/',
-      keywords=['python3', 'templating', 'html', 'web']
+      keywords=['python3', 'templating', 'html', 'web'],
+      download_url='https://github.com/Hrabal/TemPy/archive/0.1.tar.gz',
+      python_requires='>=3.3',
       )
