@@ -4,11 +4,11 @@
 """
 import unittest
 
-from tempy.tags import *
+from tempy.tags import Div, A, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
 
 
-class TestTag(unittest.TestCase):
+class TestDOMelement(unittest.TestCase):
 
     def setUp(self):
         self.page = Html()
@@ -108,9 +108,29 @@ class TestTag(unittest.TestCase):
 
     def test_replace_with(self):
         old = Div().append_to(self.page)
-        new = old.replace_with(A())
-        #print(self.page.childs)
+        old.replace_with(A())
         self.assertTrue(isinstance(self.page[0], A))
+
+    def test_remove(self):
+        new = Div().append_to(self.page)
+        new.remove()
+        self.assertTrue(new not in self.page)
+
+    def test_move(self):
+        new = Div().append_to(self.page)
+        new_container = Div()
+        new.move(new_container)
+        self.assertTrue(new not in self.page and new in new_container)
+
+    def test_pop(self):
+        new = Div().append_to(self.page)
+        self.page.pop(0)
+        self.assertTrue(new not in self.page)
+
+    def test_empty(self):
+        new = Div().append_to(self.page)
+        self.page.empty()
+        self.assertTrue(new not in self.page)
 
 
 if __name__ == '__main__':

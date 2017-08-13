@@ -231,14 +231,14 @@ class DOMElement:
 
     def remove(self):
         """Detach this element from his father."""
-        if self._own_index and self.parent:
-            self.parent.pop(i=self._own_index)
+        if self._own_index is not None and self.parent:
+            self.parent.pop(self._own_index)
         return self
 
     def move(self, new_father, idx=None, prepend=None):
         """Moves this element from his father to the given one."""
-        self.parent.pop(i=self._own_index)
-        new_father._insert(self._name, self, idx, prepend)
+        self.parent.pop(self._own_index)
+        new_father._insert(self, idx, prepend)
         new_father._stable = False
         return self
 
@@ -255,7 +255,8 @@ class DOMElement:
     def empty(self):
         """Remove all this tag's childs."""
         self._stable = False
-        map(lambda child: self.pop(child._own_index), self.childs)
+        for child in self.childs:
+            self.pop(child._own_index)
         return self
 
     # TODO: Make all the following properties?
