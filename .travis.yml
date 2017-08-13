@@ -12,6 +12,7 @@ python:
 branches:
   only:
     - master
+    - widgets
 # before_install: TODO: make it work
 #   - bash ./preflight.sh # exclude only .md commits
 # command to run tests
