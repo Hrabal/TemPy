@@ -243,4 +243,7 @@ Transfer/sec:      3.63MB
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
+
+## Requires Python >= 3.3 
+
 ### Apache 2.0 license, see LICENSE for details.
