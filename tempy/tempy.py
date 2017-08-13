@@ -213,7 +213,7 @@ class DOMElement:
         """Wraps this element inside another empty tag."""
         # TODO: make multiple with content_receiver
         if other.childs:
-            raise TagError
+            raise TagError(self, 'Wrapping in a non empty Tag is forbidden.')
         if self.parent:
             self.before(other)
             self.parent.pop(self._own_index)
@@ -225,13 +225,9 @@ class DOMElement:
 
     def replace_with(self, other):
         """Replace this element with the given DOMElement."""
-        if isinstance(other, DOMElement):
-            self = other
-        elif isinstance(other, (GeneratorType, Iterable)):
-            self.parent.childs[self._own_index: self._own_index+1] = list(other)
-        else:
-            raise TagError()
-        return self
+        self.after(other)
+        self.parent.pop(self._own_index)
+        return other
 
     def remove(self):
         """Detach this element from his father."""
@@ -249,7 +245,7 @@ class DOMElement:
     def pop(self, idx=None):
         """Removes the child at given position, if no position is given removes the last."""
         self._stable = False
-        if not idx:
+        if idx is None:
             idx = len(self.childs) - 1
         elem = self.childs.pop(idx)
         if isinstance(elem, DOMElement):

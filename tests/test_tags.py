@@ -68,10 +68,6 @@ class TestTag(unittest.TestCase):
         new = self.page.clone()
         self.assertEqual(new, self.page)
 
-    def test_append_to(self):
-        new = Div().append_to(self.page)
-        self.assertTrue(new in self.page)
-
     def test_after(self):
         new1 = Div().append_to(self.page)
         new2 = Div()
@@ -83,6 +79,39 @@ class TestTag(unittest.TestCase):
         new2 = Div()
         new1.before(new2)
         self.assertEqual(new1._own_index, new2._own_index+1)
+
+    def test_prepend(self):
+        self.page(Div(), Div())
+        new2 = Div()
+        self.page.prepend(new2)
+        self.assertEqual(new2._own_index, 0)
+
+    def test_prepend_to(self):
+        self.page(Div(), Div())
+        new2 = Div().prepend_to(self.page)
+        self.assertEqual(new2._own_index, 0)
+
+    def test_append(self):
+        self.page(Div(), Div())
+        new2 = Div()
+        self.page.append(new2)
+        self.assertEqual(new2._own_index, 2)
+
+    def test_append_to(self):
+        self.page(Div(), Div())
+        new2 = Div().append_to(self.page)
+        self.assertEqual(new2._own_index, 2)
+
+    def test_wrap(self):
+        new = Div().wrap(self.page)
+        self.assertTrue(new in self.page)
+
+    def test_replace_with(self):
+        old = Div().append_to(self.page)
+        new = old.replace_with(A())
+        #print(self.page.childs)
+        self.assertTrue(isinstance(self.page[0], A))
+
 
 if __name__ == '__main__':
     unittest.main()
