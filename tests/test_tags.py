@@ -78,5 +78,11 @@ class TestTag(unittest.TestCase):
         new1.after(new2)
         self.assertEqual(new1._own_index, new2._own_index-1)
 
+    def test_before(self):
+        new1 = Div().append_to(self.page)
+        new2 = Div()
+        new1.before(new2)
+        self.assertEqual(new1._own_index, new2._own_index+1)
+
 if __name__ == '__main__':
     unittest.main()

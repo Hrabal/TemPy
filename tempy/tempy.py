@@ -85,7 +85,7 @@ class DOMElement:
         Returns index after flattening and a _ChildElement.
         "reverse" parameter inverts the yielding.
         """
-        verse = (1, 0)[reverse]
+        verse = (1, -1)[reverse]
         if isinstance(items, GeneratorType):
             items = list(items)
         unnamed = (_ChildElement(None, item) for item in items[::verse])
