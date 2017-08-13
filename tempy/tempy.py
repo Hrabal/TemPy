@@ -4,10 +4,11 @@ from uuid import uuid4
 from copy import copy
 from functools import wraps
 from itertools import chain
+from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import TagError
+from .exceptions import TagError, WrongContentError
 
 
 class _ChildElement:
@@ -47,7 +48,9 @@ class DOMElement:
         return self.uuid
 
     def __eq__(self, other):
-        return self.uuid == other.uuid
+        self_compdict, other_compdict = self.__dict__, other.__dict__
+        map(lambda x: x.pop('uuid'), (self_compdict, other_compdict))
+        return other_compdict == other_compdict
 
     def __getitem__(self, i):
         return self.childs[i]
@@ -70,8 +73,11 @@ class DOMElement:
     @property
     def _own_index(self):
         if self.parent:
-            return self.parent.childs.index(self)
-        return None
+            try:
+                return [t.uuid for t in self.parent.childs].index(self.uuid)
+            except ValueError:
+                return -1
+        return -1
 
     def _yield_items(self, items, kwitems, reverse=False):
         """
@@ -150,6 +156,8 @@ class DOMElement:
         Adds content data in this element. This will be used in the rendering of this element's childs.
         Multiple injections on the same key will override the content (dict.update behavior).
         """
+        if contents and not isinstance(contents, dict):
+            raise WrongContentError(self, contents, 'Contents should be a dict')
         self._stable = False
         if not contents:
             contents = {}
@@ -168,32 +176,38 @@ class DOMElement:
         self._insert(child)
 
     @content_receiver()
-    def after(self, i, child):
+    def after(self, i, sibling):
         """Adds siblings after the current tag."""
-        self.parent._insert(child, idx=self._own_index + 1 + i)
+        self.parent._insert(sibling, idx=self._own_index + 1 + i)
+        return self
 
     @content_receiver(reverse=True)
-    def before(self, i, child):
+    def before(self, i, sibling):
         """Adds siblings before the current tag."""
-        self.parent._insert(child, idx=self._own_index - i)
+        self.parent._insert(sibling, idx=self._own_index - i)
+        return self
 
     @content_receiver(reverse=True)
     def prepend(self, _, child):
-        """Adds childs tho this tag, starting from the first position."""
+        """Adds childs to this tag, starting from the first position."""
         self._insert(child, prepend=True)
+        return self
 
     def prepend_to(self, father):
         """Adds this tag to a father, at the beginning."""
         father.prepend(self)
+        return self
 
     @content_receiver()
     def append(self, _, child):
         """Adds childs to this tag, after the current existing childs."""
         self._insert(child)
+        return self
 
     def append_to(self, father):
         """Adds this tag to a parent, after the current existing childs."""
         father.append(self)
+        return self
 
     def wrap(self, other):
         """Wraps this element inside another empty tag."""

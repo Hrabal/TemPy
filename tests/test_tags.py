@@ -64,5 +64,19 @@ class TestTag(unittest.TestCase):
         head, body = self.page.childs
         self.check_head_body(head, body)
 
+    def test_clone(self):
+        new = self.page.clone()
+        self.assertEqual(new, self.page)
+
+    def test_append_to(self):
+        new = Div().append_to(self.page)
+        self.assertTrue(new in self.page)
+
+    def test_after(self):
+        new1 = Div().append_to(self.page)
+        new2 = Div()
+        new1.after(new2)
+        self.assertEqual(new1._own_index, new2._own_index-1)
+
 if __name__ == '__main__':
     unittest.main()
