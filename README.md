@@ -22,16 +22,20 @@ No parsing and a simple structure makes TemPy fast. See below for benchmarks aga
 TemPy offers clean syntax for building pages in pure python:
 ```python
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
-page = Html()(
-    Head()(
-        Meta(charset='utf-8'),
+another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
+
+# make tags instantiating TemPy objects
+page = Html()(  # add tags inside the one you created calling the parent
+    Head()(  # add multiple tags in one call
+        Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
         Link(href="my.css", typ="text/css", rel="stylesheet")
     ),
     Body()(
         Div(klass='linkBox')(
             A(href='www.foo.bar')
         ),
-        (P()(text) for text in my_text_list)
+        (P()(text) for text in my_text_list),  # tag insertion accepts generators
+        another_list  # add text from a list, str.join is used in rendering
     )
 ).render()
 >>> <html>
@@ -46,25 +50,40 @@ page = Html()(
 >>>         <p>This is foo</p>
 >>>         <p>This is Bar</p>
 >>>         <p>Have you met my friend Baz?</p>
+>>>         Lorem ipsum dolor sit amet, consectetur adipiscing elit
 >>>     </body>
 >>> </html>
 ```
 
+#### Building blocks
 You can also create blocks and put them together using the manipulation api:
 ```python
-# basic_template.py
+# --- file: base_elements.py
 from somewhere import links, foot_imgs
+# define some common blocks
+header = Div(klass='header')(title=Div()('My website'), logo=Img(src='img.png'))
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
 footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
-page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
-...
-# my_controller.py
+
+# --- file: pages.py
+from base_elements import header, menu, footer
+# import the common blocks and use them inside your page
+
+home_page = Html()(Head(), Body()(header, menu, content='Hello world.', footer=footer))
+content_page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
+
+# --- file: my_controller.py
 from tempy.tags import Div
-from basic_template import page
+from home_page import home_page, content_page
+
 @controller_framework_decorator
-def mycontroller():
+def mycontroller(url='/'):
+    return home_page.render()
+
+@controller_framework_decorator
+def mycontroller(url='/content'):
     content = Div()('This is my content!')
-    return page.container.append(content)
+    return content_page.container.append(content).render()
 ```
 
 ### Elements creation and removal
