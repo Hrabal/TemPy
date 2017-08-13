@@ -62,7 +62,7 @@ class DOMElement:
         return x in self.childs
 
     def __copy__(self):
-        new = self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else cfor c in self.childs)
+        new = self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else c for c in self.childs)
         if hasattr(new, 'attrs'):
             new.attrs = self.attrs
         return new
