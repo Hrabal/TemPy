@@ -8,6 +8,8 @@ PM me if you want to help maintaining this project or if you are willing to deve
 
 Open an Issue to ask for features, suggest ideas, or report a bug.
 
+We have a [Slack](tempy-dev.slack.com) for TemPy dev discussions (ask for an invitation at federicocerchiari @ gmail . com).
+
 ### Program
 Planned evolution of this project:
 - Better exception handling.
