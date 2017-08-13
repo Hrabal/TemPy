@@ -32,12 +32,18 @@ page = Html()(  # add tags inside the one you created calling the parent
     ),
     Body()(
         Div(klass='linkBox')(
-            A(href='www.foo.bar')
+            A(href='www.foo.com')
         ),
         (P()(text) for text in my_text_list),  # tag insertion accepts generators
         another_list  # add text from a list, str.join is used in rendering
     )
-).render()
+)
+
+# add tags and content later
+page[1][0](A(href='www.bar.com'))  # calling the tag
+page[1][0].append(A(href='www.baz.com'))  # using the API
+
+page.render()
 >>> <html>
 >>>     <head>
 >>>         <meta charset="utf-8"/>
@@ -45,7 +51,9 @@ page = Html()(  # add tags inside the one you created calling the parent
 >>>     </head>
 >>>     <body>
 >>>         <div class="linkBox">
->>>             <a href="www.foo.bar"></a>
+>>>             <a href="www.foo.com"></a>
+>>>             <a href="www.bar.com"></a>
+>>>             <a href="www.baz.com"></a>
 >>>         </div>
 >>>         <p>This is foo</p>
 >>>         <p>This is Bar</p>
