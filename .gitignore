@@ -1,3 +1,7 @@
 *.pyc
 *.sublime-*
 playground/*.*
+.tox
+build/
+dist/
+*.egg-info

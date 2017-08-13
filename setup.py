@@ -23,7 +23,6 @@ setup(name='tempy',
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
       description='Python OOP Templating System',
-      long_description=open('README.md').read(),
       license='LICENSE',
       packages=['tempy'],
       url='https://hrabal.github.io/TemPy/'
