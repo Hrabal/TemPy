@@ -244,6 +244,7 @@ Transfer/sec:      3.63MB
 ### Contribute.
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
-## Requires Python >= 3.3 
+## Python versions compatibility:
+Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy)
 
 ### Apache 2.0 license, see LICENSE for details.
