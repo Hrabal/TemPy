@@ -178,7 +178,7 @@ class DOMElement:
         self.parent._insert(child, idx=self._own_index - i)
 
     @content_receiver(reverse=True)
-    def prepend(self, child):
+    def prepend(self, _, child):
         """Adds childs tho this tag, starting from the first position."""
         self._insert(child, prepend=True)
 
@@ -187,7 +187,7 @@ class DOMElement:
         father.prepend(self)
 
     @content_receiver()
-    def append(self, child):
+    def append(self, _, child):
         """Adds childs to this tag, after the current existing childs."""
         self._insert(child)
 
