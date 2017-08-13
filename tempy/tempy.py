@@ -80,6 +80,8 @@ class DOMElement:
         "reverse" parameter inverts the yielding.
         """
         verse = (1, 0)[reverse]
+        if isinstance(items, GeneratorType):
+            items = list(items)
         unnamed = (_ChildElement(None, item) for item in items[::verse])
         named = (_ChildElement(k, v) for k, v in list(kwitems.items())[::verse])
         contents = (unnamed, named)[::verse]
