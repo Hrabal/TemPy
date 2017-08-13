@@ -25,5 +25,6 @@ setup(name='tempy',
       description='Python OOP Templating System',
       license='LICENSE',
       packages=['tempy'],
-      url='https://hrabal.github.io/TemPy/'
+      url='https://hrabal.github.io/TemPy/',
+      keywords=['python3', 'templating', 'html', 'web']
       )
