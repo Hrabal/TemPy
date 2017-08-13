@@ -23,6 +23,7 @@ No parsing and a simple structure makes TemPy fast. See below for benchmarks aga
 
 TemPy offers clean syntax for building pages in pure python:
 ```python
+from tempy.tags import Html, Head, Body, Meta, Link, Div, P, A
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
 
@@ -246,7 +247,7 @@ Transfer/sec:      3.63MB
 ### Contribute.
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
-## Python versions compatibility:
+## Python versions compatibility
 Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy)
 
 ### Apache 2.0 license, see LICENSE for details.
