@@ -12,8 +12,8 @@ python:
 branches:
   only:
     - master
-before_install:
-  - bash ./preflight.sh # exclude only .md commits
+# before_install: TODO: make it work
+#   - bash ./preflight.sh # exclude only .md commits
 # command to run tests
 script: python -m unittest discover
 after_script:
