@@ -9,7 +9,14 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "3.7-dev" # 3.7 development branch
   - "nightly" # currently points to 3.7-dev
+branches:
+  only:
+    - master
+before_install:
+  - bash ./preflight.sh # exclude only .md commits
 # command to run tests
 script: python -m unittest discover
+after_script:
+  - sleep 10 # helps travis finish logging
 notifications:
   slack: tempy-dev:FaMoO57tis4weJUGWJARATJv
