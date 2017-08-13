@@ -14,6 +14,7 @@ We have a [Slack](tempy-dev.slack.com) for TemPy dev discussions (ask for an inv
 Planned evolution of this project:
 - Better exception handling.
 - Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
+- TemPy widgets, see the widget branch.
 - Make pretty formatting of the output html.
 - Implement math operators for DOMElement (i.e: `Div() += Div()` add the latter as a child or `Div() | Div()` makes a new `Content` containint the two.)
 - Writing more tests.
