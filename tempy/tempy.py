@@ -539,7 +539,7 @@ class Tag(DOMElement):
         return self._render
 
     def _get_child_renders(self):
-        return ''.join(child.render() if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs)
+        return ''.join(child.render() if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs if child is not None)
 
 
 class VoidTag(Tag):
