@@ -34,7 +34,7 @@ page = Html()(  # add tags inside the one you created calling the parent
         Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
         Link(href="my.css", typ="text/css", rel="stylesheet")
     ),
-    Body()(
+    body=Body()(  # give them a name so you can navigate the DOM with those names
         Div(klass='linkBox')(
             A(href='www.foo.com')
         ),
@@ -46,6 +46,8 @@ page = Html()(  # add tags inside the one you created calling the parent
 # add tags and content later
 page[1][0](A(href='www.bar.com'))  # calling the tag
 page[1][0].append(A(href='www.baz.com'))  # using the API
+link = Link().append_to(page.body) # access the body as if it's a page attribute
+link.attr(href='www.python.org')(This is a link to Python) # Add attributes and content to already placed tags
 
 page.render()
 >>> <html>
@@ -76,14 +78,16 @@ from somewhere import links, foot_imgs
 header = Div(klass='header')(title=Div()('My website'), logo=Img(src='img.png'))
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
 footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
-
+```
+```python
 # --- file: pages.py
 from base_elements import header, menu, footer
 
 # import the common blocks and use them inside your page
-home_page = Html()(Head(), Body()(header, menu, content='Hello world.', footer=footer))
-content_page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
-
+home_page = Html()(Head(), body=Body()(header, menu, content='Hello world.', footer=footer))
+content_page = Html()(Head(), body=Body()(header, menu, container=Div(klass='container'), footer=footer))
+```
+```python
 # --- file: my_controller.py
 from tempy.tags import Div
 from home_page import home_page, content_page
@@ -95,7 +99,7 @@ def mycontroller(url='/'):
 @controller_framework_decorator
 def mycontroller(url='/content'):
     content = Div()('This is my content!')
-    return content_page.container.append(content).render()
+    return content_page.body.container.append(content).render()
 ```
 
 ### Elements creation and removal
