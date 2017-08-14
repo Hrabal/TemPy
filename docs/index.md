@@ -1,6 +1,6 @@
 # TemPy
 [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) 
-![TemPy Logo](tempy.png)
+![TemPy Logo](../tempy.png)
 
 ### Fast Object-Oriented HTML templating With Python!
 
