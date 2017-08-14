@@ -18,3 +18,12 @@ No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags 
 See below for benchmarks against other templating engines.
 
 **Build, manipulate, and navigate HTML documents. With no HTML involved.**
+
+## Credits: made and mantained by Federico Cerchiari / Hrabal
+### Contribute.
+Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
+
+## Python versions compatibility
+Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy)
+
+### Apache 2.0 license, see LICENSE for details.
