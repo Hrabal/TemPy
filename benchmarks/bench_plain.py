@@ -5,34 +5,54 @@ import time
 from functools import reduce
 from datetime import datetime
 from jinja2 import Template
-from tempy_templates.sw import page as tempy_template
+
 
 mean = lambda l: reduce(lambda x, y: x + y, l) / len(l)
-sencond_to_run = 20
+seconds_to_run = 20
 results = {}
 with open('sw-people.json', 'r') as f:
     people = json.load(f)
 
-j2_temp_file = os.path.join('templates', 'j2_sw_local.html')
 context = {'people': people}
 
 
-def render_j2(tpl_path, context):
-    with open(tpl_path) as f:
+def render_j2_hello(context):
+    with open(os.path.join('templates', 'hello_world.html')) as f:
+        return Template(f.read()).render()
+
+def render_tempy_hello(context):
+    from tempy_templates.hello_world import page as tempy_template
+    return tempy_template.render()
+
+def render_j2_sw_mono(context):
+    with open(os.path.join('templates', 'j2_sw_monofile.html')) as f:
         return Template(f.read()).render(context)
 
-
-def render_tempy(_, context):
+def render_tempy_sw_mono(context):
+    from tempy_templates.sw_monofile import page as tempy_template
     return tempy_template.render(characters=context['people'].values())
 
-for test in (render_tempy, render_j2):
+#def render_j2_sw_multifile(context):
+#    with open(os.path.join('templates', 'sw_characters.html')) as f:
+#        return Template(f.read()).render(context)
+#
+#def render_tempy_sw_multifile(context):
+#    from tempy_templates.sw_multifile import page as tempy_template
+#    return tempy_template.render(characters=context['people'].values())
+
+
+for test in (render_j2_hello,render_tempy_hello,render_j2_sw_mono,render_tempy_sw_mono): #,render_j2_sw_multifile,render_tempy_sw_multifile):
     measures = []
-    t_end = time.time() + sencond_to_run
+    t_end = time.time() + seconds_to_run
     while time.time() < t_end:
         start = datetime.now()
-        test(j2_temp_file, context)
+        test(context)
         measures.append(datetime.now() - start)
     results[test.__name__] = measures
 
-print(len(results['render_j2']), mean(results['render_j2']))
-print(len(results['render_tempy']), mean(results['render_tempy']))
+print('render_j2_hello', len(results['render_j2_hello']), mean(results['render_j2_hello']))
+print('render_tempy_hello', len(results['render_tempy_hello']), mean(results['render_tempy_hello']))
+print('render_j2_sw_mono', len(results['render_j2_sw_mono']), mean(results['render_j2_sw_mono']))
+print('render_tempy_sw_mono', len(results['render_tempy_sw_mono']), mean(results['render_tempy_sw_mono']))
+#print(len(results['render_j2_sw_multifile']), mean(results['render_j2_sw_multifile']))
+#print(len(results['render_tempy_sw_multifile']), mean(results['render_tempy_sw_multifile']))

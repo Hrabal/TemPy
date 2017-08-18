@@ -11,5 +11,3 @@ page = Html()(
         'Hello World'
         )
     )
-
-print(page.render())
