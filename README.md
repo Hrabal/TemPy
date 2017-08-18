@@ -20,6 +20,11 @@ See below for benchmarks against other templating engines.
 **Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
 # Usage
+### Installation
+TemPy is avaiable on PyPi: `pip3 install tem-py`.
+
+Or clone/download this repository and run `python3 setup.py install`
+
 ### Basic Templating
 
 TemPy offers clean syntax for building pages in pure python:
