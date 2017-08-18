@@ -18,7 +18,7 @@
 
 from setuptools import setup
 
-setup(name='tempy',
+setup(name='tem-py',
       version='0.1',
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
