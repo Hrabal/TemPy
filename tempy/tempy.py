@@ -141,14 +141,14 @@ class DOMElement:
                     # Happens when iterable in kwitems
                     # i.e: d = Div(paragraphs=[P() for _ in range(5)])
                     # d.paragraphs -> [P(), P(), P()...]
-                    yield i, item.obj
+                    yield i, None, item.obj
                 else:
                     yield from self._yield_items(item.obj, {})
             elif isinstance(item.obj, DOMElement):
                 item.obj._name = item._name
-                yield i, item.obj
+                yield i, item._name, item.obj
             else:
-                yield i, item.obj
+                yield i, item._name, item.obj
 
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
@@ -158,14 +158,14 @@ class DOMElement:
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, tag in inst._yield_items(tags, kwtags, reverse):
+                for i, name, tag in inst._yield_items(tags, kwtags, reverse):
                     inst._stable = False
-                    func(inst, i, tag)
+                    func(inst, i, name, tag)
                 return inst
             return wrapped
         return _receiver
 
-    def _insert(self, child, idx=None, prepend=False):
+    def _insert(self, child, name=None, idx=None, prepend=False):
         """Inserts something inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
         If the child is a DOMElement, correctly links the child.
@@ -180,8 +180,10 @@ class DOMElement:
         self.childs.insert(idx, child)
         if isinstance(child, (DOMElement, Content)):
             child.parent = self
-            if child._name:
-                setattr(self, child._name, child)
+            if name:
+                child._name = name
+        if name:
+            setattr(self, name, child)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -215,26 +217,26 @@ class DOMElement:
         return copy(self)
 
     @content_receiver()
-    def __call__(self, _, child):
+    def __call__(self, _, name, child):
         """Calling the object will add the given parameters as childs"""
-        self._insert(child)
+        self._insert(child, name=name)
 
     @content_receiver()
-    def after(self, i, sibling):
+    def after(self, i, name, sibling):
         """Adds siblings after the current tag."""
-        self.parent._insert(sibling, idx=self._own_index + 1 + i)
+        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
         return self
 
     @content_receiver(reverse=True)
-    def before(self, i, sibling):
+    def before(self, i, name, sibling):
         """Adds siblings before the current tag."""
-        self.parent._insert(sibling, idx=self._own_index - i)
+        self.parent._insert(sibling, idx=self._own_index - i, name=name)
         return self
 
     @content_receiver(reverse=True)
-    def prepend(self, _, child):
+    def prepend(self, _, name, child):
         """Adds childs to this tag, starting from the first position."""
-        self._insert(child, prepend=True)
+        self._insert(child, name=name, prepend=True)
         return self
 
     def prepend_to(self, father):
@@ -243,9 +245,9 @@ class DOMElement:
         return self
 
     @content_receiver()
-    def append(self, _, child):
+    def append(self, _, name, child):
         """Adds childs to this tag, after the current existing childs."""
-        self._insert(child)
+        self._insert(child, name=name)
         return self
 
     def append_to(self, father):
@@ -279,10 +281,12 @@ class DOMElement:
             self.parent.pop(self._own_index)
         return self
 
-    def move(self, new_father, idx=None, prepend=None):
+    def move(self, new_father, idx=None, prepend=None, name=None):
         """Moves this element from his father to the given one."""
         self.parent.pop(self._own_index)
-        new_father._insert(self, idx, prepend)
+        if name:
+            self._name = name
+        new_father._insert(self, idx=idx, prepend=prepend, name=self._name)
         new_father._stable = False
         return self
 
@@ -659,7 +663,6 @@ class Content:
                 ret.append(content.render(pretty))
             else:
                 if self._template:
-                    self._template.inject(content)
                     ret.append(self._template.inject(content).render())
                 else:
                     ret.append(str(content))

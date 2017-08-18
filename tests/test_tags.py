@@ -218,6 +218,10 @@ class TestDOMelement(unittest.TestCase):
         self.page(test=div)
         test_div = self.page.test
         self.assertEqual(div, test_div)
+        test_string = 'test_sting'
+        self.page(test2=test_string)
+        test_cont = self.page.test2
+        self.assertEqual(test_string, test_cont)
 
 
 if __name__ == '__main__':
