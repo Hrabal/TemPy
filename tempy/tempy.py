@@ -93,7 +93,7 @@ class DOMElement:
     def __isub__(self, other):
         """removes the child."""
         if other not in self:
-            raise ValueError(f'Subtraction impossible. {other} is not in {self}')
+            raise ValueError('Subtraction impossible. {o} is not in {s}'.format(o=other, s=self))
         return self.pop(other._own_index)
 
     def __mul__(self, n):
