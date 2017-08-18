@@ -76,6 +76,43 @@ class DOMElement:
             new.attrs = self.attrs
         return new
 
+    def __add__(self, other):
+        """Addition produces a copy of the left operator, containig the right operator as a child."""
+        return self.clone()(other)
+
+    def __iadd__(self, other):
+        """In-place addition adds the right operand as left's child"""
+        return self(other)
+
+    def __sub__(self, other):
+        """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
+        ret = self.clone()
+        ret -= other
+        return ret
+
+    def __isub__(self, other):
+        """removes the child."""
+        if other not in self:
+            raise ValueError(f'Subtraction impossible. {other} is not in {self}')
+        return self.pop(other._own_index)
+
+    def __mul__(self, n):
+        """Returns a list of clones."""
+        if not isinstance(n, int):
+            raise TypeError
+        if n < 0:
+            raise ValueError('DOMElement does not support negative multiplication')
+        return [self.clone() for i in range(n)]
+
+    def __imul__(self, n):
+        """Clones the element n times."""
+        if not self.parent:
+            return self * n
+        if n == 0:
+            self.parent.pop(self._own_index)
+            return self
+        return self.after(self * (n-1))
+
     @property
     def _own_index(self):
         if self.parent:

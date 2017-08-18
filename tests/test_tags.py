@@ -142,6 +142,77 @@ class TestDOMelement(unittest.TestCase):
         test = next(reversed(div))
         self.assertTrue(isinstance(test, P))
 
+    def test_add(self):
+        a = A()
+        div = Div()
+        result = div + a
+        self.assertTrue(a in result)
+        self.assertFalse(a in div)
+        self.assertEqual(result[0], a)
+        self.assertIsNot(div, result)
+        same_check = div.clone()(a)
+        self.assertEqual(same_check, result)
+
+    def test_iadd(self):
+        a = A()
+        div = Div()
+        div += a
+        self.assertTrue(a in div)
+        self.assertEqual(div[0], a)
+
+    def test_sub(self):
+        a = A()
+        div = Div()
+        div(a)
+        result = div - a
+        self.assertFalse(a in result)
+        self.assertTrue(a in div)
+        self.assertIsNot(div, result)
+
+    def test_isub(self):
+        a = A()
+        div = Div()
+        div(a)
+        div -= a
+        self.assertFalse(a in div)
+        with self.assertRaises(ValueError):
+            div -= P()
+
+    def test_mul(self):
+        div = Div()
+        result = div * 5
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 5)
+        self.assertTrue(div in result)
+        self.assertFalse(div.uuid in [tag.uuid for tag in result])
+        with self.assertRaises(TypeError):
+            result = div * 'string'
+        with self.assertRaises(ValueError):
+            result = div * -1
+        result = div * 0
+        self.assertFalse(result)
+        self.assertEqual(len(result), 0)
+        self.assertIsInstance(result, list)
+
+    def test_imul(self):
+        a = A()
+        div = Div()
+        div(P(), a, P())
+        self.assertEqual(len(div), 3)
+        a *= 2
+        self.assertTrue(a in div)
+        self.assertEqual(len(div), 4)
+        self.assertIsInstance(div[2], A)
+
+    def test_imul_zero(self):
+        a = A()
+        div = Div()
+        div(P(), a, P())
+        self.assertEqual(len(div), 3)
+        a *= 0
+        self.assertEqual(len(div), 2)
+        self.assertIsInstance(div[1], P)
+
 
 if __name__ == '__main__':
     unittest.main()
