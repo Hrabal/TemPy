@@ -232,6 +232,8 @@ Here are a few benchmarks of TemPy in action, rendering a template with a single
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
 
+![TemPy Logo](bench.jpg)
+
 Running 20s test @ http://127.0.0.1:8888/tempy + http://127.0.0.1:8888/j2
   10 threads and 200 connections
 
