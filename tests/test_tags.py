@@ -213,6 +213,12 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(len(div), 2)
         self.assertIsInstance(div[1], P)
 
+    def test_getattr(self):
+        div = Div(klass='test')
+        self.page(test=div)
+        test_div = self.page.test
+        self.assertEqual(div, test_div)
+
 
 if __name__ == '__main__':
     unittest.main()

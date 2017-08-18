@@ -145,6 +145,7 @@ class DOMElement:
                 else:
                     yield from self._yield_items(item.obj, {})
             elif isinstance(item.obj, DOMElement):
+                item.obj._name = item._name
                 yield i, item.obj
             else:
                 yield i, item.obj
