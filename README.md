@@ -47,7 +47,7 @@ page = Html()(  # add tags inside the one you created calling the parent
 page[1][0](A(href='www.bar.com'))  # calling the tag
 page[1][0].append(A(href='www.baz.com'))  # using the API
 link = Link().append_to(page.body) # access the body as if it's a page attribute
-link.attr(href='www.python.org')(This is a link to Python) # Add attributes and content to already placed tags
+link.attr(href='www.python.org')('This is a link to Python') # Add attributes and content to already placed tags
 
 page.render()
 >>> <html>
@@ -60,6 +60,7 @@ page.render()
 >>>             <a href="www.foo.com"></a>
 >>>             <a href="www.bar.com"></a>
 >>>             <a href="www.baz.com"></a>
+>>>             <a href="www.python.org">This is a link to Python</a>
 >>>         </div>
 >>>         <p>This is foo</p>
 >>>         <p>This is Bar</p>
@@ -90,7 +91,7 @@ content_page = Html()(Head(), body=Body()(header, menu, container=Div(klass='con
 ```python
 # --- file: my_controller.py
 from tempy.tags import Div
-from home_page import home_page, content_page
+from pages import home_page, content_page
 
 @controller_framework_decorator
 def mycontroller(url='/'):

@@ -58,6 +58,12 @@ class DOMElement:
     def __iter__(self):
         return iter(self.childs)
 
+    def __next__(self):
+        return next(iter(self.childs))
+
+    def __reversed__(self):
+        return iter(self.childs[::-1])
+
     def __len__(self):
         return len(self.childs)
 

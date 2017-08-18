@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy.tags import Div, A, Html, Head, Body
+from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
 
 
@@ -131,6 +131,16 @@ class TestDOMelement(unittest.TestCase):
         new = Div().append_to(self.page)
         self.page.empty()
         self.assertTrue(new not in self.page)
+
+    def test_next(self):
+        div = Div()(A(), P(), Div())
+        test = next(div)
+        self.assertTrue(isinstance(test, A))
+
+    def test_reverse(self):
+        div = Div()(A(), Div(), P())
+        test = next(reversed(div))
+        self.assertTrue(isinstance(test, P))
 
 
 if __name__ == '__main__':
