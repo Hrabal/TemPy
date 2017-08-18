@@ -228,11 +228,11 @@ Performance varies considerably based on the complexity of the rendered content,
 
 TemPy does not parse strings, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
-Here are a few benchmarks of TemPy in action, rendering a template with a single for loop (see code [here](benchmarks))
+Here are a few benchmarks of TemPy in action, used in a Flask app, rendering a template (see code [here](benchmarks))
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
 
-![TemPy Logo](bench.jpg)
+![TemPy Web Rendering](bench.jpg)
 
 Running 20s test @ http://127.0.0.1:8888/tempy + http://127.0.0.1:8888/j2
   10 threads and 200 connections
@@ -255,6 +255,9 @@ Req/Sec | 59.29 | 20.53 | 151.00 | 71.23%
 11841 requests in 20.08s, 72.80MB read
 Requests/sec:    589.70
 Transfer/sec:      3.63MB
+
+Performance difference is even higher in Jinja2 plain (no Flask) rendering:
+![TemPy No-Web Rednering](bench_plain.jpg)
 
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.

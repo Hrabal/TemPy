@@ -50,9 +50,9 @@ for test in (render_j2_hello,render_tempy_hello,render_j2_sw_mono,render_tempy_s
         measures.append(datetime.now() - start)
     results[test.__name__] = measures
 
-print('render_j2_hello', len(results['render_j2_hello']), mean(results['render_j2_hello']))
-print('render_tempy_hello', len(results['render_tempy_hello']), mean(results['render_tempy_hello']))
-print('render_j2_sw_mono', len(results['render_j2_sw_mono']), mean(results['render_j2_sw_mono']))
-print('render_tempy_sw_mono', len(results['render_tempy_sw_mono']), mean(results['render_tempy_sw_mono']))
+print('render_j2_hello', len(results['render_j2_hello']), mean(results['render_j2_hello']), len(results['render_j2_hello'])/seconds_to_run)
+print('render_tempy_hello', len(results['render_tempy_hello']), mean(results['render_tempy_hello']), len(results['render_tempy_hello'])/seconds_to_run)
+print('render_j2_sw_mono', len(results['render_j2_sw_mono']), mean(results['render_j2_sw_mono']), len(results['render_j2_sw_mono'])/seconds_to_run)
+print('render_tempy_sw_mono', len(results['render_tempy_sw_mono']), mean(results['render_tempy_sw_mono']), len(results['render_tempy_sw_mono'])/seconds_to_run)
 #print(len(results['render_j2_sw_multifile']), mean(results['render_j2_sw_multifile']))
 #print(len(results['render_tempy_sw_multifile']), mean(results['render_tempy_sw_multifile']))
