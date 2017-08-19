@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from tempy_templates.hello_world import page as hw_page
 from tempy_templates.sw_multifile import page as sw_multi_page
 from tempy_templates.sw_monofile import page as sw_mono_page
-from tempy_templates.sw_multifile_table import page as sw_multi_page_table
+# from tempy_templates.sw_multifile_table import page as sw_multi_page_table
 
 app = Flask(__name__)
 with open('sw-people.json', 'r') as f:
@@ -30,7 +30,7 @@ def tempy_sw_monofile():
 
 @app.route('/tempy_sw_multifile')
 def tempy_sw_multifile():
-    return sw_multi_page.render(characters=people.values())
+    return sw_multi_page.render(characters=people.values(), pretty=True)
 
 @app.route('/j2_sw_multifile')
 def j2_sw_multifile():
@@ -38,7 +38,6 @@ def j2_sw_multifile():
 
 @app.route('/tempy_hw')
 def tempy_hw():
-    hw_page.body(a)
     return hw_page.render()
 
 @app.route('/j2_hw')

@@ -436,7 +436,7 @@ class Tag(DOMElement):
     """
     Provides an api for tag inner manipulation and for rendering.
     """
-    _template = '<{tag}{attrs}>{inner}</{tag}>'
+    _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
     _needed_kwargs = None
     _void = False
 
@@ -575,6 +575,13 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
+        pretty = kwargs.pop('pretty', False)
+        if pretty:
+            pretty1 = 0 if pretty is True else pretty
+            pretty2 = pretty1 + 1
+        else:
+            pretty1 = pretty2 = False
+
         for arg in args:
             if isinstance(arg, dict):
                 self.inject(arg)
@@ -587,17 +594,20 @@ class Tag(DOMElement):
 
         tag_data = {
             'tag': getattr(self, '_%s__tag' % self.__class__.__name__),
-            'attrs': self.attrs.render()
+            'attrs': self.attrs.render(),
+            'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
+            'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
         }
-        tag_data['inner'] = self._get_child_renders() if not self._void and self.childs else ''
+        tag_data['inner'] = self._get_child_renders(pretty1+1) if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
         self._stable = True
         return self._render
 
-    def _get_child_renders(self):
-        return ''.join(child.render() if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs if child is not None)
+    def _get_child_renders(self, pretty):
+        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content)) else str(child)
+                       for child in self.childs if child is not None)
 
 
 class VoidTag(Tag):
@@ -659,10 +669,10 @@ class Content:
         ret = []
         for content in self.content:
             if isinstance(content, DOMElement):
-                ret.append(content.render(pretty))
+                ret.append(content.render(pretty=pretty))
             else:
                 if self._template:
-                    ret.append(self._template.inject(content).render())
+                    ret.append(self._template.inject(content).render(pretty=pretty))
                 else:
                     ret.append(str(content))
         return ''.join(ret)
