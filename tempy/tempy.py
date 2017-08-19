@@ -36,13 +36,13 @@ class DOMElement:
         self.uuid = uuid4()
 
     def __repr__(self):
-        return '<{0}.{1} {2}. Son of {3}. Childs: {4}. Named \'{5}\'>'.format(
+        return '<%s.%s %s.%s%s%s>' % (
             self.__module__,
             type(self).__name__,
             self.uuid,
-            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
-            len(self.childs),
-            self._name)
+            ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
+            ' %d childs.' % len(self.childs) if self.childs else '',
+            ' Named %s' % self._name if self._name else '')
 
     def __hash__(self):
         return self.uuid
@@ -93,7 +93,7 @@ class DOMElement:
     def __isub__(self, other):
         """removes the child."""
         if other not in self:
-            raise ValueError('Subtraction impossible. {o} is not in {s}'.format(o=other, s=self))
+            raise ValueError('%s is not in %s' % (other, self))
         return self.pop(other._own_index)
 
     def __mul__(self, n):
@@ -101,7 +101,7 @@ class DOMElement:
         if not isinstance(n, int):
             raise TypeError
         if n < 0:
-            raise ValueError('DOMElement does not support negative multiplication')
+            raise ValueError('Negative multiplication not permitted.')
         return [self.clone() for i in range(n)]
 
     def __imul__(self, n):
@@ -203,7 +203,7 @@ class DOMElement:
         Multiple injections on the same key will override the content (dict.update behavior).
         """
         if contents and not isinstance(contents, dict):
-            raise WrongContentError(self, contents, 'Contents should be a dict')
+            raise WrongContentError(self, contents, 'contents should be a dict')
         self._stable = False
         if not contents:
             contents = {}
@@ -307,8 +307,7 @@ class DOMElement:
             self.pop(child._own_index)
         return self
 
-    # TODO: Make all the following properties?
-    def childrens(self):
+    def children(self):
         """Returns Tags and Content Placehorlders childs of this element."""
         return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
@@ -342,7 +341,7 @@ class DOMElement:
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
-        return filter(lambda x: x != self, self.parent.childs)
+        return filter(lambda x: x.uuid != self.uuid, self.parent.childs)
 
     def parent(self):
         """Returns this element's father"""
@@ -445,7 +444,7 @@ class Tag(DOMElement):
         self.attrs = TagAttrs()
         self.data = {}
         if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
-            raise TagError()
+            raise TagError(self, '%s needed, while %s given' % self._needed_kwargs, kwargs.keys())
         self.attr(**kwargs)
         self._tab_count = 0
         self._render = None
@@ -459,7 +458,7 @@ class Tag(DOMElement):
             ' .css_class %s' % (self.attrs['klass']) if 'klass' in self.attrs else '',
             ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
             )
-        return super().__repr__()[:-1] + '{}>'.format(css_repr)
+        return super().__repr__()[:-1] + '%s>' % css_repr
 
     @property
     def length(self):
@@ -629,12 +628,12 @@ class Content:
         self.stable = False
 
     def __repr__(self):
-        return '<{0}.{1} {2}. Son of {3}. Named \'{4}\'>'.format(
+        return '<%s.%s %s.%s%s>' % (
             self.__module__,
             type(self).__name__,
             self.uuid,
-            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
-            self._name)
+            ' Son of %s' % type(self.parent).__name__ if self.parent else '',
+            ' Named %s' % self._name if self._name else '')
 
     def __copy__(self):
         return self.__class__(self._name, self._fixed_content, self._template)
