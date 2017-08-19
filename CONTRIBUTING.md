@@ -15,7 +15,7 @@ Planned evolution of this project:
 - Better exception handling.
 - Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
 - TemPy widgets, see the widget branch.
-- Make pretty formatting of the output html.
+- Better pretty formatting.
 - Writing more tests.
 
 Ideas I'm thinking about:
