@@ -19,7 +19,7 @@
 from setuptools import setup
 
 setup(name='tem-py',
-      version='0.1.1',
+      version='0.1.2',
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
       description='Python OOP Templating System',
