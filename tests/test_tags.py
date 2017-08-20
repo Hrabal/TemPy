@@ -234,9 +234,62 @@ class TestDOMelement(unittest.TestCase):
     def test_equality(self):
         div1 = Div()
         div2 = Div()
+        # Empty same-type tags are equal
         self.assertEqual(div1, div2)
+
+        # Non-empty tags are not equal
         div1(Div())
         self.assertNotEqual(div1, div2)
+
+        # empty tags with different fathers are not equal
+        div1 = Div()
+        div2 = Div()
+        Div()(div1)
+        self.assertNotEqual(div1, div2)
+
+    def test_childs_index(self):
+        div = Div()
+        a = A()
+        div(P(), P(), a)
+        self.assertEqual(div[2], a)
+
+    def test_iter_chidls(self):
+        d = Div()
+        childs = [A(), P(), P(), Div(), 'test', 1]
+        d(childs)
+        for i, child in enumerate(d):
+            self.assertEqual(childs[i], child)
+
+    def test_next_chidls(self):
+        d = Div()
+        childs = [A(), P(), P(), Div(), 'test', 1]
+        d(childs)
+        self.assertEqual(childs[0], next(d))
+
+    def test_iter_reversed(self):
+        d = Div()
+        childs = [A(), P(), P(), Div(), 'test', 1]
+        d(childs)
+        for t_child, child in zip(reversed(childs), reversed(d)):
+            self.assertEqual(t_child, child)
+
+    def test_copy(self):
+        from copy import copy
+        # Empty tag copy generates equal div
+        d1 = Div(test='test')()
+        d2 = copy(d1)
+        self.assertEqual(d1, d2)
+
+        # A copy of a copy is a copy of the original
+        d3 = copy(d2)
+        self.assertEqual(d1, d3)
+
+        # Non empty tag copy generates different tag but with same structure
+        d1(P())
+        d3 = copy(d1)
+        self.assertNotEqual(d1, d3)
+        self.assertEqual(len(d1.childs), len(d3.childs))
+        self.assertEqual(d1.childs[0].__class__, d3.childs[0].__class__)
 
 
 if __name__ == '__main__':
