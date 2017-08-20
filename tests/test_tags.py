@@ -291,6 +291,22 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(len(d1.childs), len(d3.childs))
         self.assertEqual(d1.childs[0].__class__, d3.childs[0].__class__)
 
+    def test_move_childs(self):
+        childs = [A(), P(), 'test', 0]
+        d1 = Div()(childs)
+        d2 = Div()
+        d1.move_childs(d2)
+        self.assertFalse(d1.childs)
+        self.assertTrue(d2.childs)
+        self.assertEqual(childs[0].parent, d2)
+
+    def test_wrap_inner(self):
+        d1, p, a = Div(), P(), A()
+        d1(a)
+        d1.wrap_inner(p)
+        self.assertFalse(a in d1)
+        self.assertTrue(a in p)
+        self.assertTrue(p in d1)
 
 if __name__ == '__main__':
     unittest.main()

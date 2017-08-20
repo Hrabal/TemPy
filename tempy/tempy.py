@@ -275,8 +275,9 @@ class DOMElement:
         return self
 
     def wrap_inner(self, other):
-        # TODO
-        pass
+        self.move_childs(other)
+        self(other)
+        return self
 
     def replace_with(self, other):
         """Replace this element with the given DOMElement."""
@@ -288,6 +289,15 @@ class DOMElement:
         """Detach this element from his father."""
         if self._own_index is not None and self.parent:
             self.parent.pop(self._own_index)
+        return self
+
+    def move_childs(self, new_father, idx_from=None, idx_to=None):
+        """Moves all the childs to a new father"""
+        idx_from = idx_from or 0
+        idx_to = idx_to or len(self.childs)
+        removed = self.childs[idx_from: idx_to]
+        self.childs[idx_from: idx_to] = []
+        new_father(removed)
         return self
 
     def move(self, new_father, idx=None, prepend=None, name=None):
