@@ -103,8 +103,9 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(new2._own_index, 2)
 
     def test_wrap(self):
-        new = Div().wrap(self.page)
-        self.assertTrue(new in self.page)
+        container = Div()
+        new = A().wrap(container)
+        self.assertTrue(new in container)
 
     def test_replace_with(self):
         old = Div().append_to(self.page)
@@ -222,6 +223,20 @@ class TestDOMelement(unittest.TestCase):
         self.page(test2=test_string)
         test_cont = self.page.test2
         self.assertEqual(test_string, test_cont)
+
+    def test_hash(self):
+        div1 = Div()
+        div2 = div1.clone()
+        test_dict = {div1: 0}
+        test_dict[div2] = 1
+        self.assertEqual(len(test_dict), 2)
+
+    def test_equality(self):
+        div1 = Div()
+        div2 = Div()
+        self.assertEqual(div1, div2)
+        div1(Div())
+        self.assertNotEqual(div1, div2)
 
 
 if __name__ == '__main__':

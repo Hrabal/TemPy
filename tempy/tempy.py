@@ -33,7 +33,7 @@ class DOMElement:
         self.childs = []
         self.parent = None
         self.content_data = {}
-        self.uuid = uuid4()
+        self.uuid = uuid4().int
 
     def __repr__(self):
         return '<%s.%s %s.%s%s%s>' % (
@@ -48,9 +48,15 @@ class DOMElement:
         return self.uuid
 
     def __eq__(self, other):
-        self_compdict, other_compdict = self.__dict__, other.__dict__
-        map(lambda x: x.pop('uuid'), (self_compdict, other_compdict))
-        return other_compdict == other_compdict
+        if self.__class__ != other.__class__:
+            return False
+        comp_dicts = [{
+            'name': t._name,
+            'childs': [getattr(c, 'uuid', None) for c in t.childs],
+            'parent': getattr(t.parent, 'uuid', None),
+            'content_data': t.content_data,
+        } for t in (self, other)]
+        return comp_dicts[0] == comp_dicts[1]
 
     def __getitem__(self, i):
         return self.childs[i]
@@ -86,8 +92,10 @@ class DOMElement:
 
     def __sub__(self, other):
         """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
+        if other not in self:
+            raise ValueError('%s is not in %s' % (other, self))
         ret = self.clone()
-        ret -= other
+        ret.pop(other._own_index)
         return ret
 
     def __isub__(self, other):
@@ -263,7 +271,8 @@ class DOMElement:
         if self.parent:
             self.before(other)
             self.parent.pop(self._own_index)
-        return other.append(self)
+        other.append(self)
+        return self
 
     def wrap_inner(self, other):
         # TODO
@@ -441,6 +450,7 @@ class Tag(DOMElement):
     _void = False
 
     def __init__(self, **kwargs):
+        super().__init__()
         self.attrs = TagAttrs()
         self.data = {}
         if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
@@ -449,7 +459,6 @@ class Tag(DOMElement):
         self._tab_count = 0
         self._render = None
         self._stable = False
-        super().__init__()
         if self._void:
             self._render = self.render()
 
