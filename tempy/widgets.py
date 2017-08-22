@@ -104,3 +104,19 @@ class TempyTable(Table):
         idx = idx if idx is not None else len(self.body[idy]) - 1
         cell = self.body[idy].pop(idx)
         return cell if tags else cell.childs[0]
+
+    def make_header(self, head):
+        if not hasattr(self, 'header'):
+            self.header = self(header=Thead())
+        return self.header(Tr()(Th()(col) for col in head))
+
+    def make_footer(self, footer):
+        if not hasattr(self, 'footer'):
+            self.footer = self(footer=Tfoot())
+        return self.footer(Tr()(Td()(col) for col in footer))
+
+    def make_caption(self, caption):
+        if not hasattr(self, 'caption'):
+            self(caption=Caption())
+        return self.caption(caption)
+
