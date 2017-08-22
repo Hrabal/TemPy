@@ -301,12 +301,19 @@ class DOMElement:
             self.parent.pop(self._own_index)
         return self
 
-    def move_childs(self, new_father, idx_from=None, idx_to=None):
+    def _detach_childs(self, idx_from=None, idx_to=None):
         """Moves all the childs to a new father"""
         idx_from = idx_from or 0
         idx_to = idx_to or len(self.childs)
         removed = self.childs[idx_from: idx_to]
+        for child in removed:
+            if isinstance(child, (DOMElement, Content)):
+                child.parent = None
         self.childs[idx_from: idx_to] = []
+        return removed
+
+    def move_childs(self, new_father, idx_from=None, idx_to=None):
+        removed = self._detach_childs(idx_from=idx_from, idx_to=idx_to)
         new_father(removed)
         return self
 
@@ -332,8 +339,7 @@ class DOMElement:
     def empty(self):
         """Remove all this tag's childs."""
         self._stable = False
-        for child in self.childs:
-            self.pop(child._own_index)
+        self._detach_childs()
         return self
 
     def children(self):
