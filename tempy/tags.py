@@ -5,6 +5,18 @@ All the HTML tags as defined in the W3C reference, in alphabetical order.
 """
 from .tempy import Tag, VoidTag
 
+DOCTYPES = {
+    'html': 'HTML',
+    'html_strict': 'HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"',
+    'html_transitional': 'HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"',
+    'html_frameset': 'HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"',  
+    'xhtml_strict': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"',
+    'xhtml_transitional': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"',
+    'xhtml_frameset': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd"',
+    'xhtml_1_1_dtd': 'html PUBLIC "-//W3C//DTD XHTML 1.1//EN"  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"',
+    'xhtml_basic_1_1': 'html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd"',
+}
+
 
 class Comment(VoidTag):
     __tag = ''
@@ -17,7 +29,27 @@ class Comment(VoidTag):
 
 class Doctype(VoidTag):
     __tag = '!DOCTYPE'
-    _template = '<{tag}{attrs}>'
+    _template = '<{tag}{type}>'
+
+    def __init__(self, doctype):
+        self.doctype = doctype
+
+    def render(self, *args, **kwargs):
+        pretty = kwargs.pop('pretty', False)
+        return '<!DOCTYPE %s>%s' % (DOCTYPES[self.doctype], '\n' if pretty else '')
+
+
+class Html(Tag):
+    __tag = 'html'
+
+    def __init__(self, *args, **kwargs):
+        # Setting a default doctype: 'html'
+        self.doctype = Doctype(kwargs.pop('doctype', 'html'))
+        super().__init__(*args, **kwargs)
+
+    def render(self, *args, **kwargs):
+        """Override so each html page served have a doctype"""
+        return self.doctype.render() + super().render(*args, **kwargs)
 
 
 class A(Tag):
@@ -246,10 +278,6 @@ class Hr(VoidTag):
     __tag = 'hr'
 
 
-class Html(Tag):
-    __tag = 'html'
-
-
 class I(Tag):
     __tag = 'i'
 
@@ -314,7 +342,7 @@ class Menuitem(Tag):
     __tag = 'menuitem'
 
 
-class Meta(Tag):
+class Meta(VoidTag):
     __tag = 'meta'
 
 

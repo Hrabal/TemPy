@@ -3,12 +3,60 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 Widgets
 """
+from collections import Counter
 from itertools import zip_longest
 
-import tempy.tags
+import tempy.tags as tags
 from .tools import AdjustableList
 from .exceptions import WidgetDataError, WidgetError
-from .tags import Table, Tbody, Thead, Caption, Tfoot, Td, Tr, Th, Li, Ul
+from .tags import Html, Table, Tbody, Thead, Caption, Tfoot, Td, Tr, Th, Li, Ul
+
+
+class TempyPage(Html):
+    """HTML Page widget.
+    Builds an empty html page with named common tags:
+    - Doctype
+    - Head - Title - description meta - keywords meta
+    - Body
+    """
+    __tag = Html._Html__tag
+
+    def __init__(self, title=None, content=None, charset='UTF-8',
+                 keywords=None, doctype=None, **kwargs):
+        super().__init__(**kwargs)
+        keywords = keywords or []
+        self(
+            head=tags.Head()(
+                charset=tags.Meta(charset=charset),
+                description=tags.Meta(name='description', content=content),
+                keywords=tags.Meta(name='keywords', content=''.join(keywords)),
+                title=tags.Title()(title),
+            ),
+            body=tags.Body()
+        )
+
+    def set_charset(self, charset):
+        self.head.charset.attr(charset=charset)
+        return self
+
+    def set_description(self, description):
+        self.head.description.attr(content=description)
+        return self
+
+    def set_keywords(self, keywords):
+        self.head.keywords.attr(content=''.join(keywords))
+        return self
+
+    def generate_keywords(self, n=5):
+        # TODO: that a sort of placeholder for future (better) implementation
+        words = Counter()
+        for el in self.body._dfs_tags():
+            el_contents = el._get_non_tag_contents()
+            for cont in el_contents:
+                words += Counter(' '.split(cont))
+        del words['and']
+        self.set_keywords(words.most_common(10)[5:])
+        return self
 
 
 class TempyTable(Table):
@@ -151,7 +199,7 @@ class TempyList:
     def __new__(cls, typ=None, struct=None):
         if isinstance(typ, str):
             try:
-                typ = getattr(tempy.tags, typ)
+                typ = getattr(tags, typ)
             except AttributeError:
                 raise WidgetError(cls, 'TempyList type not expected.')
         try:
