@@ -589,6 +589,11 @@ class Tag(DOMElement):
         """Renders the inner html of this element."""
         return self._get_child_renders()
 
+    def _get_non_tag_contents(self):
+        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
+        for thing in filter(lambda x: not isinstance(x, DOMElement), self.childs):
+            yield thing.render() if isinstance(thing, Content) else thing
+
     def text(self):
         """Renders the contents inside this element, without html tags."""
         texts = []
