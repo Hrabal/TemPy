@@ -181,8 +181,6 @@ class TestTempyList(unittest.TestCase):
         self.assertIsInstance(li[1][1], Ul)
         self.assertEqual(len(li[1][1]), 3)
         self.assertIsInstance(li[1][1][0], Li)
-        self.assertTrue('a' in li[1][1][0])
-
 
 if __name__ == '__main__':
     unittest.main()
