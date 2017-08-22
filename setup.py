@@ -15,7 +15,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import os
 from setuptools import setup
 
 long_description = """
@@ -27,7 +26,7 @@ No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags 
 """
 
 setup(name='tem-py',
-      version='0.1.2',
+      version='0.2',
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
       description='Python OOP Templating System',
@@ -35,7 +34,7 @@ setup(name='tem-py',
       packages=['tempy'],
       url='https://github.com/Hrabal/TemPy',
       keywords=['python3', 'templating', 'html', 'web'],
-      download_url='https://github.com/Hrabal/TemPy/archive/0.1.2.tar.gz',
+      download_url='https://github.com/Hrabal/TemPy/archive/0.2.tar.gz',
       python_requires='>=3.3',
       long_description=long_description
       )
