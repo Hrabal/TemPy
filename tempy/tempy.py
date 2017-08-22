@@ -4,10 +4,11 @@ from uuid import uuid4
 from copy import copy
 from functools import wraps
 from itertools import chain
+from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import TagError
+from .exceptions import TagError, WrongContentError
 
 
 class _ChildElement:
@@ -32,28 +33,42 @@ class DOMElement:
         self.childs = []
         self.parent = None
         self.content_data = {}
-        self.uuid = uuid4()
+        self.uuid = uuid4().int
 
     def __repr__(self):
-        return '<{0}.{1} {2}. Son of {3}. Childs: {4}. Named \'{5}\'>'.format(
+        return '<%s.%s %s.%s%s%s>' % (
             self.__module__,
             type(self).__name__,
             self.uuid,
-            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
-            len(self.childs),
-            self._name)
+            ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
+            ' %d childs.' % len(self.childs) if self.childs else '',
+            ' Named %s' % self._name if self._name else '')
 
     def __hash__(self):
         return self.uuid
 
     def __eq__(self, other):
-        return self.uuid == other.uuid
+        if self.__class__ != other.__class__:
+            return False
+        comp_dicts = [{
+            'name': t._name,
+            'childs': [getattr(c, 'uuid', None) for c in t.childs],
+            'parent': getattr(t.parent, 'uuid', None),
+            'content_data': t.content_data,
+        } for t in (self, other)]
+        return comp_dicts[0] == comp_dicts[1]
 
     def __getitem__(self, i):
         return self.childs[i]
 
     def __iter__(self):
         return iter(self.childs)
+
+    def __next__(self):
+        return next(iter(self.childs))
+
+    def __reversed__(self):
+        return iter(self.childs[::-1])
 
     def __len__(self):
         return len(self.childs)
@@ -67,11 +82,53 @@ class DOMElement:
             new.attrs = self.attrs
         return new
 
+    def __add__(self, other):
+        """Addition produces a copy of the left operator, containig the right operator as a child."""
+        return self.clone()(other)
+
+    def __iadd__(self, other):
+        """In-place addition adds the right operand as left's child"""
+        return self(other)
+
+    def __sub__(self, other):
+        """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
+        if other not in self:
+            raise ValueError('%s is not in %s' % (other, self))
+        ret = self.clone()
+        ret.pop(other._own_index)
+        return ret
+
+    def __isub__(self, other):
+        """removes the child."""
+        if other not in self:
+            raise ValueError('%s is not in %s' % (other, self))
+        return self.pop(other._own_index)
+
+    def __mul__(self, n):
+        """Returns a list of clones."""
+        if not isinstance(n, int):
+            raise TypeError
+        if n < 0:
+            raise ValueError('Negative multiplication not permitted.')
+        return [self.clone() for i in range(n)]
+
+    def __imul__(self, n):
+        """Clones the element n times."""
+        if not self.parent:
+            return self * n
+        if n == 0:
+            self.parent.pop(self._own_index)
+            return self
+        return self.after(self * (n-1))
+
     @property
     def _own_index(self):
         if self.parent:
-            return self.parent.childs.index(self)
-        return None
+            try:
+                return [t.uuid for t in self.parent.childs].index(self.uuid)
+            except ValueError:
+                return -1
+        return -1
 
     def _yield_items(self, items, kwitems, reverse=False):
         """
@@ -79,7 +136,7 @@ class DOMElement:
         Returns index after flattening and a _ChildElement.
         "reverse" parameter inverts the yielding.
         """
-        verse = (1, 0)[reverse]
+        verse = (1, -1)[reverse]
         if isinstance(items, GeneratorType):
             items = list(items)
         unnamed = (_ChildElement(None, item) for item in items[::verse])
@@ -92,13 +149,14 @@ class DOMElement:
                     # Happens when iterable in kwitems
                     # i.e: d = Div(paragraphs=[P() for _ in range(5)])
                     # d.paragraphs -> [P(), P(), P()...]
-                    yield i, item.obj
+                    yield i, None, item.obj
                 else:
                     yield from self._yield_items(item.obj, {})
             elif isinstance(item.obj, DOMElement):
-                yield i, item.obj
+                item.obj._name = item._name
+                yield i, item._name, item.obj
             else:
-                yield i, item.obj
+                yield i, item._name, item.obj
 
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
@@ -108,14 +166,14 @@ class DOMElement:
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, tag in inst._yield_items(tags, kwtags, reverse):
+                for i, name, tag in inst._yield_items(tags, kwtags, reverse):
                     inst._stable = False
-                    func(inst, i, tag)
+                    func(inst, i, name, tag)
                 return inst
             return wrapped
         return _receiver
 
-    def _insert(self, child, idx=None, prepend=False):
+    def _insert(self, child, name=None, idx=None, prepend=False):
         """Inserts something inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
         If the child is a DOMElement, correctly links the child.
@@ -130,8 +188,10 @@ class DOMElement:
         self.childs.insert(idx, child)
         if isinstance(child, (DOMElement, Content)):
             child.parent = self
-            if child._name:
-                setattr(self, child._name, child)
+            if name:
+                child._name = name
+        if name:
+            setattr(self, name, child)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -150,6 +210,8 @@ class DOMElement:
         Adds content data in this element. This will be used in the rendering of this element's childs.
         Multiple injections on the same key will override the content (dict.update behavior).
         """
+        if contents and not isinstance(contents, dict):
+            raise WrongContentError(self, contents, 'contents should be a dict')
         self._stable = False
         if not contents:
             contents = {}
@@ -163,79 +225,94 @@ class DOMElement:
         return copy(self)
 
     @content_receiver()
-    def __call__(self, _, child):
+    def __call__(self, _, name, child):
         """Calling the object will add the given parameters as childs"""
-        self._insert(child)
+        self._insert(child, name=name)
 
     @content_receiver()
-    def after(self, i, child):
+    def after(self, i, name, sibling):
         """Adds siblings after the current tag."""
-        self.parent._insert(child, idx=self._own_index + 1 + i)
+        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
+        return self
 
     @content_receiver(reverse=True)
-    def before(self, i, child):
+    def before(self, i, name, sibling):
         """Adds siblings before the current tag."""
-        self.parent._insert(child, idx=self._own_index - i)
+        self.parent._insert(sibling, idx=self._own_index - i, name=name)
+        return self
 
     @content_receiver(reverse=True)
-    def prepend(self, _, child):
-        """Adds childs tho this tag, starting from the first position."""
-        self._insert(child, prepend=True)
+    def prepend(self, _, name, child):
+        """Adds childs to this tag, starting from the first position."""
+        self._insert(child, name=name, prepend=True)
+        return self
 
     def prepend_to(self, father):
         """Adds this tag to a father, at the beginning."""
         father.prepend(self)
+        return self
 
     @content_receiver()
-    def append(self, _, child):
+    def append(self, _, name, child):
         """Adds childs to this tag, after the current existing childs."""
-        self._insert(child)
+        self._insert(child, name=name)
+        return self
 
     def append_to(self, father):
         """Adds this tag to a parent, after the current existing childs."""
         father.append(self)
+        return self
 
     def wrap(self, other):
         """Wraps this element inside another empty tag."""
         # TODO: make multiple with content_receiver
         if other.childs:
-            raise TagError
+            raise TagError(self, 'Wrapping in a non empty Tag is forbidden.')
         if self.parent:
             self.before(other)
             self.parent.pop(self._own_index)
-        return other.append(self)
+        other.append(self)
+        return self
 
     def wrap_inner(self, other):
-        # TODO
-        pass
+        self.move_childs(other)
+        self(other)
+        return self
 
     def replace_with(self, other):
         """Replace this element with the given DOMElement."""
-        if isinstance(other, DOMElement):
-            self = other
-        elif isinstance(other, (GeneratorType, Iterable)):
-            self.parent.childs[self._own_index: self._own_index+1] = list(other)
-        else:
-            raise TagError()
-        return self
+        self.after(other)
+        self.parent.pop(self._own_index)
+        return other
 
     def remove(self):
         """Detach this element from his father."""
-        if self._own_index and self.parent:
-            self.parent.pop(i=self._own_index)
+        if self._own_index is not None and self.parent:
+            self.parent.pop(self._own_index)
         return self
 
-    def move(self, new_father, idx=None, prepend=None):
+    def move_childs(self, new_father, idx_from=None, idx_to=None):
+        """Moves all the childs to a new father"""
+        idx_from = idx_from or 0
+        idx_to = idx_to or len(self.childs)
+        removed = self.childs[idx_from: idx_to]
+        self.childs[idx_from: idx_to] = []
+        new_father(removed)
+        return self
+
+    def move(self, new_father, idx=None, prepend=None, name=None):
         """Moves this element from his father to the given one."""
-        self.parent.pop(i=self._own_index)
-        new_father._insert(self._name, self, idx, prepend)
+        self.parent.pop(self._own_index)
+        if name:
+            self._name = name
+        new_father._insert(self, idx=idx, prepend=prepend, name=self._name)
         new_father._stable = False
         return self
 
     def pop(self, idx=None):
         """Removes the child at given position, if no position is given removes the last."""
         self._stable = False
-        if not idx:
+        if idx is None:
             idx = len(self.childs) - 1
         elem = self.childs.pop(idx)
         if isinstance(elem, DOMElement):
@@ -245,11 +322,11 @@ class DOMElement:
     def empty(self):
         """Remove all this tag's childs."""
         self._stable = False
-        map(lambda child: self.pop(child._own_index), self.childs)
+        for child in self.childs:
+            self.pop(child._own_index)
         return self
 
-    # TODO: Make all the following properties?
-    def childrens(self):
+    def children(self):
         """Returns Tags and Content Placehorlders childs of this element."""
         return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
@@ -283,7 +360,7 @@ class DOMElement:
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
-        return filter(lambda x: x != self, self.parent.childs)
+        return filter(lambda x: x.uuid != self.uuid, self.parent.childs)
 
     def parent(self):
         """Returns this element's father"""
@@ -378,20 +455,20 @@ class Tag(DOMElement):
     """
     Provides an api for tag inner manipulation and for rendering.
     """
-    _template = '<{tag}{attrs}>{inner}</{tag}>'
+    _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
     _needed_kwargs = None
     _void = False
 
     def __init__(self, **kwargs):
+        super().__init__()
         self.attrs = TagAttrs()
         self.data = {}
         if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
-            raise TagError()
+            raise TagError(self, '%s needed, while %s given' % self._needed_kwargs, kwargs.keys())
         self.attr(**kwargs)
         self._tab_count = 0
         self._render = None
         self._stable = False
-        super().__init__()
         if self._void:
             self._render = self.render()
 
@@ -400,7 +477,7 @@ class Tag(DOMElement):
             ' .css_class %s' % (self.attrs['klass']) if 'klass' in self.attrs else '',
             ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
             )
-        return super().__repr__()[:-1] + '{}>'.format(css_repr)
+        return super().__repr__()[:-1] + '%s>' % css_repr
 
     @property
     def length(self):
@@ -517,6 +594,13 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
+        pretty = kwargs.pop('pretty', False)
+        if pretty:
+            pretty1 = 0 if pretty is True else pretty
+            pretty2 = pretty1 + 1
+        else:
+            pretty1 = pretty2 = False
+
         for arg in args:
             if isinstance(arg, dict):
                 self.inject(arg)
@@ -529,17 +613,20 @@ class Tag(DOMElement):
 
         tag_data = {
             'tag': getattr(self, '_%s__tag' % self.__class__.__name__),
-            'attrs': self.attrs.render()
+            'attrs': self.attrs.render(),
+            'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
+            'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
         }
-        tag_data['inner'] = self._get_child_renders() if not self._void and self.childs else ''
+        tag_data['inner'] = self._get_child_renders(pretty1+1) if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
         self._stable = True
         return self._render
 
-    def _get_child_renders(self):
-        return ''.join(child.render() if isinstance(child, (DOMElement, Content)) else str(child) for child in self.childs if child is not None)
+    def _get_child_renders(self, pretty):
+        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content)) else str(child)
+                       for child in self.childs if child is not None)
 
 
 class VoidTag(Tag):
@@ -570,12 +657,12 @@ class Content:
         self.stable = False
 
     def __repr__(self):
-        return '<{0}.{1} {2}. Son of {3}. Named \'{4}\'>'.format(
+        return '<%s.%s %s.%s%s>' % (
             self.__module__,
             type(self).__name__,
             self.uuid,
-            '{} {}'.format(type(self.parent).__name__, self.parent.uuid) if self.parent else 'None',
-            self._name)
+            ' Son of %s' % type(self.parent).__name__ if self.parent else '',
+            ' Named %s' % self._name if self._name else '')
 
     def __copy__(self):
         return self.__class__(self._name, self._fixed_content, self._template)
@@ -601,11 +688,10 @@ class Content:
         ret = []
         for content in self.content:
             if isinstance(content, DOMElement):
-                ret.append(content.render(pretty))
+                ret.append(content.render(pretty=pretty))
             else:
                 if self._template:
-                    self._template.inject(content)
-                    ret.append(self._template.inject(content).render())
+                    ret.append(self._template.inject(content).render(pretty=pretty))
                 else:
                     ret.append(str(content))
         return ''.join(ret)

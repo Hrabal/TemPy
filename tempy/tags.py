@@ -23,6 +23,12 @@ class Doctype(VoidTag):
 class A(Tag):
     __tag = 'a'
 
+    def render(self, *args, **kwargs):
+        """Override of the rendering so that if the link have no text in it, the href is used inside the <a> tag"""
+        if not self.childs and 'href' in self.attrs:
+            return self.clone()(self.attrs['href']).render(*args, **kwargs)
+        return super().render(*args, **kwargs)
+
 
 class Abbr(Tag):
     __tag = 'abbr'

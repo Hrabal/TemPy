@@ -14,15 +14,22 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 ..so the idea of TemPy.
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. See below for benchmarks against other templating engines.
+No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
+See below for benchmarks against other templating engines.
 
 **Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
 # Usage
+### Installation
+TemPy is avaiable on PyPi: `pip3 install tem-py`.
+
+Or clone/download this repository and run `python3 setup.py install`
+
 ### Basic Templating
 
 TemPy offers clean syntax for building pages in pure python:
 ```python
+from tempy.tags import Html, Head, Body, Meta, Link, Div, P, A
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
 another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
 
@@ -32,7 +39,7 @@ page = Html()(  # add tags inside the one you created calling the parent
         Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
         Link(href="my.css", typ="text/css", rel="stylesheet")
     ),
-    Body()(
+    body=Body()(  # give them a name so you can navigate the DOM with those names
         Div(klass='linkBox')(
             A(href='www.foo.com')
         ),
@@ -44,6 +51,8 @@ page = Html()(  # add tags inside the one you created calling the parent
 # add tags and content later
 page[1][0](A(href='www.bar.com'))  # calling the tag
 page[1][0].append(A(href='www.baz.com'))  # using the API
+link = Link().append_to(page.body) # access the body as if it's a page attribute
+link.attr(href='www.python.org')('This is a link to Python') # Add attributes and content to already placed tags
 
 page.render()
 >>> <html>
@@ -56,6 +65,7 @@ page.render()
 >>>             <a href="www.foo.com"></a>
 >>>             <a href="www.bar.com"></a>
 >>>             <a href="www.baz.com"></a>
+>>>             <a href="www.python.org">This is a link to Python</a>
 >>>         </div>
 >>>         <p>This is foo</p>
 >>>         <p>This is Bar</p>
@@ -74,17 +84,19 @@ from somewhere import links, foot_imgs
 header = Div(klass='header')(title=Div()('My website'), logo=Img(src='img.png'))
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
 footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
-
+```
+```python
 # --- file: pages.py
 from base_elements import header, menu, footer
+
 # import the common blocks and use them inside your page
-
-home_page = Html()(Head(), Body()(header, menu, content='Hello world.', footer=footer))
-content_page = Html()(Head(), Body()(header, menu, container=Div(klass='container'), footer=footer))
-
+home_page = Html()(Head(), body=Body()(header, menu, content='Hello world.', footer=footer))
+content_page = Html()(Head(), body=Body()(header, menu, container=Div(klass='container'), footer=footer))
+```
+```python
 # --- file: my_controller.py
 from tempy.tags import Div
-from home_page import home_page, content_page
+from pages import home_page, content_page
 
 @controller_framework_decorator
 def mycontroller(url='/'):
@@ -93,7 +105,7 @@ def mycontroller(url='/'):
 @controller_framework_decorator
 def mycontroller(url='/content'):
     content = Div()('This is my content!')
-    return content_page.container.append(content).render()
+    return content_page.body.container.append(content).render()
 ```
 
 ### Elements creation and removal
@@ -135,7 +147,7 @@ All the main jQuery manipulating apis are provided.
 ## Tag Attributes 
 Add attributes to every element at definition time or later:
 ```python
-div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' is 'class' but without overriding Python's buildin keywords
+div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' because 'class' is a Python's buildin keyword
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
 
 a = A(klass='someHtmlClass')('text of this link')
@@ -161,7 +173,7 @@ ps = (P() for _ in range(10))
 container_div = Div()(divs)
 
 for i, div in enumerate(container_div):
-    div.attr(id='divId'+i)
+    div.attr(id='divId'+str(i))
 container_div[0].append(ps)
 container_div[0][4].attr(id='pId')
 >>> <div>
@@ -170,7 +182,7 @@ container_div[0][4].attr(id='pId')
 >>>         <p></p>
 >>>         <p></p>
 >>>         <p></p>
->>>         <p id="uniquePid"></p>
+>>>         <p id="pId"></p>
 >>>         <p></p>
 >>>         <p></p>
 >>>         <p></p>
@@ -214,11 +226,13 @@ container_div.slice()
 # Performance
 Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
 
-TemPy does parse, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
+TemPy does not parse strings, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
-Here are a few benchmarks of TemPy in action, rendering a template with a single for loop (see code [here](benchmarks))
+Here are a few benchmarks of TemPy in action, used in a Flask app, rendering a template (see code [here](benchmarks))
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
+
+![TemPy Web Rendering](bench.jpg)
 
 Running 20s test @ http://127.0.0.1:8888/tempy + http://127.0.0.1:8888/j2
   10 threads and 200 connections
@@ -242,11 +256,14 @@ Req/Sec | 59.29 | 20.53 | 151.00 | 71.23%
 Requests/sec:    589.70
 Transfer/sec:      3.63MB
 
+Performance difference is even higher in Jinja2 plain (no Flask) rendering:
+![TemPy No-Web Rednering](bench_plain.jpg)
+
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
-## Python versions compatibility:
+## Python versions compatibility
 Python >= 3.3 needed, ask [Travis](https://travis-ci.org/Hrabal/TemPy) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy)
 
 ### Apache 2.0 license, see LICENSE for details.
