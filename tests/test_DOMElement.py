@@ -241,11 +241,6 @@ class TestDOMelement(unittest.TestCase):
         div1(Div())
         self.assertNotEqual(div1, div2)
 
-        # empty tags with different fathers are not equal
-        div1 = Div()
-        div2 = Div()
-        Div()(div1)
-        self.assertNotEqual(div1, div2)
 
     def test_childs_index(self):
         div = Div()

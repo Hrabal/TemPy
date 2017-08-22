@@ -6,7 +6,7 @@ import unittest
 from copy import copy
 
 from tempy.widgets import TempyTable
-from tempy.tags import Table
+from tempy.tags import Table, Tr, Td
 
 from tempy.exceptions import WidgetDataError
 
@@ -94,6 +94,43 @@ class TestTempyTable(unittest.TestCase):
         self.assertTrue('test2' in table.body[3][11])
         with self.assertRaises(IndexError):
             table.body[0][11]
+
+    def test_pop_row(self):
+        table = TempyTable(data=self.data)
+
+        # test pop last
+        r = table.pop_row()
+        self.assertEqual(r, self.data[-1])
+
+        # test pop get tags
+        r = table.pop_row(tags=True)
+        test_row = Tr()(Td()(c) for c in self.data[-2])
+        for cell, t_cell in zip(r, test_row):
+            self.assertEqual(cell, t_cell)
+
+        # test pop by index
+        r = table.pop_row(0)
+        self.assertEqual(r, self.data[0])
+
+    def test_pop_cell(self):
+        table = TempyTable(data=self.data)
+
+        # test pop last
+        r = table.pop_cell()
+        self.assertEqual(r, self.data[-1][-1])
+
+        # test pop get tags
+        r = table.pop_cell(tags=True)
+        test_cell = Td()(self.data[-2][-1])
+        self.assertEqual(r, test_cell)
+
+        # test pop by index row
+        r = table.pop_cell(0)
+        self.assertEqual(r, self.data[0][-1])
+
+        # test pop by index row andcol
+        r = table.pop_cell(0, 0)
+        self.assertEqual(r, self.data[0][0])
 
 
 if __name__ == '__main__':

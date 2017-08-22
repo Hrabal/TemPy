@@ -53,7 +53,6 @@ class DOMElement:
         comp_dicts = [{
             'name': t._name,
             'childs': [getattr(c, 'uuid', None) for c in t.childs],
-            'parent': getattr(t.parent, 'uuid', None),
             'content_data': t.content_data,
         } for t in (self, other)]
         return comp_dicts[0] == comp_dicts[1]
