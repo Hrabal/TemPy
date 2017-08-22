@@ -6,8 +6,8 @@ Widgets
 from itertools import zip_longest
 
 from .tools import AdjustableList
-from .exceptions import WidgetDataError
 from .tags import Table, Caption, Thead, Tbody, Tfoot, Tr, Th, Td
+from .exceptions import WidgetDataError, WidgetError
 
 
 class TempyTable(Table):
@@ -31,11 +31,11 @@ class TempyTable(Table):
             data = [[None for _ in range(cols)]
                     for _ in range(rows + sum((head, foot)))]
         if caption:
-            self(caption=Caption()(caption))
+            self.make_caption(caption)
         if head:
-            self(header=Thead()(Tr()(Th()(col) for col in data.pop(0))))
+            self.make_header(data.pop(0))
         if foot:
-            self(footer=Tfoot()(Tr()(Td()(col) for col in data.pop())))
+            self.make_footer(data.pop())
         self.populate(data, resize_x=True)
 
     def _check_row_size(self, row):
@@ -54,13 +54,15 @@ class TempyTable(Table):
         force: if True, overwrites the present data, else fills only the empty cells.
         normalize: if True all the rows will have the same number of columns, if False, data structure is followed.
         """
-        if not data:
-            # Maybe raise?
+        if data is None:
+            # Maybe raise? Empty the table?
             return self
 
         if not self.body:
             # Table is empty
-            self(body=Tbody()(Tr()(Td()(col) for col in row) for row in data))
+            self(body=Tbody())
+            for row in data:
+                self.add_row(row, resize_x=True)
         else:
             max_data_x = max(map(len, data))
             if not resize_x:
