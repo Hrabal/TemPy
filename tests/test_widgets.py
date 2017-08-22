@@ -5,8 +5,8 @@
 import unittest
 from copy import copy
 
-from tempy.widgets import TempyTable
-from tempy.tags import Table, Tr, Td
+from tempy.widgets import TempyTable, TempyList
+from tempy.tags import Table, Tr, Td, Ul, Ol, Li
 
 from tempy.exceptions import WidgetDataError
 
@@ -131,6 +131,57 @@ class TestTempyTable(unittest.TestCase):
         # test pop by index row andcol
         r = table.pop_cell(0, 0)
         self.assertEqual(r, self.data[0][0])
+
+
+class TestTempyList(unittest.TestCase):
+
+    def test_create_empty(self):
+        li = TempyList()
+        self.assertIsInstance(li, Ul)
+        self.assertEqual(len(li), 0)
+
+        li = TempyList(Ol)
+        self.assertIsInstance(li, Ol)
+        self.assertEqual(len(li), 0)
+
+        li = TempyList('Ol')
+        self.assertIsInstance(li, Ol)
+        self.assertEqual(len(li), 0)
+
+    def test_populate_empty(self):
+        li = TempyList()
+        li.populate([1, 2, 3])
+        self.assertIsInstance(li, Ul)
+        self.assertEqual(len(li), 3)
+        self.assertIsInstance(li[0], Li)
+
+    def test_create_full(self):
+        li = TempyList(struct=[1, 2, 3])
+        self.assertIsInstance(li, Ul)
+        self.assertEqual(len(li), 3)
+        self.assertIsInstance(li[0], Li)
+        self.assertTrue(1 in li[0])
+
+        li = TempyList(struct={1, 2, 3})
+        self.assertIsInstance(li, Ul)
+        self.assertEqual(len(li), 3)
+        self.assertIsInstance(li[0], Li)
+
+        li = TempyList(struct={1: None, 2: None, 3: None, '_typ': Ol})
+        self.assertIsInstance(li, Ol)
+        self.assertEqual(len(li), 3)
+        self.assertIsInstance(li[0], Li)
+
+    def test_populate_recursive(self):
+        li = TempyList()
+        li.populate({1: None, 2: ['a', 'b', 'c'], 3: {'test': [1, 2, 3]}})
+        self.assertIsInstance(li, Ul)
+        self.assertEqual(len(li), 3)
+        self.assertIsInstance(li[0], Li)
+        self.assertIsInstance(li[1][1], Ul)
+        self.assertEqual(len(li[1][1]), 3)
+        self.assertIsInstance(li[1][1][0], Li)
+        self.assertTrue('a' in li[1][1][0])
 
 
 if __name__ == '__main__':

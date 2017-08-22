@@ -5,9 +5,10 @@ Widgets
 """
 from itertools import zip_longest
 
+import tempy.tags
 from .tools import AdjustableList
-from .tags import Table, Caption, Thead, Tbody, Tfoot, Tr, Th, Td
 from .exceptions import WidgetDataError, WidgetError
+from .tags import Table, Tbody, Thead, Caption, Tfoot, Td, Tr, Th, Li, Ul
 
 
 class TempyTable(Table):
@@ -120,3 +121,43 @@ class TempyTable(Table):
             self(caption=Caption())
         return self.caption(caption)
 
+
+class TempyListMeta:
+    def __init__(self, struct=None):
+        self._typ = self.__class__.__bases__[1]
+        self._TempyList__tag = getattr(self._typ, '_%s__tag' % self._typ.__name__)
+        super().__init__()
+        self.populate(struct=struct)
+
+    def populate(self, struct):
+        if struct is None:
+            # Maybe raise? Empty the list?
+            return self
+
+        if isinstance(struct, (list, set)):
+            struct = dict(zip_longest(struct, [None]))
+        if not isinstance(struct, dict):
+            raise WidgetDataError(self, 'List Imput not managed, expected (dict, list), got %s' % type(struct))
+        else:
+            for k, submenu in struct.items():
+                item = Li()(k)
+                self(item)
+                if submenu:
+                    item(TempyList(typ=self._typ, struct=submenu))
+        return self
+
+
+class TempyList:
+    def __new__(cls, typ=None, struct=None):
+        if isinstance(typ, str):
+            try:
+                typ = getattr(tempy.tags, typ)
+            except AttributeError:
+                raise WidgetError(cls, 'TempyList type not expected.')
+        try:
+            typ = struct.pop('_typ')
+        except (TypeError, KeyError, AttributeError):
+            pass
+        typ = typ or Ul
+        cls_typ = type("TempyList%s" % typ.__name__, (TempyListMeta, typ), {})
+        return cls_typ(struct=struct)
