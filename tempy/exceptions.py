@@ -24,3 +24,14 @@ class ContentError(object):
 
 class WrongContentError(ContentError, ValueError):
     """Raised when the provided content is not a dict."""
+
+
+class WidgetError(TempyException):
+    """Base widget error"""
+    def __init__(self, widget, *args):
+        super().__init__(*args)
+        self.widget = widget
+
+
+class WidgetDataError(WidgetError):
+    """Raised when wrong data is given to a widget"""
