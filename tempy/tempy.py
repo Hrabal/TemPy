@@ -130,6 +130,16 @@ class DOMElement:
                 return -1
         return -1
 
+    @property
+    def length(self):
+        """Returns the number of childs."""
+        return len(self.childs)
+
+    @property
+    def is_empty(self):
+        """True if no childs"""
+        return self.length == 0
+
     def _yield_items(self, items, kwitems, reverse=False):
         """
         Recursive generator, flattens the given items/kwitems.
@@ -478,11 +488,6 @@ class Tag(DOMElement):
             ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
             )
         return super().__repr__()[:-1] + '%s>' % css_repr
-
-    @property
-    def length(self):
-        """Returns the number of childs."""
-        return len(self.childs)
 
     @property
     def index(self):
