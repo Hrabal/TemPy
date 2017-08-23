@@ -5,8 +5,8 @@
 import unittest
 from copy import copy
 
-from tempy.widgets import TempyTable, TempyList
-from tempy.tags import Table, Tr, Td, Ul, Ol, Li
+from tempy.widgets import TempyTable, TempyList, TempyPage
+from tempy.tags import Table, Tr, Td, Ul, Ol, Li, Html, Head, Body
 
 from tempy.exceptions import WidgetDataError
 
@@ -181,6 +181,19 @@ class TestTempyList(unittest.TestCase):
         self.assertIsInstance(li[1][1], Ul)
         self.assertEqual(len(li[1][1]), 3)
         self.assertIsInstance(li[1][1][0], Li)
+
+
+class TestTempyPage(unittest.TestCase):
+
+    def test_create(self):
+        page = TempyPage()
+        self.assertIsInstance(page, Html)
+        self.assertEqual(len(page), 2)
+        self.assertIsInstance(page.head, Head)
+        self.assertIsInstance(page.body, Body)
+        self.assertEqual(len(page.head.title), 0)
+        self.assertEqual(page.head.charset.attrs['charset'], 'UTF-8')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -6,6 +6,7 @@ import unittest
 
 from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
+from tempy.exceptions import WrongContentError
 
 
 class TestDOMelement(unittest.TestCase):
@@ -29,6 +30,10 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(self.page.first(), head)
         self.assertEqual(self.page.last(), body)
 
+    def test_render_raise(self):
+        with self.assertRaises(NotImplementedError):
+            DOMElement().render()
+
     def test_create_instantiation(self):
         self.is_tag(self.page)
 
@@ -41,6 +46,12 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(self.page.childs[0], head)
         self.assertEqual(self.page.first(), head)
         self.assertEqual(self.page.last(), head)
+
+    def test_own_index(self):
+        d = Div()
+        p = Div()(d)
+        self.assertEqual(d._own_index, 0)
+        self.assertEqual(p._own_index, -1)
 
     def test_create_call_multitag(self):
         head = Head()
@@ -97,6 +108,12 @@ class TestDOMelement(unittest.TestCase):
         self.page.append(new2)
         self.assertEqual(new2._own_index, 2)
 
+    def test__insert_negative_index(self):
+        d = Div()
+        child = Div()
+        d._insert(child, idx=-1)
+        self.assertEqual(child._own_index, 0)
+
     def test_append_to(self):
         self.page(Div(), Div())
         new2 = Div().append_to(self.page)
@@ -127,6 +144,9 @@ class TestDOMelement(unittest.TestCase):
         new = Div().append_to(self.page)
         self.page.pop(0)
         self.assertTrue(new not in self.page)
+        new2 = Div().append_to(self.page)
+        self.page.pop()
+        self.assertTrue(new2 not in self.page)
 
     def test_empty(self):
         new = Div().append_to(self.page)
@@ -142,6 +162,16 @@ class TestDOMelement(unittest.TestCase):
         div = Div()(A(), Div(), P())
         test = next(reversed(div))
         self.assertTrue(isinstance(test, P))
+
+    def test_contents(self):
+        test = [A(), Div(), P()]
+        div = Div()(test)
+        self.assertEqual(div.contents(), test)
+
+    def test_children(self):
+        test = [A(), Div(), P(), 'test']
+        div = Div()(test)
+        self.assertEqual(list(div.children()), test[:-1])
 
     def test_add(self):
         a = A()
@@ -204,6 +234,9 @@ class TestDOMelement(unittest.TestCase):
         self.assertTrue(a in div)
         self.assertEqual(len(div), 4)
         self.assertIsInstance(div[2], A)
+        b = Div()
+        b *= 2
+        self.assertEqual(b, [Div(), Div()])
 
     def test_imul_zero(self):
         a = A()
@@ -302,6 +335,28 @@ class TestDOMelement(unittest.TestCase):
         self.assertFalse(a in d1)
         self.assertTrue(a in p)
         self.assertTrue(p in d1)
+
+    def test__find_content(self):
+        a = Div()
+        a.inject(test='test')
+        b = Div()
+        a(b)
+        b._find_content('test')
+        c = P()
+        c._find_content('test')
+
+    def test_inject(self):
+        a = Div()
+        a.inject(test='test')
+        self.assertEqual(a.content_data['test'], 'test')
+        a.inject({'test2': 'test'})
+        self.assertEqual(a.content_data['test2'], 'test')
+        a.inject({'test3': 'test'}, test4='test')
+        self.assertEqual(a.content_data['test3'], 'test')
+        self.assertEqual(a.content_data['test4'], 'test')
+        with self.assertRaises(WrongContentError):
+            a.inject([1,2,3])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -76,10 +76,7 @@ class DOMElement:
         return x in self.childs
 
     def __copy__(self):
-        new = self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else c for c in self.childs)
-        if hasattr(new, 'attrs'):
-            new.attrs = self.attrs
-        return new
+        return self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else c for c in self.childs)
 
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
@@ -188,19 +185,20 @@ class DOMElement:
         If the child is a DOMElement, correctly links the child.
         If a name is provided, an attribute containing the child is created in this instance.
         """
-        if idx and idx < 0:
-            idx = 0
-        if prepend:
-            idx = 0
-        else:
-            idx = idx if idx is not None else len(self.childs)
-        self.childs.insert(idx, child)
-        if isinstance(child, (DOMElement, Content)):
-            child.parent = self
+        if child is not None:
+            if idx and idx < 0:
+                idx = 0
+            if prepend:
+                idx = 0
+            else:
+                idx = idx if idx is not None else len(self.childs)
+            self.childs.insert(idx, child)
+            if isinstance(child, (DOMElement, Content)):
+                child.parent = self
+                if name:
+                    child._name = name
             if name:
-                child._name = name
-        if name:
-            setattr(self, name, child)
+                setattr(self, name, child)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -343,7 +341,7 @@ class DOMElement:
 
     def children(self):
         """Returns Tags and Content Placehorlders childs of this element."""
-        return filter(lambda x: isinstance(x, DOMElement), self.childs)
+        return filter(lambda x: isinstance(x, (DOMElement, Content)), self.childs)
 
     def contents(self):
         """Returns this elements childs list, unfiltered."""
@@ -494,6 +492,11 @@ class Tag(DOMElement):
             )
         return super().__repr__()[:-1] + '%s>' % css_repr
 
+    def __copy__(self):
+        new = super().__copy__()
+        new.attrs = copy(self.attrs)
+        return new
+
     @property
     def index(self):
         """Returns the position of this element in the parent's childs list.
@@ -640,8 +643,8 @@ class Tag(DOMElement):
         return self._render
 
     def _get_child_renders(self, pretty):
-        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content)) else str(child)
-                       for child in self.childs if child is not None)
+        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content))
+                       else str(child) for child in self.childs)
 
 
 class VoidTag(Tag):

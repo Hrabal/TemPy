@@ -37,6 +37,7 @@ class Doctype(VoidTag):
 
     def __init__(self, doctype):
         self.doctype = doctype
+        super().__init__()
 
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
@@ -52,7 +53,7 @@ class Html(Tag):
     def __init__(self, *args, **kwargs):
         # Setting a default doctype: 'html'
         self.doctype = Doctype(kwargs.pop('doctype', 'html'))
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
 
     def render(self, *args, **kwargs):
         """Override so each html page served have a doctype"""
