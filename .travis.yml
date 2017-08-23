@@ -18,7 +18,7 @@ branches:
 # before_install: TODO: make it work
 #   - bash ./preflight.sh # exclude only .md commits
 # command to run tests
-script: coverage run python3 -m unittest discover
+script: coverage run -m unittest discover
 after_success:
   coveralls
 after_script:
