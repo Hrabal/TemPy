@@ -1,6 +1,7 @@
 # TemPy
-[![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) 
-![TemPy Logo](tempy.png)
+[![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master)
+
+[TemPy Logo](tempy.png)
 
 ### Fast Object-Oriented HTML templating With Python!
 
