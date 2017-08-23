@@ -182,6 +182,18 @@ class TempyTable(Table):
 
 
 class TempyListMeta:
+    """Widget for lists, manages the automatic generation starting from iterables and dicts.
+    Plain iterables will produce plain lists, nested dicts will produce nested lists.
+    Default list type is unordered. List type (ol or ul) can be passed as string argument ("Ul", "Ol"),
+    list tag classes (tempy.tags.Ul, tempy.tags.Ol) or "_typ" special key in the given structure:
+    >>> ul = TempyList()
+    >>> ol = TempyList(typ='Ol')
+    >>> ol = TempyList(typ=tempy.tags.Ol)
+    >>> ol = TempyList(struct={'_typ': tempy.tags.Ol})
+    >>> ol = TempyList(struct={'_typ': 'Ol'})
+    List building is made through the TempyList.populate method; this will trasform a python datastructure
+    (list/tuple/dict/etc..) in a Tempy tree.
+    """
     def __init__(self, struct=None):
         self._typ = self.__class__.__bases__[1]
         self._TempyList__tag = getattr(self._typ, '_%s__tag' % self._typ.__name__)
@@ -189,11 +201,33 @@ class TempyListMeta:
         self.populate(struct=struct)
 
     def populate(self, struct):
+        """Generates the list tree.
+        struct: if a list/set/tuple is given, a flat list is generated <*l><li>v1</li><li>v2</li>...</*l>
+        If the given struct is a dict, key contaninct lists/tuples/sets/dicts will be transformed in nested
+        lists, and so on recursively, using dict keys as list items, and dict values as sublists:
+        >>> struct = {'ele1': None, 'ele2': ['sub2.1', 'sub2.2'], 'ele3': {'sub3.1': None, 'sub3.2': None, '_typ': 'Ol'}}
+        >>> TempyList(struct=struct)
+        <ul>
+            <li>ele1</li>
+            <li>ele2
+                <ul>
+                    <li>sub2.1</li>
+                    <li>sub2.2</li>
+                </ul>
+            </li>
+            <li>ele3
+                <ol>
+                    <li>sub3.1</li>
+                    <li>sub3.2</li>
+                </ol>
+            </li>
+        </ul>      
+        """
         if struct is None:
             # Maybe raise? Empty the list?
             return self
 
-        if isinstance(struct, (list, set)):
+        if isinstance(struct, (list, set, tuple)):
             struct = dict(zip_longest(struct, [None]))
         if not isinstance(struct, dict):
             raise WidgetDataError(self, 'List Imput not managed, expected (dict, list), got %s' % type(struct))
@@ -207,17 +241,18 @@ class TempyListMeta:
 
 
 class TempyList:
-    """TempyList is a general Class factory, 
+    """TempyList is a class factory, it works for both ul and ol lists (TODO: dl).
+    See TempyListMeta for TempyList methods and docstings."""
     def __new__(cls, typ=None, struct=None):
+        try:
+            typ = struct.pop('_typ')
+        except (TypeError, KeyError, AttributeError):
+            pass
         if isinstance(typ, str):
             try:
                 typ = getattr(tags, typ)
             except AttributeError:
                 raise WidgetError(cls, 'TempyList type not expected.')
-        try:
-            typ = struct.pop('_typ')
-        except (TypeError, KeyError, AttributeError):
-            pass
         typ = typ or Ul
         cls_typ = type("TempyList%s" % typ.__name__, (TempyListMeta, typ), {})
         return cls_typ(struct=struct)
