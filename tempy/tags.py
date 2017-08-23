@@ -28,6 +28,10 @@ class Comment(VoidTag):
 
 
 class Doctype(VoidTag):
+    """Doctype is a special tag that needs special rendering.
+    It is mandatory to provide a doctype code that will be tranlated into valid HTML doctype coding.
+    Avaiable doctype codes: html, html_strict, html_transitional, html_frameset, xhtml_strict, xhtml_transitional, xhtml_frameset, xhtml_1_1_dtd, xhtml_basic_1_1
+    """
     __tag = '!DOCTYPE'
     _template = '<{tag}{type}>'
 
@@ -40,6 +44,9 @@ class Doctype(VoidTag):
 
 
 class Html(Tag):
+    """Html tag have a custom render method for it needs to output the Doctype tag outside the main page tree.
+    Every Html object is associated with a Doctype object (default doctype code: 'html').
+    """
     __tag = 'html'
 
     def __init__(self, *args, **kwargs):
