@@ -6,7 +6,7 @@ import unittest
 
 from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
-from tempy.exceptions import WrongContentError
+from tempy.exceptions import WrongContentError, TagError
 
 
 class TestDOMelement(unittest.TestCase):
@@ -123,6 +123,15 @@ class TestDOMelement(unittest.TestCase):
         container = Div()
         new = A().wrap(container)
         self.assertTrue(new in container)
+        with self.assertRaises(TagError):
+            A().wrap(Div()(P()))
+        container = Div()
+        to_wrap = Div()
+        outermost = Div()
+        outermost(to_wrap)
+        to_wrap.wrap(container)
+        self.assertTrue(to_wrap in container)
+        self.assertTrue(container in outermost)
 
     def test_replace_with(self):
         old = Div().append_to(self.page)
@@ -136,9 +145,15 @@ class TestDOMelement(unittest.TestCase):
 
     def test_move(self):
         new = Div().append_to(self.page)
+        self.assertTrue(new in self.page)
         new_container = Div()
         new.move(new_container)
         self.assertTrue(new not in self.page and new in new_container)
+        new = Div().append_to(self.page)
+        new_container = Div()
+        new.move(new_container, name='test')
+        self.assertTrue(new not in self.page and new in new_container)
+        self.assertEqual(new_container.test, new)
 
     def test_pop(self):
         new = Div().append_to(self.page)
@@ -199,6 +214,8 @@ class TestDOMelement(unittest.TestCase):
         self.assertFalse(a in result)
         self.assertTrue(a in div)
         self.assertIsNot(div, result)
+        with self.assertRaises(ValueError):
+            _ = div - P()
 
     def test_isub(self):
         a = A()
@@ -273,7 +290,6 @@ class TestDOMelement(unittest.TestCase):
         # Non-empty tags are not equal
         div1(Div())
         self.assertNotEqual(div1, div2)
-
 
     def test_childs_index(self):
         div = Div()
