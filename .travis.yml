@@ -9,6 +9,8 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "3.7-dev" # 3.7 development branch
   - "nightly" # currently points to 3.7-dev
+install:
+  - "pip3 install coveralls"
 branches:
   only:
     - master
@@ -16,7 +18,9 @@ branches:
 # before_install: TODO: make it work
 #   - bash ./preflight.sh # exclude only .md commits
 # command to run tests
-script: python -m unittest discover
+script: coverage run python3 -m unittest discover
+after_success:
+  coveralls
 after_script:
   - sleep 10 # helps travis finish logging
 notifications:
