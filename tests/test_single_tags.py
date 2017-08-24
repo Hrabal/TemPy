@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy.tags import Div, A
+from tempy.tags import Div, A, Comment
 
 
 class TestSingleTags(unittest.TestCase):
@@ -16,6 +16,12 @@ class TestSingleTags(unittest.TestCase):
         a = A(href='www.test.com')
         expected = '<a href="www.test.com">www.test.com</a>'
         self.assertEqual(a.render(), expected)
+
+    def test_comment(self):
+        comment_string = 'Test comment'
+        c = Comment(comment_string)
+        print(c.render())
+        self.assertTrue(comment_string in c.render())
 
 if __name__ == '__main__':
     unittest.main()
