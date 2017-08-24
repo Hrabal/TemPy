@@ -40,6 +40,11 @@ class TempyPage(Html):
             body=tags.Body()
         )
 
+    def set_doctype(self, doctype):
+        """Changes the <meta> charset tag (default charset in init is UTF-8)."""
+        self.doctype.type_code = doctype
+        return self
+
     def set_charset(self, charset):
         """Changes the <meta> charset tag (default charset in init is UTF-8)."""
         self.head.charset.attr(charset=charset)
@@ -52,18 +57,7 @@ class TempyPage(Html):
 
     def set_keywords(self, keywords):
         """Changes the <meta> keywords tag."""
-        self.head.keywords.attr(content=''.join(keywords))
-        return self
-
-    def generate_keywords(self, n=5):
-        # TODO: that a sort of placeholder for future (better) implementation
-        words = Counter()
-        for el in self.body._dfs_tags():
-            el_contents = el._get_non_tag_contents()
-            for cont in el_contents:
-                words += Counter(' '.split(cont))
-        del words['and']
-        self.set_keywords(words.most_common(10)[5:])
+        self.head.keywords.attr(content=', '.join(keywords))
         return self
 
 
@@ -164,14 +158,16 @@ class TempyTable(Table):
 
     def make_header(self, head):
         """Makes the header row from the given data."""
+        header = Thead().append_to(self)
         if not hasattr(self, 'header'):
-            self.header = self(header=Thead())
+            self.header = header
         return self.header(Tr()(Th()(col) for col in head))
 
     def make_footer(self, footer):
         """Makes the footer row from the given data."""
+        footer = Tfoot().append_to(self)
         if not hasattr(self, 'footer'):
-            self.footer = self(footer=Tfoot())
+            self.footer = footer
         return self.footer(Tr()(Td()(col) for col in footer))
 
     def make_caption(self, caption):
