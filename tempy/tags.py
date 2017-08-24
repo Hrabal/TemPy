@@ -20,11 +20,14 @@ DOCTYPES = {
 
 class Comment(VoidTag):
     __tag = ''
-    _template = '<!-- {attrs} -->'
+    _template = '<!-- %s -->'
 
     def __init__(self, comment_text):
+        self._comment = comment_text
         super().__init__()
-        self.attrs._comment = comment_text
+
+    def render(self):
+        return self._template % self._comment
 
 
 class Doctype(VoidTag):
