@@ -36,12 +36,12 @@ class Doctype(VoidTag):
     _template = '<{tag}{type}>'
 
     def __init__(self, doctype):
-        self.doctype = doctype
+        self.type_code = doctype
         super().__init__()
 
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
-        return '<!DOCTYPE %s>%s' % (DOCTYPES[self.doctype], '\n' if pretty else '')
+        return '<!DOCTYPE %s>%s' % (DOCTYPES[self.type_code], '\n' if pretty else '')
 
 
 class Html(Tag):
