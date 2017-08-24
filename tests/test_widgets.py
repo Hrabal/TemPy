@@ -6,9 +6,9 @@ import unittest
 from copy import copy
 
 from tempy.widgets import TempyTable, TempyList, TempyPage
-from tempy.tags import Table, Tr, Td, Ul, Ol, Li, Html, Head, Body
+from tempy.tags import Table, Tr, Td, Ul, Ol, Li, Html, Head, Body, Thead, Tfoot
 
-from tempy.exceptions import WidgetDataError
+from tempy.exceptions import WidgetDataError, WidgetError
 
 
 class TestTempyTable(unittest.TestCase):
@@ -45,6 +45,12 @@ class TestTempyTable(unittest.TestCase):
         self.assertEqual(len(table.body), 15)
         self.assertEqual(len(table.body[0]), 10)
         self.verify_content(table)
+
+    def test_init_from_data_full(self):
+        table = TempyTable(data=self.data, head=True, foot=True)
+        self.assertEqual(len(table.body), 13)
+        self.assertIsInstance(table.header, Thead)
+        self.assertIsInstance(table.footer, Tfoot)
 
     def test_populate(self):
         # test no_resize
@@ -148,12 +154,17 @@ class TestTempyList(unittest.TestCase):
         self.assertIsInstance(li, Ol)
         self.assertEqual(len(li), 0)
 
+        with self.assertRaises(WidgetError):
+            li = TempyList('Wrong')
+
     def test_populate_empty(self):
         li = TempyList()
         li.populate([1, 2, 3])
         self.assertIsInstance(li, Ul)
         self.assertEqual(len(li), 3)
         self.assertIsInstance(li[0], Li)
+        with self.assertRaises(WidgetDataError):
+            li.populate('wrong type')
 
     def test_create_full(self):
         li = TempyList(struct=[1, 2, 3])
@@ -193,6 +204,30 @@ class TestTempyPage(unittest.TestCase):
         self.assertIsInstance(page.body, Body)
         self.assertEqual(len(page.head.title), 0)
         self.assertEqual(page.head.charset.attrs['charset'], 'UTF-8')
+
+    def test_charset(self):
+        page = TempyPage()
+        self.assertEqual(page.head.charset.attrs['charset'], 'UTF-8')
+        page.set_charset('text/html;charset=ISO-8859-1')
+        self.assertEqual(page.head.charset.attrs['charset'], 'text/html;charset=ISO-8859-1')
+
+    def test_description(self):
+        page = TempyPage()
+        page.set_description('test page')
+        self.assertEqual(page.head.description.attrs['content'], 'test page')
+
+    def test_keywords(self):
+        page = TempyPage()
+        kw = ['test', 'foo', 'bar']
+        page.set_keywords(kw)
+        self.assertEqual(page.head.keywords.attrs['content'], ', '.join(kw))
+
+    def test_doctype(self):
+        page = TempyPage()
+        page.set_doctype('html_strict')
+        charset_string = 'HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"'
+        self.assertTrue(charset_string in page.render())
+
 
 
 if __name__ == '__main__':
