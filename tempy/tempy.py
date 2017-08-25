@@ -422,7 +422,7 @@ class TagAttrs(dict):
     TagAttrs.render formats all the attributes in the proper html format.
     """
     _MAPPING_ATTRS = ('style', )
-    _MULTI_VALUES_ATTRS = ('klass', 'typ', )
+    _SET_VALUES_ATTRS = ('klass', )
     _SPECIALS = {
         'klass': 'class',
         'typ': 'type'
@@ -430,21 +430,28 @@ class TagAttrs(dict):
     _FORMAT = {
         'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
-        'typ': lambda x: ' '.join(x),
         'comment': lambda x: x
     }
 
-    def __setitem__(self, key, value):
-        if key in self._MULTI_VALUES_ATTRS:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for key in self._SET_VALUES_ATTRS:
             if key not in self:
-                super().__setitem__(key, [])
-            self[key].append(value)
-        elif key in self._MAPPING_ATTRS:
+                super().__setitem__(key, set())
+        for key in self._MAPPING_ATTRS:
             if key not in self:
                 super().__setitem__(key, {})
+
+    def __setitem__(self, key, value):
+        if key in self._SET_VALUES_ATTRS:
+            self[key].add(value)
+        elif key in self._MAPPING_ATTRS:
             self[key].update(value)
         else:
             super().__setitem__(key, value)
+
+    def __copy__(self):
+        return TagAttrs(self.items())
 
     def update(self, attrs=None, **kwargs):
         if attrs is not None:
@@ -525,17 +532,27 @@ class Tag(DOMElement):
         self.attrs.pop(attr, None)
         return self
 
+    def has_class(self, csscl):
+        """Checks if this element have the given css class."""
+        return csscl in self.attrs['klass']
+
+    def toggle_class(self, csscl):
+        """Same as jQuery's toggleClass function. It toggles the css class on this element."""
+        self._stable = False
+        action = ('add', 'remove')[self.has_class(csscl)]
+        return getattr(self.attrs['klass'], action)(csscl)
+
     def add_class(self, cssclass):
         """Adds a css class to this element."""
-        self._stable = False
-        self.attrs['klass'].append(cssclass)
-        return self
+        if self.has_class(cssclass):
+            return self
+        return self.toggle_class(cssclass)
 
     def remove_class(self, cssclass):
         """Removes the given class from this element."""
-        self._stable = False
-        self.attrs['klass'].remove(cssclass)
-        return self
+        if not self.has_class(cssclass):
+            return self
+        return self.toggle_class(cssclass)
 
     def css(self, *props, **kwprops):
         """Adds css properties tho this element."""
@@ -578,15 +595,6 @@ class Tag(DOMElement):
             return self
         else:
             return self.data[key]
-
-    def has_class(self, csscl):
-        """Checks if this element have the given css class."""
-        return csscl in self.attrs['klass']
-
-    def toggle_class(self, csscl):
-        """Same as jQuery's toggleClass function. It toggles the css class on this element."""
-        self._stable = False
-        return self.remove_class(csscl) if self.has_class(csscl) else self.add_class(csscl)
 
     def html(self):
         """Renders the inner html of this element."""

@@ -5,6 +5,8 @@ engines:
     enabled: true
     config: 
       python_version: 3
+    config: 
+      threshold: "C"
   duplication:
     enabled: true
     config:
