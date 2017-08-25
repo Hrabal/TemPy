@@ -156,19 +156,23 @@ class TempyTable(Table):
         cell = self.body[idy].pop(idx)
         return cell if tags else cell.childs[0]
 
+    def _make_table_part(self, part, data):
+        part_tag, inner_tag = {
+            'header': (Thead, Th),
+            'footer': (Tfoot, Td)
+            }.get(part)
+        part_instance = part_tag().append_to(self)
+        if not hasattr(self, part):
+            setattr(self, part, part_instance)
+        return part_instance(Tr()(inner_tag()(col) for col in data))
+
     def make_header(self, head):
         """Makes the header row from the given data."""
-        header = Thead().append_to(self)
-        if not hasattr(self, 'header'):
-            self.header = header
-        return self.header(Tr()(Th()(col) for col in head))
+        self._make_table_part('header', head)
 
     def make_footer(self, footer):
         """Makes the footer row from the given data."""
-        footer = Tfoot().append_to(self)
-        if not hasattr(self, 'footer'):
-            self.footer = footer
-        return self.footer(Tr()(Td()(col) for col in footer))
+        self._make_table_part('footer', footer)
 
     def make_caption(self, caption):
         """Adds/Sobstitute the table's caption."""
