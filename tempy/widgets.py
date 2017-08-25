@@ -205,23 +205,23 @@ class TempyListMeta:
         struct: if a list/set/tuple is given, a flat list is generated <*l><li>v1</li><li>v2</li>...</*l>
         If the given struct is a dict, key contaninct lists/tuples/sets/dicts will be transformed in nested
         lists, and so on recursively, using dict keys as list items, and dict values as sublists:
-        >>> struct = {'ele1': None, 'ele2': ['sub2.1', 'sub2.2'], 'ele3': {'sub3.1': None, 'sub3.2': None, '_typ': 'Ol'}}
+        >>> struct = {'ele1': None, 'ele2': ['sub21', 'sub22'], 'ele3': {'sub31': None, 'sub32': None, '_typ': 'Ol'}}
         >>> TempyList(struct=struct)
         <ul>
             <li>ele1</li>
             <li>ele2
                 <ul>
-                    <li>sub2.1</li>
-                    <li>sub2.2</li>
+                    <li>sub21</li>
+                    <li>sub22</li>
                 </ul>
             </li>
             <li>ele3
                 <ol>
-                    <li>sub3.1</li>
-                    <li>sub3.2</li>
+                    <li>sub31</li>
+                    <li>sub32</li>
                 </ol>
             </li>
-        </ul>      
+        </ul>
         """
         if struct is None:
             # Maybe raise? Empty the list?

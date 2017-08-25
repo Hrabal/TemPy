@@ -569,7 +569,7 @@ class Tag(DOMElement):
     def toggle(self):
         """Same as jQuery's toggle, toggles the display attribute of this element."""
         self._stable = False
-        return self.show() if self.attrs['style']['display'] == None else self.hide()
+        return self.show() if self.attrs['style']['display'] is None else self.hide()
 
     def data(self, key, value=None):
         """Adds extra data to this element, this data will not be rendered."""
