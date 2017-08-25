@@ -20,7 +20,6 @@ class TestSingleTags(unittest.TestCase):
     def test_comment(self):
         comment_string = 'Test comment'
         c = Comment(comment_string)
-        print(c.render())
         self.assertTrue(comment_string in c.render())
 
 if __name__ == '__main__':
