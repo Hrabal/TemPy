@@ -6,16 +6,16 @@
 
 class TempyException(Exception):
     """Base TemPy exception class"""
+    def __init__(self, tempy_object, *args):
+        super().__init__(*args)
+        self.tempy_object = tempy_object
 
 
 class TagError(TempyException):
     """Base Tag Exception"""
-    def __init__(self, tag, *args):
-        super().__init__(*args)
-        self.tag = tag
 
 
-class ContentError(object):
+class ContentError(TagError):
     """Raised when dealing with Content or DOMElement.content_data"""
     def __init__(self, tag, content, *args):
         super().__init__(tag, content, *args)
@@ -28,9 +28,6 @@ class WrongContentError(ContentError, ValueError):
 
 class WidgetError(TempyException):
     """Base widget error"""
-    def __init__(self, widget, *args):
-        super().__init__(*args)
-        self.widget = widget
 
 
 class WidgetDataError(WidgetError):
