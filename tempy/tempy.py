@@ -478,13 +478,14 @@ class Tag(DOMElement):
     def __init__(self, **kwargs):
         super().__init__()
         self.attrs = TagAttrs()
-        self.data = {}
+        self._data = {}
         if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
-            raise TagError(self, '%s needed, while %s given' % self._needed_kwargs, kwargs.keys())
+            provided = ''.join(kwargs.keys()) or 'none'
+            raise TagError(self, '%s arguments needed, while %s given' % (self._needed_kwargs, provided))
         self.attr(**kwargs)
         self._tab_count = 0
         self._render = None
-        self._stable = False
+        self._stable = True
         if self._void:
             self._render = self.render()
 
@@ -557,10 +558,8 @@ class Tag(DOMElement):
         if props:
             if len(props) == 1 and isinstance(props[0], Mapping):
                 styles = props[0]
-            elif len(props) == 2:
-                styles = dict(*props)
             else:
-                raise TagError
+                raise WrongContentError(self, props, 'Arguments not valid')
         elif kwprops:
             styles = kwprops
         else:
@@ -596,10 +595,10 @@ class Tag(DOMElement):
         """Renders the inner html of this element."""
         return self._get_child_renders()
 
-    def _get_non_tag_contents(self):
+    def _get_non_tempy_contents(self):
         """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
-        for thing in filter(lambda x: not isinstance(x, DOMElement), self.childs):
-            yield thing.render() if isinstance(thing, Content) else thing
+        for thing in filter(lambda x: not isinstance(x, (DOMElement, Content)), self.childs):
+            yield thing
 
     def text(self):
         """Renders the contents inside this element, without html tags."""
@@ -611,7 +610,7 @@ class Tag(DOMElement):
                 texts.append(child.render())
             else:
                 texts.append(child)
-        return ''.join(texts)
+        return ' '.join(texts)
 
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
@@ -646,7 +645,7 @@ class Tag(DOMElement):
         self._stable = True
         return self._render
 
-    def _get_child_renders(self, pretty):
+    def _get_child_renders(self, pretty=False):
         return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content))
                        else str(child) for child in self.childs)
 
@@ -713,8 +712,6 @@ class Content:
                 yield from content
             elif isinstance(content, dict):
                 yield content
-            elif isinstance(content, Iterable) and not isinstance(content, str):
-                yield from iter(content)
             elif isinstance(content, str):
                 yield content
             else:
