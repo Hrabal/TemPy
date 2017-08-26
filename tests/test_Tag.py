@@ -5,7 +5,7 @@
 import unittest
 
 from tempy import Tag, Content
-from tempy.tags import Div
+from tempy.tags import Div, Html, Head, Title, Body, P, A
 from tempy.exceptions import TagError, WrongContentError
 
 
@@ -65,11 +65,15 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(WrongContentError):
             div.css(1, 2, 3)
 
+        with self.assertRaises(WrongContentError):
+            div.css()
+
         div.css({'color': 'blue'})
         self.assertEqual(div.attrs['style'], {'color': 'blue'})
 
         div.css(**{'color': 'yellow'})
         self.assertEqual(div.attrs['style'], {'color': 'yellow'})
+
 
     def test_hide_show(self):
         d = Div()
@@ -115,6 +119,7 @@ class TestTag(unittest.TestCase):
     def test__get_non_tempy_contents(self):
         d = Div()(Div(), 1, Content(name='test'), 'test', False, True, Div())
         self.assertEqual(list(d._get_non_tempy_contents()), [1, 'test', False, True])
+
 
 if __name__ == '__main__':
     unittest.main()

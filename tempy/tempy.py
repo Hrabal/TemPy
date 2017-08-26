@@ -383,27 +383,28 @@ class DOMElement:
         """Slice of this element's childs as childs[start:end:step]"""
         return self.childs[start:end:step]
 
-    def _dfs_tags(self):
-        """Iterate the element inner content, in reverse depth-first.
-         Used to render the tags from the childmost ones to the root.
-        """
-        # Based on http://www.ics.uci.edu/~eppstein/PADS/DFS.py
-        # by D. Eppstein, July 2004.
-        given = set()
-        stack = copy(self.childs)
-        while stack:
-            tag = stack.pop()
-            if not tag.childs:
-                given.add(tag)
-                yield tag
-            else:
-                if set(tag.childs).issubset(given):
-                    given.add(tag)
-                    yield tag
-                else:
-                    stack.append(tag)
-                    stack += list(set(tag.childs) - given)
-        yield self
+    # TODO: Implement Depth-first traversing with order api
+    # def reverse_dfs(self):
+    #     """Iterate the tree starting from current element, in reverse depth-first."""
+    #     # Based on http://www.ics.uci.edu/~eppstein/PADS/DFS.py
+    #     # by D. Eppstein, July 2004.
+    #     given = set()
+    #     stack = copy(self.childs)
+    #     while stack:
+    #         tag = stack.pop()
+    #         if not tag.childs:
+    #             given.add(tag)
+    #             yield tag
+    #         else:
+    #             if set(tag.childs).issubset(given):
+    #                 given.add(tag)
+    #                 yield tag
+    #             else:
+    #                 stack.append(tag)
+    #                 stack += list(set(tag.childs) - given)
+    #     yield self
+
+    # TODO: Implement Breadth-first traversing
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
@@ -563,7 +564,7 @@ class Tag(DOMElement):
         elif kwprops:
             styles = kwprops
         else:
-            raise TagError
+            raise WrongContentError(self, None, 'args or wkargs are needed')
         return self.attr(attrs={'style': styles})
 
     def hide(self):
