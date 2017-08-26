@@ -719,8 +719,6 @@ class Content:
                 yield content
             elif isinstance(content, Iterable) and not isinstance(content, str):
                 yield from iter(content)
-            elif type(content) in (MappingProxyType, ):
-                yield iter(content.values())
             elif isinstance(content, str):
                 yield content
             else:

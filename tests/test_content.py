@@ -12,7 +12,7 @@ from tempy.exceptions import ContentError
 class TestTag(unittest.TestCase):
 
     def setUp(self):
-        self.test_contents = {'test1': 1, 'test2': {'test21': [1, 2, 3], 'test22': None}}
+        self.test_contents = {'test1': 1, 'test2': {'test21': [1, 2, 3], 'test22': None, 'test23': 'test_string'}}
 
     def test_init(self):
         with self.assertRaises(ContentError):
@@ -29,6 +29,10 @@ class TestTag(unittest.TestCase):
 
         cont = Content(content=('test'))
         self.assertEqual(list(cont.content), ['test', ])
+
+        c = (i for i in (1, 2, 3))
+        cont = Content(content=c)
+        self.assertEqual(list(cont.content), [1, 2, 3])
 
         cont = Content(content=('test', ))
         self.assertEqual(list(cont.content), ['test', ])
@@ -47,12 +51,16 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(ContentError):
             Content(name='test', template='wrong')
 
+    def test_eq(self):
+        self.assertEqual(Content(name='test'), Content(name='test'))
+        self.assertNotEqual(Content(name='test'), Div)
+
     def test_render(self):
         d = Div()(Content(name='test1')).inject(self.test_contents)
         self.assertEqual(d.render(), '<div>1</div>')
 
         d = Div()(Content(name='test1'), Content(name='test2')).inject(self.test_contents)
-        self.assertEqual(d.render(), '<div>11 2 3</div>')
+        self.assertEqual(d.render(), '<div>11 2 3 test_string</div>')
 
         d = Div()(Content(name='test1')).inject({'test1': Div()})
         self.assertEqual(d.render(), '<div><div></div></div>')
