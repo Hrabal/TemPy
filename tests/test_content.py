@@ -3,15 +3,80 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import unittest
-
-from tempy.tags import Div
-from tempy.tempy import DOMElement, Tag, TagAttrs
+from copy import copy
+from tempy.tags import Div, P
+from tempy.tempy import Content
+from tempy.exceptions import ContentError
 
 
 class TestTag(unittest.TestCase):
 
     def setUp(self):
-        self.test_contents = {'test1': 1, 'test2': {1: [1, 2, 3], 2: None}}
+        self.test_contents = {'test1': 1, 'test2': {'test21': [1, 2, 3], 'test22': None}}
+
+    def test_init(self):
+        with self.assertRaises(ContentError):
+            Content()
+
+        cont = Content(name='test')
+        self.assertEqual(cont._name, 'test')
+
+        cont = Content(content='test')
+        self.assertEqual(list(cont.content), ['test', ])
+
+        cont = Content(content=['test'])
+        self.assertEqual(list(cont.content), ['test', ])
+
+        cont = Content(content=('test'))
+        self.assertEqual(list(cont.content), ['test', ])
+
+        cont = Content(content=('test', ))
+        self.assertEqual(list(cont.content), ['test', ])
+
+        cont = Content(content=1)
+        self.assertEqual(list(cont.content), [1, ])
+
+        self.assertEqual(cont.length, 1)
+
+        cont = Content(content={'test': 'test'})
+        self.assertEqual(list(cont.content), [{'test': 'test'}, ])
+
+        cont = Content(name='test', template=Div())
+        self.assertEqual(cont._template, Div())
+
+        with self.assertRaises(ContentError):
+            Content(name='test', template='wrong')
+
+    def test_render(self):
+        d = Div()(Content(name='test1')).inject(self.test_contents)
+        self.assertEqual(d.render(), '<div>1</div>')
+
+        d = Div()(Content(name='test1'), Content(name='test2')).inject(self.test_contents)
+        self.assertEqual(d.render(), '<div>11 2 3</div>')
+
+        d = Div()(Content(name='test1')).inject({'test1': Div()})
+        self.assertEqual(d.render(), '<div><div></div></div>')
+
+        template = Div()(Content(name='test21'))
+        d = Div()(Content(name='test2', template=template)).inject(self.test_contents)
+        self.assertEqual(d.render(), '<div><div>1 2 3</div></div>')
+
+    def test_content_from_parent(self):
+        cont = Content(name='test1')
+        d = Div()(cont)
+        d.inject(self.test_contents)
+        self.assertEqual(list(cont.content), [1, ])
+
+    def test_content_from_granpa(self):
+        cont = Content(name='test1')
+        p = P()(Div()(cont))
+        p.inject(self.test_contents)
+        self.assertEqual(list(cont.content), [1, ])
+
+    def test_copy(self):
+        cont = Content(name='test', content='test')
+        cont2 = copy(cont)
+        self.assertEqual(cont, cont2)
 
     def test_inject_dict(self):
         tag = Div()()

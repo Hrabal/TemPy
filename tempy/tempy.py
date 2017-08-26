@@ -8,7 +8,7 @@ from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import TagError, WrongContentError
+from .exceptions import TagError, WrongContentError, ContentError
 
 
 class _ChildElement:
@@ -675,10 +675,12 @@ class Content:
         self.parent = None
         self._tab_count = 0
         if not name and not content:
-            raise TagError
+            raise ContentError(self, 'Content needs at least one argument: name or content')
         self._name = name
         self._fixed_content = content
         self._template = template
+        if self._template and not isinstance(self._template, DOMElement):
+            raise ContentError(self, 'template argument should be a DOMElement')
         self.uuid = uuid4()
         self.stable = False
 
@@ -690,37 +692,65 @@ class Content:
             ' Son of %s' % type(self.parent).__name__ if self.parent else '',
             ' Named %s' % self._name if self._name else '')
 
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        comp_dicts = [{
+            '_name': t._name,
+            'content': list(t.content),
+            '_template': t._template,
+        } for t in (self, other)]
+        return comp_dicts[0] == comp_dicts[1]
+
     def __copy__(self):
         return self.__class__(self._name, self._fixed_content, self._template)
 
     @property
     def content(self):
-        content = self._fixed_content or self.parent._find_content(self._name)
-        if content:
-            if type(content) in (list, tuple, GeneratorType) or (isinstance(content, Iterable) and content is not str):
-                return list(content)
+        content = self._fixed_content
+        if not content and self.parent:
+            content = self.parent._find_content(self._name)
+        if isinstance(content, DOMElement) or content:
+            if isinstance(content, DOMElement):
+                yield content
+            elif type(content) in (list, tuple, GeneratorType):
+                yield from content
+            elif isinstance(content, dict):
+                yield content
+            elif isinstance(content, Iterable) and not isinstance(content, str):
+                yield from iter(content)
             elif type(content) in (MappingProxyType, ):
-                return list(content.values())
+                yield iter(content.values())
+            elif isinstance(content, str):
+                yield content
             else:
-                return (content, )
+                yield from iter([content, ])
         else:
             raise StopIteration
 
     @property
     def length(self):
-        return len(self.content)
+        return len(list(self.content))
 
     def render(self, pretty=False):
         ret = []
         for content in self.content:
-            if isinstance(content, DOMElement):
-                ret.append(content.render(pretty=pretty))
-            else:
-                if self._template:
-                    ret.append(self._template.inject(content).render(pretty=pretty))
+            if content is not None:
+                if isinstance(content, DOMElement):
+                    ret.append(content.render(pretty=pretty))
                 else:
-                    ret.append(str(content))
-        return ''.join(ret)
+                    if self._template:
+                        ret.append(self._template.inject(content).render(pretty=pretty))
+                    elif isinstance(content, dict):
+                        for k, v in content.items():
+                            if v is not None:
+                                if isinstance(v, list):
+                                    ret = ret + [str(i) for i in v if i is not None]
+                                else:
+                                    ret.append(str(v))
+                    else:
+                        ret.append(str(content))
+        return ' '.join(ret)
 
 
 class Css(Tag):
