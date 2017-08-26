@@ -621,8 +621,8 @@ class Tag(DOMElement):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
         pretty = kwargs.pop('pretty', False)
-        if pretty:
-            pretty1 = 0 if pretty is True else pretty
+        if isinstance(pretty, bool) and pretty:
+            pretty1 = 0
             pretty2 = pretty1 + 1
         else:
             pretty1 = pretty2 = False
@@ -643,7 +643,7 @@ class Tag(DOMElement):
             'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
             'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
         }
-        tag_data['inner'] = self._get_child_renders(pretty1+1) if not self._void and self.childs else ''
+        tag_data['inner'] = self._get_child_renders(pretty2) if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
