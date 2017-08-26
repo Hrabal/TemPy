@@ -5,7 +5,7 @@
 import unittest
 
 
-class TestTag(unittest.TestCase):
+class TestRender(unittest.TestCase):
     pass
 
 

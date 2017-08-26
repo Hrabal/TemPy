@@ -373,22 +373,6 @@ class TestDOMelement(unittest.TestCase):
         with self.assertRaises(WrongContentError):
             a.inject([1, 2, 3])
 
-    def test_class(self):
-        div = Div()
-        klass = 'test_class'
-        div.add_class(klass)
-        self.assertTrue(klass in div.attrs['klass'])
-        self.assertTrue(div.has_class(klass))
-
-        div.remove_class(klass)
-        self.assertFalse(div.has_class(klass))
-
-        div.toggle_class(klass)
-        self.assertTrue(div.has_class(klass))
-
-        div.toggle_class(klass)
-        self.assertFalse(div.has_class(klass))
-
     def test_attrs(self):
         d = Div()
         d.attrs['klass'] = 'test'
