@@ -15,6 +15,10 @@ class TestTag(unittest.TestCase):
     def setUp(self):
         self.test_contents = {'test1': 1, 'test2': {'test21': [1, 2, 3], 'test22': None, 'test23': 'test_string'}}
 
+    def test_repr(self):
+        c = Content(name='test')
+        self.assertEqual(len(str(c)), len('<tempy.tempy.Content 97fa6e42-bb6e-4d9b-8bad-872405209148. Named test>'))
+
     def test_init(self):
         with self.assertRaises(ContentError):
             Content()

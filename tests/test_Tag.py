@@ -5,7 +5,7 @@
 import unittest
 
 from tempy import Tag, Content
-from tempy.tags import Div, Html, Head, Title, Body, P, A
+from tempy.tags import Div, P
 from tempy.exceptions import TagError, WrongContentError
 
 
@@ -17,6 +17,11 @@ class TestTag(unittest.TestCase):
 
         with self.assertRaises(TagError):
             TestTag()
+
+    def test_parent(self):
+        d = Div()
+        p = P().append_to(d)
+        self.assertEqual(p.parent, d)
 
     def test_index(self):
         father = Div()(Div(), Div())
@@ -73,7 +78,6 @@ class TestTag(unittest.TestCase):
 
         div.css(**{'color': 'yellow'})
         self.assertEqual(div.attrs['style'], {'color': 'yellow'})
-
 
     def test_hide_show(self):
         d = Div()
