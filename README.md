@@ -1,6 +1,7 @@
 # TemPy
-[![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy)
+![TemPy Logo](tempy.png)
 
+[![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy)
 ### Fast Object-Oriented HTML templating With Python!
 
 ### What
