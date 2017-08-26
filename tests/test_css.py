@@ -52,6 +52,10 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(WrongContentError):
             Css(['test', 'wrong'])
 
+    def test_function_content(self):
+        css = Css({'h1': {'color': lambda: 'TEST'}})
+        self.assertTrue('TEST' in css.render())
+
     def test_render(self):
         expected = '<style>html { background-color: lightblue; } h1 { color: white; text-align: center; } </style>'
         css = Css(self.css_dict)

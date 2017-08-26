@@ -781,11 +781,11 @@ class Css(Tag):
                 parents = []
 
             for key, value in node.items():
-                if value.__class__.__name__ in ('str', 'unicode'):
+                if isinstance(value, str):
                     result.append('%s: %s; %s' % (key, value, "\n" if pretty else ""))
-                elif value.__class__.__name__ == 'function':
+                elif hasattr(value, '__call__'):
                     result.append('%s: %s; %s' % (key, value(), "\n" if pretty else ""))
-                elif value.__class__.__name__ == 'dict':
+                elif isinstance(value, dict):
                     nodes_to_parse.append(([p for p in parents] + [key], value))
             if result:
                 result.append("} " + ("\n\n" if pretty else ""))
