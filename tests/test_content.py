@@ -4,6 +4,7 @@
 """
 import unittest
 from copy import copy
+from collections import Counter
 from tempy.tags import Div, P
 from tempy.tempy import Content
 from tempy.exceptions import ContentError
@@ -57,17 +58,17 @@ class TestTag(unittest.TestCase):
 
     def test_render(self):
         d = Div()(Content(name='test1')).inject(self.test_contents)
-        self.assertEqual(d.render(), '<div>1</div>')
+        self.assertEqual(Counter(d.render()), Counter('<div>1</div>'))
 
         d = Div()(Content(name='test1'), Content(name='test2')).inject(self.test_contents)
-        self.assertEqual(d.render(), '<div>11 2 3 test_string</div>')
+        self.assertEqual(Counter(d.render()), Counter('<div>11 2 3 test_string</div>'))
 
         d = Div()(Content(name='test1')).inject({'test1': Div()})
-        self.assertEqual(d.render(), '<div><div></div></div>')
+        self.assertEqual(Counter(d.render()), Counter('<div><div></div></div>'))
 
         template = Div()(Content(name='test21'))
         d = Div()(Content(name='test2', template=template)).inject(self.test_contents)
-        self.assertEqual(d.render(), '<div><div>1 2 3</div></div>')
+        self.assertEqual(Counter(d.render()), Counter('<div><div>1 2 3</div></div>'))
 
     def test_content_from_parent(self):
         cont = Content(name='test1')
