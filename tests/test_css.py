@@ -4,6 +4,7 @@
 """
 import unittest
 from copy import copy
+from collections import Counter
 
 from tempy import Css
 from tempy.exceptions import WrongContentError
@@ -55,7 +56,8 @@ class TestTag(unittest.TestCase):
         expected = '<style>html { background-color: lightblue; } h1 { color: white; text-align: center; } </style>'
         css = Css(self.css_dict)
         rendered_css = css.render()
-        self.assertEqual(rendered_css, expected)
+        # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
+        self.assertEqual(Counter(rendered_css), Counter(expected))
 
 
 if __name__ == '__main__':
