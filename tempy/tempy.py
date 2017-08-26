@@ -569,31 +569,36 @@ class Tag(DOMElement):
     def hide(self):
         """Adds the "display: none" style attribute."""
         self._stable = False
-        self.attrs['style']['display'] = None
+        self.attrs['style']['display'] = 'none'
         return self
 
-    def show(self):
-        """Removes the display style attribute."""
+    def show(self, display=None):
+        """Removes the display style attribute.
+        If a display type is provided """
         self._stable = False
-        self.attrs['style'].pop('display')
+        if not display:
+            self.attrs['style'].pop('display')
+        else:
+            self.attrs['style']['display'] = display
         return self
 
     def toggle(self):
         """Same as jQuery's toggle, toggles the display attribute of this element."""
         self._stable = False
-        return self.show() if self.attrs['style']['display'] is None else self.hide()
+        return self.show() if self.attrs['style']['display'] == 'none' else self.hide()
 
-    def data(self, key, value=None):
+    def data(self, key=None, value=None):
         """Adds extra data to this element, this data will not be rendered."""
         if value:
-            self.data[key] = value
+            self._data[key] = value
             return self
-        else:
-            return self.data[key]
+        if key:
+            return self._data[key]
+        return self._data
 
-    def html(self):
+    def html(self, pretty=False):
         """Renders the inner html of this element."""
-        return self._get_child_renders()
+        return self._get_child_renders(pretty=pretty)
 
     def _get_non_tempy_contents(self):
         """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
