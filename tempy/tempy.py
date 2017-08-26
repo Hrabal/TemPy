@@ -5,7 +5,7 @@ from copy import copy
 from functools import wraps
 from itertools import chain
 from operator import attrgetter
-from collections import Mapping, OrderedDict, Iterable
+from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
 from .exceptions import TagError, WrongContentError
@@ -754,10 +754,24 @@ class Css(Tag):
     """
     _template = '<style>{css}</style>'
 
+    def __init__(self, *args, **kwargs):
+        css_styles = {}
+        if args:
+            if len(args) > 1:
+                raise WrongContentError(self, args, 'Css accepts max one positional argument.')
+            if isinstance(args[0], dict):
+                css_styles.update(args[0])
+            elif isinstance(args[0], Iterable):
+                if any(map(lambda x: not isinstance(x, dict), args[0])):
+                    raise WrongContentError(self, args, 'Unexpected arguments.')
+                css_styles = dict(ChainMap(*args[0]))
+        css_styles.update(kwargs)
+        super().__init__(css_attrs=css_styles)
+
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
         result = []
-        nodes_to_parse = [([], self.attrs)]
+        nodes_to_parse = [([], self.attrs['css_attrs'])]
 
         while nodes_to_parse:
             parents, node = nodes_to_parse.pop(0)
@@ -774,6 +788,5 @@ class Css(Tag):
                 elif value.__class__.__name__ == 'dict':
                     nodes_to_parse.append(([p for p in parents] + [key], value))
             if result:
-                result.append("}" + "\n\n" if pretty else "")
-
+                result.append("} " + ("\n\n" if pretty else ""))
         return self._template.format(css=''.join(result))
