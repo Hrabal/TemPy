@@ -168,7 +168,7 @@ class TestDOMelement(unittest.TestCase):
         self.page.empty()
         self.assertTrue(new not in self.page)
 
-    def test_next(self):
+    def test_next_magic(self):
         div = Div()(A(), P(), Div())
         test = next(div)
         self.assertTrue(isinstance(test, A))
@@ -304,7 +304,7 @@ class TestDOMelement(unittest.TestCase):
         for i, child in enumerate(d):
             self.assertEqual(childs[i], child)
 
-    def test_next_chidls(self):
+    def test_next_childs(self):
         d = Div()
         childs = [A(), P(), P(), Div(), 'test', 1]
         d(childs)
@@ -388,6 +388,69 @@ class TestDOMelement(unittest.TestCase):
 
         div.toggle_class(klass)
         self.assertFalse(div.has_class(klass))
+
+    def test_attrs(self):
+        d = Div()
+        d.attrs['klass'] = 'test'
+        self.assertTrue(d.has_class('test'))
+
+        d.attrs['style'] = {'color': 'blue'}
+        self.assertEqual(d.attrs['style'], {'color': 'blue'})
+
+        d.attrs['style'] = {'test': 'yellow'}
+        self.assertEqual(d.attrs['style'], {'color': 'blue', 'test': 'yellow'})
+
+        d.attrs.update(style={'color': 'blue', 'test': '1'})
+        self.assertEqual(d.attrs['style'], {'color': 'blue', 'test': '1'})
+
+    def test_next(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        self.assertEqual(d1.next(), d2)
+
+    def test_next_all(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        d3 = Div().append_to(c)
+        self.assertEqual(d1.next_all(), [d2, d3])
+
+    def test_prev(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        self.assertEqual(d2.prev(), d1)
+
+    def test_prev_all(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        d3 = Div().append_to(c)
+        self.assertEqual(d3.prev_all(), [d1, d2])
+
+    def test_siblings(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        d3 = Div().append_to(c)
+        self.assertEqual(d2.siblings(), [d1, d3])
+
+    def test_parent(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        self.assertEqual(d1.parent, c)
+
+    def test_slice(self):
+        c = Div()
+        d1 = Div().append_to(c)
+        d2 = Div().append_to(c)
+        d3 = Div().append_to(c)
+        self.assertEqual(c.slice(0, 1), [d1, ])
+        self.assertEqual(c.slice(0, 2), [d1, d2])
+        self.assertEqual(c.slice(0, 3), [d1, d2, d3])
+        self.assertEqual(c.slice(), [d1, d2, d3])
+        self.assertEqual(c.slice(0, step=2), [d1, d3])
 
 
 if __name__ == '__main__':

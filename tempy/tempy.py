@@ -357,23 +357,23 @@ class DOMElement:
 
     def next(self):
         """Returns the next sibling."""
-        return self.parent.child[self._own_index + 1]
+        return self.parent.childs[self._own_index + 1]
 
     def next_all(self):
         """Returns all the next siblings as a list."""
-        return self.parent.child[self._own_index + 1:]
+        return self.parent.childs[self._own_index + 1:]
 
     def prev(self):
         """Returns the previous sibling."""
-        return self.parent.child[self._own_index - 1]
+        return self.parent.childs[self._own_index - 1]
 
     def prev_all(self):
         """Returns all the previous siblings as a list."""
-        return self.parent.child[:self._own_index - 1]
+        return self.parent.childs[:self._own_index]
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
-        return filter(lambda x: x.uuid != self.uuid, self.parent.childs)
+        return list(filter(lambda x: x.uuid != self.uuid, self.parent.childs))
 
     def parent(self):
         """Returns this element's father"""
@@ -458,17 +458,13 @@ class TagAttrs(dict):
             for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
                 self[k] = v
         for k, v in kwargs.items():
+            print(k, v)
             self[k] = v
 
     def render(self):
         """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        if hasattr(self, '_comment'):
-            # Special case for the comment tag
-            return self._comment
-        else:
-            return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k),
-                                         self._FORMAT.get(k, lambda x: x)(v))
-                           for k, v in self.items() if v)
+        return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k),
+                                     self._FORMAT.get(k, lambda x: x)(v)) for k, v in self.items() if v)
 
 
 class Tag(DOMElement):
