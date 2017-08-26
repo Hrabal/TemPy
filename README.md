@@ -1,8 +1,6 @@
 # TemPy
 [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy)
 
-[TemPy Logo](tempy.png)
-
 ### Fast Object-Oriented HTML templating With Python!
 
 ### What
@@ -51,6 +49,7 @@ page = Html()(  # add tags inside the one you created calling the parent
 
 # add tags and content later
 page[1][0](A(href='www.bar.com'))  # calling the tag
+page(test=Div()) # WARNING! Correct ordering with named Tag insertion is ensured with Python >= 3.5 (because kwargs are ordered)
 page[1][0].append(A(href='www.baz.com'))  # using the API
 link = Link().append_to(page.body) # access the body as if it's a page attribute
 link.attr(href='www.python.org')('This is a link to Python') # Add attributes and content to already placed tags
