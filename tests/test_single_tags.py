@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy.tags import Div, A, Comment
+from tempy.tags import Div, A, Comment, Title
 
 
 class TestSingleTags(unittest.TestCase):
@@ -21,6 +21,13 @@ class TestSingleTags(unittest.TestCase):
         comment_string = 'Test comment'
         c = Comment(comment_string)
         self.assertTrue(comment_string in c.render())
+
+    def test_title(self):
+        title_string = 'Test title'
+        t = Title(title_string)
+        self.assertTrue(title_string in t)
+        self.assertEqual(t.render(), '<title>%s</title>' % title_string)
+
 
 if __name__ == '__main__':
     unittest.main()

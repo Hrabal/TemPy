@@ -4,9 +4,31 @@
 """
 import unittest
 
+from tempy.tags import Html, Head, Body, Link, Div, A, P, Meta, Title
+
 
 class TestRender(unittest.TestCase):
-    pass
+
+    def test_page(self):
+        expected = '<!DOCTYPE HTML><html><head><meta charset="utf-8"/><link href="my.css" type="text/css" rel="stylesheet"/><title>test_title</title></head><body><div class="linkBox"><a href="www.foo.com">www.foo.com</a></div><p>This is foo</p><p>This is Bar</p><p>Have you met my friend Baz?</p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</body></html>'
+        my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
+        another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
+
+        page = Html()(  # add tags inside the one you created calling the parent
+            Head()(  # add multiple tags in one call
+                Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
+                Link(href="my.css", typ="text/css", rel="stylesheet"),
+                Title('test_title')
+            ),
+            body=Body()(  # give them a name so you can navigate the DOM with those names
+                Div(klass='linkBox')(
+                    A(href='www.foo.com')
+                ),
+                (P()(text) for text in my_text_list),  # tag insertion accepts generators
+                another_list  # add text from a list, str.join is used in rendering
+            )
+        )
+        self.assertEqual(page.render(), expected)
 
 
 if __name__ == '__main__':

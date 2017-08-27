@@ -480,9 +480,13 @@ class Tag(DOMElement):
         super().__init__()
         self.attrs = TagAttrs()
         self._data = {}
-        if self._needed_kwargs and not set(self._needed_kwargs).issubset(set(kwargs)):
-            provided = ''.join(kwargs.keys()) or 'none'
-            raise TagError(self, '%s arguments needed, while %s given' % (self._needed_kwargs, provided))
+        for k in self._needed_kwargs or []:
+            try:
+                need_check = kwargs[k]
+            except KeyError:
+                need_check = None
+            if not need_check:
+                raise TagError(self, '%s argument needed for %s' % (k, self.__class__))
         self.attr(**kwargs)
         self._tab_count = 0
         self._render = None

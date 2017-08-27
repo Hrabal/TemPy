@@ -3,7 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 All the HTML tags as defined in the W3C reference, in alphabetical order.
 """
-from .tempy import Tag, VoidTag
+from .tempy import Tag, VoidTag, TagAttrs
 
 DOCTYPES = {
     'html': 'HTML',
@@ -71,6 +71,14 @@ class A(Tag):
         if not self.childs and 'href' in self.attrs:
             return self.clone()(self.attrs['href']).render(*args, **kwargs)
         return super().render(*args, **kwargs)
+
+
+class Title(Tag):
+    __tag = 'title'
+
+    def __init__(self, title=None):
+        super().__init__()
+        self(title)
 
 
 class Abbr(Tag):
@@ -515,10 +523,6 @@ class Thead(Tag):
 
 class Time(Tag):
     __tag = 'time'
-
-
-class Title(Tag):
-    __tag = 'title'
 
 
 class Tr(Tag):
