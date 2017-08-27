@@ -3,7 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import unittest
-
+from collections import Counter
 from tempy.tags import Html, Head, Body, Link, Div, A, P, Meta, Title
 
 
@@ -29,7 +29,7 @@ class TestRender(unittest.TestCase):
                 another_list  # add text from a list, str.join is used in rendering
             )
         )
-        self.assertEqual(page.render(), expected)
+        self.assertEqual(Counter(page.render()), Counter(expected))
 
 
 if __name__ == '__main__':
