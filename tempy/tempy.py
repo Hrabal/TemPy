@@ -464,8 +464,13 @@ class TagAttrs(dict):
 
     def render(self):
         """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        return ''.join(' %s="%s"' % (self._SPECIALS.get(k, k),
-                                     self._FORMAT.get(k, lambda x: x)(v)) for k, v in self.items() if v)
+        ret = []
+        for k, v in self.items():
+            if v:
+                f_string = (' {}="{}"', ' {}')[v is bool]
+                f_args = (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))[:2+(v is bool)]
+                ret.append(f_string.format(*f_args))
+        return ''.join(ret)
 
 
 class Tag(DOMElement):
