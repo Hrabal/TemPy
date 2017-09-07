@@ -459,7 +459,6 @@ class TagAttrs(dict):
             for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
                 self[k] = v
         for k, v in kwargs.items():
-            print(k, v)
             self[k] = v
 
     def render(self):
