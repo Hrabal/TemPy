@@ -2,12 +2,17 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
+import os
 import unittest
 from collections import Counter
 from tempy.tags import Html, Head, Body, Link, Div, A, P, Meta, Title
+from tempy import render_template
 
 
 class TestRender(unittest.TestCase):
+
+    def test_render_template(self):
+        self.assertEqual(render_template('test', start_directory=os.path.dirname(os.path.realpath(__file__))), '<div></div>')
 
     def test_page(self):
         self.maxDiff = None
