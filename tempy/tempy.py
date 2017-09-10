@@ -637,14 +637,14 @@ class Tag(DOMElement):
         self._stable = False
         return self.show() if self.attrs['style']['display'] == 'none' else self.hide()
 
-    def data(self, key=None, value=None):
-        """Adds extra data to this element, this data will not be rendered."""
-        if value:
-            self._data[key] = value
-            return self
+    def data(self, key=None, **kwargs):
+        """Adds or retrieve extra data to this element, this data will not be rendered.
+        Every tag have a _data attribute (dict), if key is given _data[key] is returned.
+        Kwargs are used to udpate this Tag's _data."""
+        self._data.update(kwargs)
         if key:
             return self._data[key]
-        return self._data
+        return self
 
     def html(self, pretty=False):
         """Renders the inner html of this element."""
