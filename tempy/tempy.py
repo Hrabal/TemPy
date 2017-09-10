@@ -436,7 +436,9 @@ class TagAttrs(dict):
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
+        for boolean_key in args:
+            super().__setitem__(boolean_key, bool)
         for key in self._SET_VALUES_ATTRS:
             if key not in self:
                 super().__setitem__(key, set())
@@ -481,7 +483,7 @@ class Tag(DOMElement):
     _needed_kwargs = None
     _void = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.attrs = TagAttrs()
         self._data = {}
@@ -492,7 +494,7 @@ class Tag(DOMElement):
                 need_check = None
             if not need_check:
                 raise TagError(self, '%s argument needed for %s' % (k, self.__class__))
-        self.attr(**kwargs)
+        self.attr(*args, **kwargs)
         self._tab_count = 0
         self._render = None
         self._stable = True
@@ -527,10 +529,11 @@ class Tag(DOMElement):
             self._stable = False
             return self._stable
 
-    def attr(self, attrs=None, **kwargs):
+    def attr(self, *args, **kwargs):
         """Add an attribute to the element"""
         self._stable = False
-        self.attrs.update(attrs or kwargs)
+        kwargs.update({k: bool for k in args})
+        self.attrs.update(kwargs)
         return self
 
     def remove_attr(self, attr):
