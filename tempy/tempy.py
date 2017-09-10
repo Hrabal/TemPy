@@ -9,7 +9,7 @@ from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import TagError, WrongContentError, ContentError
+from .exceptions import TagError, WrongContentError, ContentError, WrongArgsError
 
 
 class _ChildElement:
@@ -436,6 +436,9 @@ class TagAttrs(dict):
     }
 
     def __init__(self, *args, **kwargs):
+        for arg in args:
+            if not isinstance(arg, str):
+                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
         super().__init__(**kwargs)
         for boolean_key in args:
             super().__setitem__(boolean_key, bool)
@@ -455,7 +458,7 @@ class TagAttrs(dict):
             super().__setitem__(key, value)
 
     def __copy__(self):
-        return TagAttrs(self.items())
+        return TagAttrs(**self)
 
     def update(self, attrs=None, **kwargs):
         if attrs is not None:
@@ -531,6 +534,9 @@ class Tag(DOMElement):
 
     def attr(self, *args, **kwargs):
         """Add an attribute to the element"""
+        for arg in args:
+            if not isinstance(arg, str):
+                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
         self._stable = False
         kwargs.update({k: bool for k in args})
         self.attrs.update(kwargs)
@@ -565,7 +571,7 @@ class Tag(DOMElement):
         return self.toggle_class(cssclass)
 
     def css(self, *props, **kwprops):
-        """Adds css properties tho this element."""
+        """Adds css properties to this element."""
         self._stable = False
         styles = {}
         if props:
@@ -576,8 +582,8 @@ class Tag(DOMElement):
         elif kwprops:
             styles = kwprops
         else:
-            raise WrongContentError(self, None, 'args or wkargs are needed')
-        return self.attr(attrs={'style': styles})
+            raise WrongContentError(self, None, 'args OR wkargs are needed')
+        return self.attr(style=styles)
 
     def hide(self):
         """Adds the "display: none" style attribute."""

@@ -6,10 +6,49 @@ import unittest
 
 from tempy import Tag, Content
 from tempy.tags import Div, P
-from tempy.exceptions import TagError, WrongContentError
+from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 
 class TestTag(unittest.TestCase):
+
+    def test_tag_set_attrs(self):
+        d = Div(klass='test_css_class')
+        self.assertTrue('klass' in d.attrs)
+        self.assertEqual(d.attrs['klass'], set(['test_css_class', ]))
+
+        d.attr(klass='test_2')
+        self.assertEqual(d.attrs['klass'], set(['test_css_class', 'test_2']))
+
+    def test_tag_attrs(self):
+        d = Div(id='test_css_id')
+        self.assertTrue('id' in d.attrs)
+        self.assertEqual(d.attrs['id'], 'test_css_id')
+
+        d.attr(id='test2')
+        self.assertEqual(d.attrs['id'], 'test2')
+
+    def test_mapping_tag_attrs(self):
+        d = Div(style={'test': 'test_css'})
+        self.assertTrue('style' in d.attrs)
+        self.assertEqual(d.attrs['style'], {'test': 'test_css'})
+
+        d.attr(style={'test2': 'test_css_2'})
+        self.assertEqual(d.attrs['style'], {'test': 'test_css', 'test2': 'test_css_2'})
+
+    def test_tag_bool_attrs(self):
+        d = Div(test_boolean=bool)
+        self.assertTrue('test_boolean' in d.attrs)
+        self.assertEqual(d.attrs['test_boolean'], bool)
+        self.assertEqual(d.render(), '<div test_boolean></div>')
+
+    def test_bool_args(self):
+        d = Div('test_boolean')
+        self.assertTrue('test_boolean' in d.attrs)
+        self.assertEqual(d.attrs['test_boolean'], bool)
+        self.assertEqual(d.render(), '<div test_boolean></div>')
+
+        with self.assertRaises(WrongArgsError):
+            d = Div(1)
 
     def test_needed_kargs(self):
         class TestTag(Tag):

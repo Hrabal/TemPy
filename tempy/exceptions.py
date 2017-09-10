@@ -22,6 +22,14 @@ class TagContentError(TagError):
         self.content = content
 
 
+class TagArgsError(TagContentError):
+    """Raised when dealing with Tag init args"""
+
+
+class WrongArgsError(TagArgsError, ValueError):
+    """Raised when the provided args are not compliant."""
+
+
 class WrongContentError(TagContentError, ValueError):
     """Raised when the provided content is not a dict."""
 
