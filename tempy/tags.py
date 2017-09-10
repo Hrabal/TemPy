@@ -3,7 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 All the HTML tags as defined in the W3C reference, in alphabetical order.
 """
-from .tempy import Tag, VoidTag, TagAttrs
+from .tempy import Tag, VoidTag
 
 DOCTYPES = {
     'html': 'HTML',
@@ -55,8 +55,9 @@ class Html(Tag):
 
     def __init__(self, *args, **kwargs):
         # Setting a default doctype: 'html'
-        self.doctype = Doctype(kwargs.pop('doctype', 'html'))
+        doctype = kwargs.pop('doctype', 'html')
         super().__init__(**kwargs)
+        self.doctype = Doctype(doctype)
 
     def render(self, *args, **kwargs):
         """Override so each html page served have a doctype"""

@@ -3,7 +3,6 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 Widgets
 """
-from collections import Counter
 from itertools import zip_longest
 
 import tempy.tags as tags
@@ -29,13 +28,17 @@ class TempyPage(Html):
     def __init__(self, title=None, content=None, charset='UTF-8',
                  keywords=None, doctype=None, **kwargs):
         super().__init__(**kwargs)
-        keywords = keywords or []
+        self.set_charset(charset)
+        self.set_description(content)
+        self.set_keywords(keywords or [])
+
+    def init(self):
         self(
             head=tags.Head()(
-                charset=tags.Meta(charset=charset),
-                description=tags.Meta(name='description', content=content),
-                keywords=tags.Meta(name='keywords', content=''.join(keywords)),
-                title=tags.Title()(title),
+                charset=tags.Meta(),
+                description=tags.Meta(name='description'),
+                keywords=tags.Meta(name='keywords'),
+                title=tags.Title(),
             ),
             body=tags.Body()
         )

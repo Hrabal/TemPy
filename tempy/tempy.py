@@ -494,24 +494,44 @@ class Tag(DOMElement):
     _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
     _needed_kwargs = None
     _void = False
+    default_init = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__()
+        init_kwargs = copy(self.default_init)
+        init_kwargs.update(kwargs)
         self.attrs = TagAttrs()
         self._data = {}
         for k in self._needed_kwargs or []:
             try:
-                need_check = kwargs[k]
+                need_check = init_kwargs[k]
             except KeyError:
                 need_check = None
             if not need_check:
-                raise TagError(self, '%s argument needed for %s' % (k, self.__class__))
-        self.attr(*args, **kwargs)
+                raise TagError(self,
+                               '%s argument needed for %s' % (k,
+                                                              self.__class__))
+        self.attr(*args, **init_kwargs)
         self._tab_count = 0
         self._render = None
         self._stable = True
+        self._do_bases_init()
         if self._void:
             self._render = self.render()
+
+    def _get__tag(self):
+        for cls in self.__class__.__mro__:
+            try:
+                return getattr(self, '_%s__tag' % cls.__name__)
+            except AttributeError:
+                pass
+        raise TagError(self, '_*__tag not defined for this class or bases.')
+
+    def _do_bases_init(self):
+        for cls in reversed(self.__class__.__mro__):
+            make_func = getattr(cls, 'init', None)
+            if make_func:
+                make_func(self)
 
     def __repr__(self):
         css_repr = '%s%s' % (
@@ -666,7 +686,7 @@ class Tag(DOMElement):
             return self._render
 
         tag_data = {
-            'tag': getattr(self, '_%s__tag' % self.__class__.__name__),
+            'tag': self._get__tag(),
             'attrs': self.attrs.render(),
             'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
             'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
