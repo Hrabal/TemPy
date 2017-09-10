@@ -376,7 +376,7 @@ class DOMElement:
         """Returns all the siblings of this element as a list."""
         return list(filter(lambda x: x.uuid != self.uuid, self.parent.childs))
 
-    def parent(self):
+    def get_parent(self):
         """Returns this element's father"""
         return self.parent
 

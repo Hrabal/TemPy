@@ -406,6 +406,11 @@ class TestDOMelement(unittest.TestCase):
         d2 = Div().append_to(c)
         self.assertEqual(d2.prev(), d1)
 
+    def test_get_parent(self):
+        darth_vader = Div()
+        luke = Div().append_to(darth_vader)
+        self.assertEqual(luke.get_parent(), darth_vader)
+
     def test_prev_all(self):
         c = Div()
         d1 = Div().append_to(c)
