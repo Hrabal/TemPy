@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 import html
+import importlib
 from uuid import uuid4
 from copy import copy
 from functools import wraps
@@ -9,7 +10,15 @@ from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import TagError, WrongContentError, ContentError, WrongArgsError
+from .exceptions import (TagError, WrongContentError, ContentError,
+                         WrongArgsError)
+
+
+def render_template(template_name, **kwargs):
+    template_module = importlib.import_module('templates.%s' % template_name,
+                                              package='templates')
+    template = template_module.template.inject(**kwargs)
+    return template.render()
 
 
 class _ChildElement:
