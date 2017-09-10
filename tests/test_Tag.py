@@ -4,12 +4,26 @@
 """
 import unittest
 
-from tempy import Tag, Content
+from tempy import Tag, Content, TagAttrs
 from tempy.tags import Div, P
 from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 
 class TestTag(unittest.TestCase):
+
+    def test_tagattrs(self):
+        a = TagAttrs(named1='test1')
+        self.assertTrue('named1' in a)
+        self.assertEqual(a['named1'], 'test1')
+
+    def test_tagattrs_bool(self):
+        a = TagAttrs('bool1', 'bool2')
+        self.assertTrue('bool1' in a)
+        self.assertTrue('bool2' in a)
+        self.assertEqual(a['bool1'], bool)
+
+        with self.assertRaises(WrongArgsError):
+            a = TagAttrs(1)
 
     def test_tag_set_attrs(self):
         d = Div(klass='test_css_class')
