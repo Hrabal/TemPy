@@ -496,28 +496,32 @@ class Tag(DOMElement):
     _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
     _needed_kwargs = None
     _void = False
-    default_init = {}
+    default_attributes = {}
+    default_data = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        init_kwargs = copy(self.default_init)
-        init_kwargs.update(kwargs)
+        default_data = copy(self.default_data)
+        default_data.update(kwargs.pop('data', {}))
+        default_attributes = copy(self.default_attributes)
+        default_attributes.update(kwargs)
         self.attrs = TagAttrs()
         self._data = {}
         for k in self._needed_kwargs or []:
             try:
-                need_check = init_kwargs[k]
+                need_check = default_attributes[k]
             except KeyError:
                 need_check = None
             if not need_check:
                 raise TagError(self,
                                '%s argument needed for %s' % (k,
                                                               self.__class__))
-        self.attr(*args, **init_kwargs)
+        self.attr(*args, **default_attributes)
+        self.data(**default_data)
         self._tab_count = 0
         self._render = None
         self._stable = True
-        self._do_bases_init()
+        self._do_bases_funcs('init')
         if self._void:
             self._render = self.render()
 
@@ -529,11 +533,11 @@ class Tag(DOMElement):
                 pass
         raise TagError(self, '_*__tag not defined for this class or bases.')
 
-    def _do_bases_init(self):
+    def _do_bases_funcs(self, func_name):
         for cls in reversed(self.__class__.__mro__):
-            make_func = getattr(cls, 'init', None)
-            if make_func:
-                make_func(self)
+            func = getattr(cls, func_name, None)
+            if func:
+                func(self)
 
     def __repr__(self):
         css_repr = '%s%s' % (
@@ -644,6 +648,8 @@ class Tag(DOMElement):
         self._data.update(kwargs)
         if key:
             return self._data[key]
+        if not kwargs:
+            return self._data
         return self
 
     def html(self, pretty=False):
@@ -670,6 +676,7 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
+        self._do_bases_funcs('pre_render')
         pretty = kwargs.pop('pretty', False)
         if isinstance(pretty, bool) and pretty:
             pretty1 = 0
