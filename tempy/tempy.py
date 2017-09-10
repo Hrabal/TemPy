@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
+import html
 from uuid import uuid4
 from copy import copy
 from functools import wraps
@@ -661,7 +662,7 @@ class Tag(DOMElement):
 
     def _get_child_renders(self, pretty=False):
         return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content))
-                       else str(child) for child in self.childs)
+                       else html.escape(str(child)) for child in self.childs)
 
 
 class VoidTag(Tag):
