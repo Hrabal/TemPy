@@ -11,6 +11,22 @@ from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 class TestTag(unittest.TestCase):
 
+    def test_recursive_tag_get(self):
+        class TestTag(Div): pass
+
+        t = TestTag()
+        with self.assertRaises(AttributeError):
+            t._TestTag__tag
+        try:
+            t._Div__tag
+        except AttributeError:
+            self.fail('tag string not retrieved correctly')
+        self.assertEqual(t._get__tag(), 'div')
+
+        class TestTag(Tag): pass
+        with self.assertRaises(TagError):
+            TestTag()._get__tag()
+
     def test_tagattrs(self):
         a = TagAttrs(named1='test1')
         self.assertTrue('named1' in a)
