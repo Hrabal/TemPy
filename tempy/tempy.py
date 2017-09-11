@@ -438,7 +438,8 @@ class TagAttrs(dict):
     _SET_VALUES_ATTRS = ('klass', )
     _SPECIALS = {
         'klass': 'class',
-        'typ': 'type'
+        'typ': 'type',
+        '_for': 'for'
     }
     _FORMAT = {
         'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
