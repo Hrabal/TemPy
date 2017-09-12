@@ -130,6 +130,10 @@ class DOMElement:
         return self.after(self * (n-1))
 
     @property
+    def root(self):
+        return self.parent.root if self.parent else self
+
+    @property
     def _own_index(self):
         if self.parent:
             try:

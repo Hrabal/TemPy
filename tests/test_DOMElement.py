@@ -441,6 +441,34 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(c.slice(), [d1, d2, d3])
         self.assertEqual(c.slice(0, step=2), [d1, d3])
 
+    def test_root(self):
+        a = Div()
+        b = Div().append_to(a)
+        c = Div().append_to(b)
+        self.assertEqual(c.root, a)
+        self.assertEqual(b.root, a)
+        self.assertEqual(a.root, a)
+
+        c = b.pop()
+        self.assertEqual(c.root, c)
+        self.assertEqual(b.root, a)
+        self.assertEqual(a.root, a)
+
+        b(c)
+        d = Div()
+        a.move_childs(d)
+        self.assertEqual(c.root, d)
+        self.assertEqual(b.root, d)
+        self.assertEqual(a.root, a)
+
+        c(a)
+        self.assertEqual(c.root, d)
+        self.assertEqual(b.root, d)
+        self.assertEqual(a.root, d)
+
+        c.empty()
+        self.assertEqual(a.root, a)
+
 
 if __name__ == '__main__':
     unittest.main()
