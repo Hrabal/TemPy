@@ -5,7 +5,7 @@
 import unittest
 
 from tempy import TempyView
-from tempy.tags import Div, Td, P, Span
+from tempy.tags import Div, Td, P, Span, Table, Tr
 
 
 class TestSingleTags(unittest.TestCase):
@@ -15,13 +15,7 @@ class TestSingleTags(unittest.TestCase):
             def __init__(self):
                 self.foo = 'foo'
                 self.bar = 'bar'
-
-            class TestView(TempyView):
-                def init(self):
-                    self(
-                        Div()(self.foo),
-                        Div()(self.bar)
-                        )
+                self.rows = [(1, 2), (3, 4)]
 
             class Div(TempyView):
                 def init(self):
@@ -30,11 +24,13 @@ class TestSingleTags(unittest.TestCase):
                         P()(self.bar)
                         )
 
-            class Tr(TempyView):
+            class Table(TempyView):
                 def init(self):
                     self(
-                        Td()(self.foo),
-                        Td()(self.bar)
+                        Tr()(
+                            Td()(row[0]),
+                            Td()(row[1])
+                        ) for row in self.rows
                         )
 
             class CustomDOMElement(TempyView):
@@ -77,3 +73,8 @@ class TestSingleTags(unittest.TestCase):
         test_instance = self.test_model()
         a = CustomDOMElement()(test_instance)
         self.assertEqual(a.render(), '<div><div><p>foo</p></div><p>bar</p></div>')
+
+    def test_tr_complex(self):
+        test_instance = self.test_model()
+        a = Table()(test_instance)
+        self.assertEqual(a.render(), '<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>')
