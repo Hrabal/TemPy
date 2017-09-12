@@ -47,7 +47,19 @@ class TestSingleTags(unittest.TestCase):
         self.test_model = Test
 
     def test_nameless_view(self):
-        test_instance = self.test_model()
+        class Test:
+            def __init__(self):
+                self.foo = 'foo'
+                self.bar = 'bar'
+
+            class TestView(TempyView):
+                def init(self):
+                    self(
+                        Div()(self.foo),
+                        Div()(self.bar)
+                        )
+
+        test_instance = Test()
         a = Span()(test_instance)
         self.assertEqual(a.render(), '<span><div>foo</div><div>bar</div></span>')
 
