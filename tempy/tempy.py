@@ -130,6 +130,10 @@ class DOMElement:
         return self.after(self * (n-1))
 
     @property
+    def is_root(self):
+        return self.root == self
+
+    @property
     def root(self):
         return self.parent.root if self.parent else self
 

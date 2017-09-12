@@ -469,6 +469,16 @@ class TestDOMelement(unittest.TestCase):
         c.empty()
         self.assertEqual(a.root, a)
 
+    def test_is_root(self):
+        a = Div()
+        self.assertTrue(a.is_root)
+
+        b = Div().append_to(a)
+        self.assertFalse(b.is_root)
+
+        c = Div().append_to(b)
+        self.assertFalse(c.is_root)
+
 
 if __name__ == '__main__':
     unittest.main()
