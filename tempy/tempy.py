@@ -12,7 +12,7 @@ from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
 from .exceptions import (TagError, WrongContentError, ContentError,
-                         WrongArgsError)
+                         WrongArgsError, IncompleteViewError)
 
 
 def render_template(template_name, start_directory=None, **kwargs):
@@ -183,6 +183,23 @@ class DOMElement:
                 yield i, item._name, item.obj
             else:
                 yield i, item._name, item.obj
+
+    def _search_for_view(self, obj):
+        to_look = chain(iter((self.__class__.__name__, self.root.__class__.__name__)),
+                        obj.__class__.__dict__)
+        for item in to_look:
+            found = obj.__class__.__dict__.get(item)
+            if found:
+                try:
+                    if issubclass(found, TempyView):
+                        return found(obj)
+                except TypeError:
+                    pass
+        return obj
+
+    def _get_child_renders(self, pretty=False):
+        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content, TempyView))
+                       else html.escape(str(child)) for child in map(self._search_for_view, self.childs))
 
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
@@ -716,10 +733,6 @@ class Tag(DOMElement):
         self._stable = True
         return self._render
 
-    def _get_child_renders(self, pretty=False):
-        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content))
-                       else html.escape(str(child)) for child in self.childs)
-
 
 class VoidTag(Tag):
     """
@@ -729,7 +742,30 @@ class VoidTag(Tag):
     _template = '<{tag}{attrs}/>'
 
 
-class Content:
+class TempyView(DOMElement):
+    """Helper Class to provide views for custom objects.
+    Objects of classes with a nested TempyView subclass are rendered using the TempyView subclass as a template.
+
+    """
+    def __init__(self, obj):
+        super().__init__()
+        self.obj = obj
+        try:
+            self.init()
+        except AttributeError:
+            raise IncompleteViewError(self.__class__, 'TempyView subclass should implement an "init" method.')
+
+    def __getattribute__(self, attr):
+        try:
+            return super().__getattribute__('obj').__getattribute__(attr)
+        except:
+            return super().__getattribute__(attr)
+
+    def render(self, pretty=False):
+        return self._get_child_renders(pretty=pretty)
+
+
+class Content(DOMElement):
     """
     Provides the ability to use a simil-tag object as content placeholder.
     At render time, a content with the same name is searched in parents, the nearest one is used.
@@ -738,7 +774,6 @@ class Content:
     """
     def __init__(self, name=None, content=None, template=None):
         super().__init__()
-        self.parent = None
         self._tab_count = 0
         if not name and not content:
             raise ContentError(self, 'Content needs at least one argument: name or content')
@@ -749,14 +784,6 @@ class Content:
             raise ContentError(self, 'template argument should be a DOMElement')
         self.uuid = uuid4()
         self.stable = False
-
-    def __repr__(self):
-        return '<%s.%s %s.%s%s>' % (
-            self.__module__,
-            type(self).__name__,
-            self.uuid,
-            ' Son of %s' % type(self.parent).__name__ if self.parent else '',
-            ' Named %s' % self._name if self._name else '')
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:

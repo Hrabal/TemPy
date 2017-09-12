@@ -43,4 +43,12 @@ class WidgetDataError(WidgetError):
 
 
 class ContentError(TempyException):
-    """Base Tag Exception"""
+    """Base Content Exception"""
+
+
+class ViewError(TempyException):
+    """Base TempyView Exception"""
+
+
+class IncompleteViewError(ViewError, TypeError):
+    """Raised when a TempyView subclass is not defined correctly."""
