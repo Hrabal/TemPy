@@ -77,7 +77,3 @@ class TestSingleTags(unittest.TestCase):
         test_instance = self.test_model()
         a = CustomDOMElement()(test_instance)
         self.assertEqual(a.render(), '<div><div><p>foo</p></div><p>bar</p></div>')
-
-
-if __name__ == '__main__':
-    unittest.main()

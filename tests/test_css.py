@@ -62,7 +62,3 @@ class TestTag(unittest.TestCase):
         rendered_css = css.render()
         # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
         self.assertEqual(Counter(rendered_css), Counter(expected))
-
-
-if __name__ == '__main__':
-    unittest.main()

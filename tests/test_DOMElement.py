@@ -478,7 +478,3 @@ class TestDOMelement(unittest.TestCase):
 
         c = Div().append_to(b)
         self.assertFalse(c.is_root)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -105,7 +105,3 @@ class TestTag(unittest.TestCase):
         tag = Div()()
         tag.inject(**self.test_contents)
         self.assertTrue(tag.content_data, self.test_contents)
-
-
-if __name__ == '__main__':
-    unittest.main()

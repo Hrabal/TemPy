@@ -192,7 +192,3 @@ class TestTag(unittest.TestCase):
     def test__get_non_tempy_contents(self):
         d = Div()(Div(), 1, Content(name='test'), 'test', False, True, Div())
         self.assertEqual(list(d._get_non_tempy_contents()), [1, 'test', False, True])
-
-
-if __name__ == '__main__':
-    unittest.main()

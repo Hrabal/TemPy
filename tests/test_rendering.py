@@ -35,7 +35,3 @@ class TestRender(unittest.TestCase):
             )
         )
         self.assertEqual(Counter(page.render()), Counter(expected))
-
-
-if __name__ == '__main__':
-    unittest.main()

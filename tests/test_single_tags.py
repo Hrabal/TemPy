@@ -27,7 +27,3 @@ class TestSingleTags(unittest.TestCase):
         t = Title(title_string)
         self.assertTrue(title_string in t)
         self.assertEqual(t.render(), '<title>%s</title>' % title_string)
-
-
-if __name__ == '__main__':
-    unittest.main()
