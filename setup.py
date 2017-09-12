@@ -26,7 +26,7 @@ No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags 
 """
 
 setup(name='tem-py',
-      version='0.4',
+      version='0.4.1',
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
       description='Python OOP Templating System',
@@ -34,7 +34,7 @@ setup(name='tem-py',
       packages=['tempy'],
       url='https://github.com/Hrabal/TemPy',
       keywords=['python3', 'templating', 'html', 'web'],
-      download_url='https://github.com/Hrabal/TemPy/archive/0.4.tar.gz',
+      download_url='https://github.com/Hrabal/TemPy/archive/0.4.1.tar.gz',
       python_requires='>=3.3',
       long_description=long_description
       )
