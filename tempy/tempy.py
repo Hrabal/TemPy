@@ -185,9 +185,7 @@ class DOMElement:
                 yield i, item._name, item.obj
 
     def _search_for_view(self, obj):
-        to_look = chain(iter((self.__class__.__name__, self.root.__class__.__name__)),
-                        obj.__class__.__dict__)
-        for item in to_look:
+        for item in (self.__class__.__name__, self.root.__class__.__name__, 'HtmlREPR'):
             found = obj.__class__.__dict__.get(item)
             if found:
                 if isinstance(found, type):

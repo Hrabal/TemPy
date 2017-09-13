@@ -49,7 +49,7 @@ class TestSingleTags(unittest.TestCase):
                 self.foo = 'foo'
                 self.bar = 'bar'
 
-            class TestView(TempyREPR):
+            class HtmlREPR(TempyREPR):
                 def init(self):
                     self(
                         Div()(self.foo),
@@ -86,7 +86,7 @@ class TestSingleTags(unittest.TestCase):
                 self.foo = 'foo'
                 self.bar = 'bar'
 
-            class TestView(TempyREPR):
+            class HtmlREPR(TempyREPR):
                 pass
 
         with self.assertRaises(IncompleteREPRError):
