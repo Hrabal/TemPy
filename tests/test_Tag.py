@@ -17,10 +17,7 @@ class TestTag(unittest.TestCase):
         t = TestTag()
         with self.assertRaises(AttributeError):
             t._TestTag__tag
-        try:
-            t._Div__tag
-        except AttributeError:
-            self.fail('tag string not retrieved correctly')
+        t._Div__tag
         self.assertEqual(t._get__tag(), 'div')
 
         class TestTag(Tag): pass
