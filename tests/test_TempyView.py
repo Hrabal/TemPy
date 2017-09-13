@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy import TempyView
+from tempy import TempyREPR
 from tempy.tags import Div, Td, P, Span, Table, Tr
 
 
@@ -17,14 +17,14 @@ class TestSingleTags(unittest.TestCase):
                 self.bar = 'bar'
                 self.rows = [(1, 2), (3, 4)]
 
-            class Div(TempyView):
+            class Div(TempyREPR):
                 def init(self):
                     self(
                         P()(self.foo),
                         P()(self.bar)
                         )
 
-            class Table(TempyView):
+            class Table(TempyREPR):
                 def init(self):
                     self(
                         Tr()(
@@ -33,7 +33,7 @@ class TestSingleTags(unittest.TestCase):
                         ) for row in self.rows
                         )
 
-            class CustomDOMElement(TempyView):
+            class CustomDOMElement(TempyREPR):
                 def init(self):
                     self(
                         Div()(P()(self.foo)),
@@ -48,7 +48,7 @@ class TestSingleTags(unittest.TestCase):
                 self.foo = 'foo'
                 self.bar = 'bar'
 
-            class TestView(TempyView):
+            class TestView(TempyREPR):
                 def init(self):
                     self(
                         Div()(self.foo),

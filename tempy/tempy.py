@@ -191,14 +191,14 @@ class DOMElement:
             found = obj.__class__.__dict__.get(item)
             if found:
                 try:
-                    if issubclass(found, TempyView):
+                    if issubclass(found, TempyREPR):
                         return found(obj)
                 except TypeError:
                     pass
         return obj
 
     def _get_child_renders(self, pretty=False):
-        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content, TempyView))
+        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content, TempyREPR))
                        else html.escape(str(child)) for child in map(self._search_for_view, self.childs))
 
     def content_receiver(reverse=False):
@@ -742,9 +742,9 @@ class VoidTag(Tag):
     _template = '<{tag}{attrs}/>'
 
 
-class TempyView(DOMElement):
+class TempyREPR(DOMElement):
     """Helper Class to provide views for custom objects.
-    Objects of classes with a nested TempyView subclass are rendered using the TempyView subclass as a template.
+    Objects of classes with a nested TempyREPR subclass are rendered using the TempyREPR subclass as a template.
 
     """
     def __init__(self, obj):
@@ -753,7 +753,7 @@ class TempyView(DOMElement):
         try:
             self.init()
         except AttributeError:
-            raise IncompleteViewError(self.__class__, 'TempyView subclass should implement an "init" method.')
+            raise IncompleteViewError(self.__class__, 'TempyREPR subclass should implement an "init" method.')
 
     def __getattribute__(self, attr):
         try:
