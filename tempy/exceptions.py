@@ -46,9 +46,9 @@ class ContentError(TempyException):
     """Base Content Exception"""
 
 
-class ViewError(TempyException):
-    """Base TempyView Exception"""
+class REPRError(TempyException):
+    """Base TempyREPR Exception"""
 
 
-class IncompleteViewError(ViewError, TypeError):
-    """Raised when a TempyView subclass is not defined correctly."""
+class IncompleteREPRError(REPRError, TypeError):
+    """Raised when a TempyREPR subclass is not defined correctly."""

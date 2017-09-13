@@ -12,7 +12,7 @@ from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
 from .exceptions import (TagError, WrongContentError, ContentError,
-                         WrongArgsError, IncompleteViewError)
+                         WrongArgsError, IncompleteREPRError)
 
 
 def render_template(template_name, start_directory=None, **kwargs):
@@ -190,11 +190,9 @@ class DOMElement:
         for item in to_look:
             found = obj.__class__.__dict__.get(item)
             if found:
-                try:
+                if isinstance(found, type):
                     if issubclass(found, TempyREPR):
                         return found(obj)
-                except TypeError:
-                    pass
         return obj
 
     def _get_child_renders(self, pretty=False):
@@ -753,7 +751,7 @@ class TempyREPR(DOMElement):
         try:
             self.init()
         except AttributeError:
-            raise IncompleteViewError(self.__class__, 'TempyREPR subclass should implement an "init" method.')
+            raise IncompleteREPRError(self.__class__, 'TempyREPR subclass should implement an "init" method.')
 
     def __getattribute__(self, attr):
         try:

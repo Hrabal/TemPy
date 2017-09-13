@@ -5,6 +5,7 @@
 import unittest
 
 from tempy import TempyREPR
+from tempy.exceptions import IncompleteREPRError
 from tempy.tags import Div, Td, P, Span, Table, Tr
 
 
@@ -78,3 +79,16 @@ class TestSingleTags(unittest.TestCase):
         test_instance = self.test_model()
         a = Table()(test_instance)
         self.assertEqual(a.render(), '<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>')
+
+    def test_incomplete(self):
+        class Test:
+            def __init__(self):
+                self.foo = 'foo'
+                self.bar = 'bar'
+
+            class TestView(TempyREPR):
+                pass
+
+        with self.assertRaises(IncompleteREPRError):
+            a = Span()(Test())
+            a.render()
