@@ -101,6 +101,15 @@ class TestTempyTable(unittest.TestCase):
         with self.assertRaises(IndexError):
             table.body[0][11]
 
+        with self.assertRaises(WidgetDataError):
+            table.populate(None)
+
+    def test_clear(self):
+        table = TempyTable(data=self.data)
+        table.clear()
+
+        self.assertTrue(table.body.is_empty)
+
     def test_pop_row(self):
         table = TempyTable(data=self.data)
 

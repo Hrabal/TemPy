@@ -110,7 +110,7 @@ class TempyTable(Table):
         """
         if data is None:
             # Maybe raise? Empty the table?
-            return self
+            raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear()')
 
         if not self.body:
             # Table is empty
@@ -138,6 +138,9 @@ class TempyTable(Table):
                             if t_cell.is_empty and d_cell is not None:
                                 t_cell(d_cell)
         return self
+
+    def clear(self):
+        return self.body.empty()
 
     def add_row(self, row_data, resize_x=False):
         """Adds a row at the end of the table"""
