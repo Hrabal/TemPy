@@ -747,9 +747,9 @@ class TempyREPR(DOMElement):
         super().__init__()
         self.obj = obj
         try:
-            self.init()
+            self.repr()
         except AttributeError:
-            raise IncompleteREPRError(self.__class__, 'TempyREPR subclass should implement an "init" method.')
+            raise IncompleteREPRError(self.__class__, 'TempyREPR subclass should implement an "repr" method.')
 
     def __getattribute__(self, attr):
         try:

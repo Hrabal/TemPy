@@ -19,14 +19,14 @@ class TestSingleTags(unittest.TestCase):
                 self.rows = [(1, 2), (3, 4)]
 
             class Div(TempyREPR):
-                def init(self):
+                def repr(self):
                     self(
                         P()(self.foo),
                         P()(self.bar)
                         )
 
             class Table(TempyREPR):
-                def init(self):
+                def repr(self):
                     self(
                         Tr()(
                             Td()(row[0]),
@@ -35,7 +35,7 @@ class TestSingleTags(unittest.TestCase):
                         )
 
             class CustomDOMElement(TempyREPR):
-                def init(self):
+                def repr(self):
                     self(
                         Div()(P()(self.foo)),
                         P()(self.bar)
@@ -50,7 +50,7 @@ class TestSingleTags(unittest.TestCase):
                 self.bar = 'bar'
 
             class HtmlREPR(TempyREPR):
-                def init(self):
+                def repr(self):
                     self(
                         Div()(self.foo),
                         Div()(self.bar)
