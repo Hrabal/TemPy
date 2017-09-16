@@ -77,7 +77,7 @@ page.render()
 ```
 
 #### Building blocks
-You can also create blocks and put them together using the manipulation api:
+You can also create blocks and put them together using the manipulation api, each TemPy object can be used later inside other TemPy object:
 ```python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
@@ -100,14 +100,117 @@ from tempy.tags import Div
 from pages import home_page, content_page
 
 @controller_framework_decorator
-def mycontroller(url='/'):
+def my_home_controller(url='/'):
     return home_page.render()
 
 @controller_framework_decorator
-def mycontroller(url='/content'):
+def my_content_controller(url='/content'):
     content = Div()('This is my content!')
     return content_page.body.container.append(content).render()
 ```
+
+#### OOT - Object Oriented Templating
+TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom html tree structures to use as blocks.
+
+```python
+from tempy.widgets import TempyPage
+
+class BasePage(TempyPage):
+    def js(self):
+        return [
+            Script(src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"),
+        ]
+
+    def css(self):
+        return [
+            Link(href=url_for('static', filename='style.css'),
+                 rel="stylesheet",
+                 typ="text/css"),
+            Link(href='https://fonts.googleapis.com/css?family=Quicksand:300',
+                 rel="stylesheet"),
+            Link(href=url_for('static',
+                              filename='/resources/font-awesome-4.7.0/css/font-awesome.min.css'),
+                 rel="stylesheet"),
+        ]
+
+    # Define the init method as a constructor of your block structure
+    def init(self):
+        self.head(self.css(), self.js())
+        self.body(
+            container=Div(id='container')(
+                title=Div(id='title')(
+                    Div(id='page_title')(A(href='/')('MySite')),
+                    menu=self.make_menu('MAIN')
+                ),
+                content=Div(id='content')(Hr())
+            )
+        )
+    
+    # Your subclass can have his own methods like any other class
+    def make_menu(self, typ):
+        return Div(klass='menu')(
+                            Nav()(
+                                Ul()(
+                                    Li()(
+                                        A(href=item[1])(item[0]))
+                                    for item in self.get_menu(typ)
+                                )
+                            ),
+                        )
+
+    def get_menu(self, typ):
+        return [(mi.name, mi.link)
+                for mi in Menu.query.filter_by(active=True, menu=typ
+                                               ).order_by(Menu.order).all()]
+
+```
+
+..you can then sublass your custom TemPy object to add specific behavior:
+```python
+class HomePage(BasePage):
+
+    def init(self):
+        self.body.container.content(
+            Div()(
+                Br(),
+                'This is my home page content', Br(),
+                H3()('Hame page important content'),
+                'Look, I\'m a string!', Br(),
+                H3()('H3 is big, really big'),
+                H1()('Today's content:'),
+                self.get_dynamic_content()
+            )
+        )
+
+    def get_dynamic_content(self):
+        # Here using SQLAlchemy:
+        current_content = Content.query.outerjoin(Content.comments).order_by(Content.date.desc(), Content.id.desc()).limit(1).first()
+        if not current_content:
+            return 'No content today!'
+        return Div()(Span()(current_content.title),
+                     Span()(current_content.text)),
+                     Div()(comment for comment in current_content.comments))
+```
+
+TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in his parent classes.
+
+#### TemPy repr's
+
+Another way to use TemPy is to define a nested `TempyREPR` class inside your classes:
+```python
+class MyClass:
+    def __init__(self):
+        self.foo = 'foo'
+        self.bar = 'bar'
+
+    class HtmlREPR(TempyREPR):
+        def repr(self):
+            self(
+                Div()(self.foo),
+                Div()(self.bar)
+            )
+```
+You can think the `TempyREPR` as a `__repr__` equivalent, so when an instance is placed inside a TemPy tree, the `TempyREPR` subclass is used to render the instance.
 
 ### Elements creation and removal
 Create DOM elements by instantiating tags:
