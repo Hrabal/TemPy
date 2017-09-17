@@ -36,7 +36,7 @@ setup(name='tem-py',
       packages=['tempy'],
       url='https://github.com/Hrabal/TemPy',
       keywords=['python3', 'templating', 'html', 'web'],
-      download_url='https://github.com/Hrabal/TemPy/archive/0.4.1.tar.gz',
+      download_url='https://github.com/Hrabal/TemPy/archive/%s.tar.gz' % __version__,
       python_requires='>=3.3',
       long_description=long_description
       )
