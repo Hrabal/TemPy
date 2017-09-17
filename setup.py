@@ -17,6 +17,8 @@
 #   limitations under the License.
 from setuptools import setup
 
+from tempy import __version__
+
 long_description = """
 Build HTML without writing a single tag.
 TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion.
@@ -26,7 +28,7 @@ No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags 
 """
 
 setup(name='tem-py',
-      version='0.4.1',
+      version=__version__,
       author='Federico Cerchiari',
       author_email='federicocerchiari@gmail.com',
       description='Python OOP Templating System',
