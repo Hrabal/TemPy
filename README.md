@@ -212,6 +212,47 @@ class MyClass:
 ```
 You can think the `TempyREPR` as a `__repr__` equivalent, so when an instance is placed inside a TemPy tree, the `TempyREPR` subclass is used to render the instance.
 
+You can define several `TempyREPR` nested classes, when dealing with non-TemPy object TemPy will search for a `TempyREPR` subclass following this priority:
+* a `TempyREPR` subclass with the same name of his TemPy container
+* a `TempyREPR` subclass with the same name of his TemPy container's root
+* a `TempyREPR` subclass named `HtmlREPR`
+* the first `TempyREPR` found.
+* if none of the previous if found, the object will be rendered calling his `__str__` method
+
+You can use this order to set different renderings for different situation/pages:
+
+```python
+class MyClass:
+    def __init__(self):
+        self.foo = 'foo'
+        self.bar = 'bar'
+        self.link = 'www.foobar.com'
+    
+    # If an instance on MyClass is found inside a div
+    class Div(TempyREPR):
+        def repr(self):
+            self(
+                Div()(self.foo),
+                Div()(self.bar)
+            )
+    
+    # If an instance on MyClass is found inside a link
+    class A(TempyREPR):
+        def repr(self):
+            self.parent.attrs['href'] = self.link
+            self('Link to ', self.bar)
+
+    # If an instance on MyClass is found inside a table cell
+    class Td(TempyREPR):
+        def repr(self):
+            self(self.bar.upper())
+    
+    # If an instance on MyClass is found when rendering the a TempyPage called 'HomePage'
+    class HomePage(TempyREPR):
+        def repr(self):  # note: here self is the object's parent, not the root
+            self('Hello World, this is bar: ', self.bar)
+```
+
 ### Elements creation and removal
 Create DOM elements by instantiating tags:
 ```python
