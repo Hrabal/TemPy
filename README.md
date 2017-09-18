@@ -17,7 +17,15 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
 See below for benchmarks against other templating engines.
 
-**Build, manipulate, and navigate HTML documents. With no HTML involved.**
+
+### **Build, manipulate, and navigate HTML documents. With no HTML involved:**
+* [Building the DOM, basic usage](#basic-usage)
+* [Building separate blocks, nesting and re-usability](#building-blocks)
+* [OOT - Object-Oriented Templating](#oot---object-oriented-templating)
+* [TemPy REPR, set and forget](#tempy-reprs)
+* [DOM elements API, change your page dynamically](#elements-api)
+* [DOM navigation, it's a tree!](#dom-navigation)
+* [Tag attributes, it's a tag!](#tag-attributes)
 
 # Usage
 ### Installation
@@ -25,7 +33,9 @@ TemPy is avaiable on PyPi: `pip3 install tem-py`.
 
 Or clone/download this repository and run `python3 setup.py install`
 
-### Basic Templating
+### Building the DOM
+
+#### basic usage
 
 TemPy offers clean syntax for building pages in pure python:
 ```python
@@ -253,7 +263,7 @@ class MyClass:
             self('Hello World, this is bar: ', self.bar)
 ```
 
-### Elements creation and removal
+### Elements api
 Create DOM elements by instantiating tags:
 ```python
 page = Html()
@@ -286,8 +296,35 @@ page.pop()
 >>> <html></html>
 ```
 
-All the main jQuery manipulating apis are provided.
-
+Several api's are provided to modify you're existing DOM elements:
+```python
+div1 = Div()
+div2 = Div()
+div1.after(div2)
+div1.before(div2)
+div1.prepend(div2)
+div1.prepend_to(div2)
+div1.append(div2)
+div1.append_to(div2)
+div1.wrap(div2)
+div1.wrap_inner(div2)
+div1.replace_with(div2)
+div1.remove(div2)
+div1.move_childs(div2)
+div1.move(div2)
+div1.pop(div2)
+div1.empty(div2)
+div1.children(div2)
+div1.contents(div2)
+div1.first(div2)
+div1.last(div2)
+div1.next(div2)
+div1.next_all(div2)
+div1.prev(div2)
+div1.prev_all(div2)
+div1.siblings(div2)
+div1.slice(div2)
+```
 
 ## Tag Attributes 
 Add attributes to every element at definition time or later:
