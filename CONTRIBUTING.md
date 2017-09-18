@@ -14,8 +14,8 @@ We have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask fo
 Planned evolution of this project:
 - [x] Better exception handling.
 - [x] Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
-- [] TemPy widgets, see the widget branch.
-- [] Better pretty formatting.
+- [ ] TemPy widgets, see the widget branch.
+- [ ] Better pretty formatting.
 - [x] Writing more tests.
 - `stable` concept refactor... there should be a better way!
 
