@@ -12,15 +12,16 @@ We have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask fo
 
 ### Program
 Planned evolution of this project:
-- Better exception handling.
-- Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
-- TemPy widgets, see the widget branch.
-- Better pretty formatting.
-- Writing more tests.
+- [x] Better exception handling.
+- [x] Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
+- [] TemPy widgets, see the widget branch.
+- [] Better pretty formatting.
+- [x] Writing more tests.
+- `stable` concept refactor... there should be a better way!
 
 Ideas I'm thinking about:
 - Html to TemPy command line converter tool, accepts plain html and makes a .py tempy module.
-- Python 2 compatibility (maybe?).
+- ~~Python 2 compatibility (maybe?).~~
 - Performance: always needed, maybe a `_partial_render` method that traverse the html tree in a depth-first reverse order and "stabilize" all the leafs? Is this useful?
 - Adding .find method to use with css-like selectors (i.e: `Html().find('#myid')`)?
 - New class: `CssManager` extracts common style properties from the DOM, creates the `Css` instance and adds it in the `<head>`?
