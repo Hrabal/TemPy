@@ -17,7 +17,7 @@ Planned evolution of this project:
 - [ ] TemPy widgets, see the widget branch.
 - [ ] Better pretty formatting.
 - [x] Writing more tests.
-- `stable` concept refactor... there should be a better way!
+- [ ] `stable` concept refactor... there should be a better way!
 
 Ideas I'm thinking about:
 - Html to TemPy command line converter tool, accepts plain html and makes a .py tempy module.
