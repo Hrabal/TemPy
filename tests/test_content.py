@@ -50,11 +50,11 @@ class TestTag(unittest.TestCase):
         cont = Content(content={'test': 'test'})
         self.assertEqual(list(cont.content), [{'test': 'test'}, ])
 
-        cont = Content(name='test', template=Div())
-        self.assertEqual(cont._template, Div())
+        cont = Content(name='test', t_repr=Div())
+        self.assertEqual(cont._t_repr, Div())
 
         with self.assertRaises(ContentError):
-            Content(name='test', template='wrong')
+            Content(name='test', t_repr='wrong')
 
     def test_eq(self):
         self.assertEqual(Content(name='test'), Content(name='test'))
@@ -70,8 +70,8 @@ class TestTag(unittest.TestCase):
         d = Div()(Content(name='test1')).inject({'test1': Div()})
         self.assertEqual(Counter(d.render()), Counter('<div><div></div></div>'))
 
-        template = Div()(Content(name='test21'))
-        d = Div()(Content(name='test2', template=template)).inject(self.test_contents)
+        t_repr = Div()(Content(name='test21'))
+        d = Div()(Content(name='test2', t_repr=t_repr)).inject(self.test_contents)
         self.assertEqual(Counter(d.render()), Counter('<div><div>1 2 3</div></div>'))
 
     def test_content_from_parent(self):

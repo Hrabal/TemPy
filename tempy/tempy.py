@@ -771,15 +771,15 @@ class Content(DOMElement):
     If no content with the same name is used, an empty string is rendered.
     If instantiated with the named attribute content, this will override all the content injection on parents.
     """
-    def __init__(self, name=None, content=None, template=None):
+    def __init__(self, name=None, content=None, t_repr=None):
         super().__init__()
         self._tab_count = 0
         if not name and not content:
             raise ContentError(self, 'Content needs at least one argument: name or content')
         self._name = name
         self._fixed_content = content
-        self._template = template
-        if self._template and not isinstance(self._template, DOMElement):
+        self._t_repr = t_repr
+        if self._t_repr and not isinstance(self._t_repr, DOMElement):
             raise ContentError(self, 'template argument should be a DOMElement')
         self.uuid = uuid4()
         self.stable = False
@@ -790,12 +790,12 @@ class Content(DOMElement):
         comp_dicts = [{
             '_name': t._name,
             'content': list(t.content),
-            '_template': t._template,
+            '_t_repr': t._t_repr,
         } for t in (self, other)]
         return comp_dicts[0] == comp_dicts[1]
 
     def __copy__(self):
-        return self.__class__(self._name, self._fixed_content, self._template)
+        return self.__class__(self._name, self._fixed_content, self._t_repr)
 
     @property
     def content(self):
@@ -827,8 +827,8 @@ class Content(DOMElement):
                 if isinstance(content, DOMElement):
                     ret.append(content.render(pretty=pretty))
                 else:
-                    if self._template:
-                        ret.append(self._template.inject(content).render(pretty=pretty))
+                    if self._t_repr:
+                        ret.append(self._t_repr.inject(content).render(pretty=pretty))
                     elif isinstance(content, dict):
                         for k, v in content.items():
                             if v is not None:
