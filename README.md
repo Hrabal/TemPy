@@ -18,7 +18,12 @@ No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags 
 See below for benchmarks against other templating engines.
 
 
-### **Build, manipulate, and navigate HTML documents. With no HTML involved:**
+### **Build, manipulate, and navigate HTML documents. With no HTML involved.**
+
+Docs published here: [hrabal.github.io/TemPy-docs](https://hrabal.github.io/TemPy-docs)
+
+Overview: 
+
 * [Building the DOM, basic usage](#basic-usage)
 * [Building separate blocks, nesting and re-usability](#building-blocks)
 * [OOT - Object-Oriented Templating](#oot---object-oriented-templating)
