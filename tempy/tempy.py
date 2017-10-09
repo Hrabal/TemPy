@@ -45,7 +45,9 @@ class DOMElement:
         self.parent = None
         self.content_data = {}
         self.uuid = uuid4().int
+        self._data = {}
         self._applied_funcs = []
+        self._reverse_mro_func('init')
 
     def _reverse_mro_func(self, func_name):
         for cls in reversed(self.__class__.__mro__):
@@ -538,7 +540,6 @@ class Tag(DOMElement):
         default_attributes = copy(self.default_attributes)
         default_attributes.update(kwargs)
         self.attrs = TagAttrs()
-        self._data = {}
         for k in self._needed_kwargs or []:
             try:
                 need_check = default_attributes[k]
@@ -550,7 +551,6 @@ class Tag(DOMElement):
                                                               self.__class__))
         self.attr(*args, **default_attributes)
         self.data(**default_data)
-        self._reverse_mro_func('init')
         self._tab_count = 0
         self._render = None
         self._stable = True
