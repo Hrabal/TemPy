@@ -38,14 +38,14 @@ class DOMElement:
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self._name = None
         self.childs = []
         self.parent = None
         self.content_data = {}
         self.uuid = uuid4().int
-        self._data = {}
+        self._data = kwargs
         self._applied_funcs = []
         self._reverse_mro_func('init')
 
@@ -256,6 +256,17 @@ class DOMElement:
             else:
                 # Fallback for no content (Raise NoContent?)
                 return ''
+
+    def data(self, key=None, **kwargs):
+        """Adds or retrieve extra data to this element, this data will not be rendered.
+        Every tag have a _data attribute (dict), if key is given _data[key] is returned.
+        Kwargs are used to udpate this Tag's _data."""
+        self._data.update(kwargs)
+        if key:
+            return self._data[key]
+        if not kwargs:
+            return self._data
+        return self
 
     def inject(self, contents=None, **kwargs):
         """
@@ -534,7 +545,6 @@ class Tag(DOMElement):
     default_data = {}
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
         default_data = copy(self.default_data)
         default_data.update(kwargs.pop('data', {}))
         default_attributes = copy(self.default_attributes)
@@ -550,7 +560,7 @@ class Tag(DOMElement):
                                '%s argument needed for %s' % (k,
                                                               self.__class__))
         self.attr(*args, **default_attributes)
-        self.data(**default_data)
+        super().__init__(**default_data)
         self._tab_count = 0
         self._render = None
         self._stable = True
@@ -666,17 +676,6 @@ class Tag(DOMElement):
         """Same as jQuery's toggle, toggles the display attribute of this element."""
         self._stable = False
         return self.show() if self.attrs['style']['display'] == 'none' else self.hide()
-
-    def data(self, key=None, **kwargs):
-        """Adds or retrieve extra data to this element, this data will not be rendered.
-        Every tag have a _data attribute (dict), if key is given _data[key] is returned.
-        Kwargs are used to udpate this Tag's _data."""
-        self._data.update(kwargs)
-        if key:
-            return self._data[key]
-        if not kwargs:
-            return self._data
-        return self
 
     def html(self, pretty=False):
         """Renders the inner html of this element."""
