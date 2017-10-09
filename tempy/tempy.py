@@ -38,7 +38,6 @@ class DOMElement:
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
-
     def __init__(self):
         super().__init__()
         self._name = None
@@ -46,6 +45,15 @@ class DOMElement:
         self.parent = None
         self.content_data = {}
         self.uuid = uuid4().int
+        self._applied_funcs = []
+        self._reverse_mro_func('init')
+
+    def _reverse_mro_func(self, func_name):
+        for cls in reversed(self.__class__.__mro__):
+            func = getattr(cls, func_name, None)
+            if func and func not in self._applied_funcs:
+                self._applied_funcs.append(func)
+                func(self)
 
     def __repr__(self):
         return '<%s.%s %s.%s%s%s>' % (
@@ -546,7 +554,6 @@ class Tag(DOMElement):
         self._tab_count = 0
         self._render = None
         self._stable = True
-        self._do_bases_funcs('init')
         if self._void:
             self._render = self.render()
 
@@ -557,12 +564,6 @@ class Tag(DOMElement):
             except AttributeError:
                 pass
         raise TagError(self, '_*__tag not defined for this class or bases.')
-
-    def _do_bases_funcs(self, func_name):
-        for cls in reversed(self.__class__.__mro__):
-            func = getattr(cls, func_name, None)
-            if func:
-                func(self)
 
     def __repr__(self):
         css_repr = '%s%s' % (
@@ -701,7 +702,7 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
-        self._do_bases_funcs('pre_render')
+        self._reverse_mro_func('pre_render')
         pretty = kwargs.pop('pretty', False)
         if isinstance(pretty, bool) and pretty:
             pretty1 = 0
