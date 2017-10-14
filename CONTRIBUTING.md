@@ -21,6 +21,8 @@ Planned evolution of this project:
 - [x] Writing more tests.
 - [ ] `stable` concept refactor... there should be a better way!
 
+see [open issues](https://github.com/Hrabal/TemPy/issues) for a complete list of contributing opportunities.
+
 Ideas I'm thinking about:
 - Html to TemPy command line converter tool, accepts plain html and makes a .py tempy module.
 - ~~Python 2 compatibility (maybe?).~~
