@@ -899,7 +899,7 @@ class Css(Tag):
                         result.append(', '.join(parent))
                     else:
                         result.append("%s " % parent)
-                result.append('  { ')
+                result.append('{ ')
             else:
                 parents = []
 
