@@ -205,9 +205,20 @@ class DOMElement:
                         return found(obj)
         return obj
 
-    def _get_child_renders(self, pretty=False):
-        return ''.join(child.render(pretty=pretty) if isinstance(child, (DOMElement, Content, TempyREPR))
-                       else html.escape(str(child)) for child in map(self._search_for_view, self.childs))
+    def _iter_child_renders(self, pretty=False):
+        for child in self.childs:
+            if not isinstance(child, (DOMElement, Content, TempyREPR)):
+                child = self._search_for_view(child)
+            try:
+                yield child.render(pretty=pretty)
+            except (AttributeError, NotImplementedError):
+                if isinstance(child, Escaped):
+                    yield child._render
+                else:
+                    yield html.escape(str(child))
+
+    def render_childs(self, pretty=False):
+        return ''.join(self._iter_child_renders(pretty=pretty))
 
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
@@ -679,7 +690,7 @@ class Tag(DOMElement):
 
     def html(self, pretty=False):
         """Renders the inner html of this element."""
-        return self._get_child_renders(pretty=pretty)
+        return self.render_childs(pretty=pretty)
 
     def _get_non_tempy_contents(self):
         """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
@@ -725,7 +736,7 @@ class Tag(DOMElement):
             'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
             'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
         }
-        tag_data['inner'] = self._get_child_renders(pretty2) if not self._void and self.childs else ''
+        tag_data['inner'] = self.render_childs(pretty2) if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
@@ -761,7 +772,7 @@ class TempyREPR(DOMElement):
             return super().__getattribute__(attr)
 
     def render(self, pretty=False):
-        return self._get_child_renders(pretty=pretty)
+        return self.render_childs(pretty=pretty)
 
 
 class Content(DOMElement):
