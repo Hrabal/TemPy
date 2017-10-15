@@ -894,7 +894,12 @@ class Css(Tag):
         while nodes_to_parse:
             parents, node = nodes_to_parse.pop(0)
             if parents:
-                result.append("%s { " % " ".join(parents))
+                for parent in parents:
+                    if isinstance(parent, tuple):
+                        result.append(', '.join(parent))
+                    else:
+                        result.append("%s " % parent)
+                result.append('  { ')
             else:
                 parents = []
 
