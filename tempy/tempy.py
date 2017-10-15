@@ -924,3 +924,10 @@ class Css(Tag):
             if result:
                 result.append("} " + ("\n\n" if pretty else ""))
         return self._template.format(css=''.join(result))
+
+
+class Escaped(DOMElement):
+
+    def __init__(self, content, **kwargs):
+        super().__init__(**kwargs)
+        self._render = content
