@@ -52,3 +52,9 @@ class REPRError(TempyException):
 
 class IncompleteREPRError(REPRError, TypeError):
     """Raised when a TempyREPR subclass is not defined correctly."""
+
+class DOMModByIndexError(IndexError, TagError):
+    """Raised when wrong index is given to any DOM modification method"""
+
+class DOMModByKeyError(KeyError, TagError):
+    """Raised when wrong search key is given to any DOM modification method"""

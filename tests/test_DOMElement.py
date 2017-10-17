@@ -162,6 +162,15 @@ class TestDOMelement(unittest.TestCase):
         new2 = Div().append_to(self.page)
         self.page.pop()
         self.assertTrue(new2 not in self.page)
+        new3 = Div()
+        self.page._insert(new3, 'child_foo')
+        self.page.pop('child_foo')
+        self.assertTrue(new3 not in self.page)
+        new4, new5 = Div(), Div()
+        self.page._insert(new4, 'child_foo_1')
+        self.page._insert(new4, 'child_foo_2')        
+        self.page.pop(['child_foo_1', 'child_foo_2'])     
+        self.assertTrue(new4 not in self.page and new5 not in self.page)   
 
     def test_empty(self):
         new = Div().append_to(self.page)

@@ -11,8 +11,8 @@ from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap
 from types import GeneratorType, MappingProxyType
 
-from .exceptions import (TagError, WrongContentError, ContentError,
-                         WrongArgsError, IncompleteREPRError)
+from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
+                         DOMModByIndexError, WrongArgsError, IncompleteREPRError)
 
 
 def render_template(template_name, start_directory=None, **kwargs):
@@ -390,15 +390,37 @@ class DOMElement:
         new_father._stable = False
         return self
 
-    def pop(self, idx=None):
-        """Removes the child at given position, if no position is given removes the last."""
+    def pop(self, arg=None):
+        """Removes the child at given position or by name (or name iterator).
+            if no argument is given removes the last."""
         self._stable = False
-        if idx is None:
-            idx = len(self.childs) - 1
-        elem = self.childs.pop(idx)
-        if isinstance(elem, DOMElement):
-            elem.parent = None
-        return elem
+        if arg is None:
+            arg = len(self.childs) - 1
+        if isinstance(arg, int):
+            result = self.childs.pop(arg)
+            if isinstance(result, DOMElement):
+                result.parent = None
+            if result is None:
+                raise DOMModByIndexError(self, "Given index invalid.")
+        else:
+            result = []
+            search_func = lambda s: [x for x in self.childs if x._name == s]
+            if isinstance(arg, str):
+                result = search_func(arg)
+            else:
+                try:
+                    for x in arg:
+                        result.extend(search_func(x))       
+                except:
+                    pass
+            if result:
+                for x in result:
+                    self.childs.remove(x)
+                    if isinstance(x, DOMElement):
+                        x.parent = False
+            else:
+                raise DOMModByKeyError(self, "Given search key invalid. No child found")
+        return result
 
     def empty(self):
         """Remove all this tag's childs."""
