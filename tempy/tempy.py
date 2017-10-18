@@ -404,22 +404,18 @@ class DOMElement:
                 raise DOMModByIndexError(self, "Given index invalid.")
         else:
             result = []
-            search_func = lambda s: [x for x in self.childs if x._name == s]
             if isinstance(arg, str):
-                result = search_func(arg)
-            else:
+                arg = [arg, ]
+            for x in arg:
                 try:
-                    for x in arg:
-                        result.extend(search_func(x))
-                except:
-                    pass
+                    result.append(getattr(self, x))
+                except AttributeError:
+                    raise DOMModByKeyError(self, "Given search key invalid. No child found")
             if result:
                 for x in result:
                     self.childs.remove(x)
                     if isinstance(x, DOMElement):
                         x.parent = False
-            else:
-                raise DOMModByKeyError(self, "Given search key invalid. No child found")
         return result
 
     def empty(self):
