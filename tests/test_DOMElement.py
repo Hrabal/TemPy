@@ -7,7 +7,7 @@ import unittest
 from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
 from tempy.exceptions import WrongContentError, TagError
-import tempy
+
 
 class TestDOMelement(unittest.TestCase):
 
@@ -168,9 +168,9 @@ class TestDOMelement(unittest.TestCase):
         self.assertTrue(new3 not in self.page)
         new4, new5 = Div(), Div()
         self.page._insert(new4, 'child_foo_1')
-        self.page._insert(new4, 'child_foo_2')        
-        self.page.pop(['child_foo_1', 'child_foo_2'])     
-        self.assertTrue(new4 not in self.page and new5 not in self.page)   
+        self.page._insert(new4, 'child_foo_2')
+        self.page.pop(['child_foo_1', 'child_foo_2'])
+        self.assertTrue(new4 not in self.page and new5 not in self.page)
 
     def test_empty(self):
         new = Div().append_to(self.page)
@@ -492,24 +492,24 @@ class TestDOMelement(unittest.TestCase):
         a, b, c, d, e, f = Div(), Div(), Div(), Div(), Div(), Div()
         a(b(d), c(e(f)))
         l = list(a.bft())
-        self.assertTrue(l == [a,b,c,d,e,f])
+        self.assertTrue(l == [a, b, c, d, e, f])
 
     def test_dft(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
         l = list(a.dfs_preorder())
-        self.assertTrue(l == [a,b,d,c])
+        self.assertTrue(l == [a, b, d, c])
         l = list(a.dfs_inorder())
-        self.assertTrue(l == [d,b,a,c])
+        self.assertTrue(l == [d, b, a, c])
         l = list(a.dfs_postorder())
-        self.assertTrue(l == [d,b,c,a])
-    
+        self.assertTrue(l == [d, b, c, a])
+
     def test_dft_reverse(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
         l = list(a.dfs_preorder(reverse=True))
-        self.assertTrue(l == [a,c,b,d])
+        self.assertTrue(l == [a, c, b, d])
         l = list(a.dfs_inorder(reverse=True))
-        self.assertTrue(l == [c,a,d,b])
+        self.assertTrue(l == [c, a, d, b])
         l = list(a.dfs_postorder(reverse=True))
-        self.assertTrue(l == [c,d,b,a])
+        self.assertTrue(l == [c, d, b, a])

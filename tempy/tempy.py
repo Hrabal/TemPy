@@ -10,6 +10,7 @@ from itertools import chain
 from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
 from types import GeneratorType, MappingProxyType
+
 from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
                          DOMModByIndexError, WrongArgsError, IncompleteREPRError)
 
@@ -20,6 +21,7 @@ def render_template(template_name, start_directory=None, **kwargs):
     template_module = importlib.import_module('templates.%s' % template_name)
     template = template_module.template.inject(**kwargs)
     return template.render()
+
 
 class _ChildElement:
     """Wrapper used to manage element insertion."""
@@ -408,7 +410,7 @@ class DOMElement:
             else:
                 try:
                     for x in arg:
-                        result.extend(search_func(x))       
+                        result.extend(search_func(x))
                 except:
                     pass
             if result:
@@ -481,7 +483,7 @@ class DOMElement:
     def dfs_preorder(self, reverse=False):
         """Generator that returns each element of the tree in Preorder order.
         Keyword arguments:
-        reverse -- if true, the search is done from right to left."""      
+        reverse -- if true, the search is done from right to left."""
         stack = deque()
         stack.append(self)
         while stack:
@@ -518,7 +520,7 @@ class DOMElement:
                     stack.extend(node.childs)
                 else:
                     stack.extend(node.childs[::-1])
- 
+
     def dfs_postorder(self, reverse=False):
         """Generator that returns each element of the tree in Postorder order.
         Keyword arguments:
@@ -537,27 +539,6 @@ class DOMElement:
                     stack.extend(node.childs)
                 else:
                     stack.extend(node.childs[::-1])
-
-    # TODO: Implement Depth-first traversing with order api
-    # def reverse_dfs(self):
-    #     """Iterate the tree starting from current element, in reverse depth-first."""
-    #     # Based on http://www.ics.uci.edu/~eppstein/PADS/DFS.py
-    #     # by D. Eppstein, July 2004.
-    #     given = set()
-    #     stack = copy(self.childs)
-    #     while stack:
-    #         tag = stack.pop()
-    #         if not tag.childs:
-    #             given.add(tag)
-    #             yield tag
-    #         else:
-    #             if set(tag.childs).issubset(given):
-    #                 given.add(tag)
-    #                 yield tag
-    #             else:
-    #                 stack.append(tag)
-    #                 stack += list(set(tag.childs) - given)
-    #     yield self
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
