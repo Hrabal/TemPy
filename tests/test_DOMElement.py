@@ -7,7 +7,7 @@ import unittest
 from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, Tag, TagAttrs
 from tempy.exceptions import WrongContentError, TagError
-
+import tempy
 
 class TestDOMelement(unittest.TestCase):
 
@@ -487,3 +487,29 @@ class TestDOMelement(unittest.TestCase):
 
         c = Div().append_to(b)
         self.assertFalse(c.is_root)
+
+    def test_bft(self):
+        a, b, c, d, e, f = Div(), Div(), Div(), Div(), Div(), Div()
+        a(b(d), c(e(f)))
+        l = list(a.bft())
+        self.assertTrue(l == [a,b,c,d,e,f])
+
+    def test_dft(self):
+        a, b, c, d = Div(), Div(), Div(), Div()
+        a(b(d), c)
+        l = list(a.dfs_preorder())
+        self.assertTrue(l == [a,b,d,c])
+        l = list(a.dfs_inorder())
+        self.assertTrue(l == [d,b,a,c])
+        l = list(a.dfs_postorder())
+        self.assertTrue(l == [d,b,c,a])
+    
+    def test_dft_reverse(self):
+        a, b, c, d = Div(), Div(), Div(), Div()
+        a(b(d), c)
+        l = list(a.dfs_preorder(reverse=True))
+        self.assertTrue(l == [a,c,b,d])
+        l = list(a.dfs_inorder(reverse=True))
+        self.assertTrue(l == [c,a,d,b])
+        l = list(a.dfs_postorder(reverse=True))
+        self.assertTrue(l == [c,d,b,a])
