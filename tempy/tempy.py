@@ -8,9 +8,9 @@ from copy import copy
 from functools import wraps
 from itertools import chain
 from operator import attrgetter
-from collections import Mapping, OrderedDict, Iterable, ChainMap
+from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
 from types import GeneratorType, MappingProxyType
-
+from enum import Enum
 from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
                          DOMModByIndexError, WrongArgsError, IncompleteREPRError)
 
@@ -21,6 +21,13 @@ def render_template(template_name, start_directory=None, **kwargs):
     template_module = importlib.import_module('templates.%s' % template_name)
     template = template_module.template.inject(**kwargs)
     return template.render()
+
+
+class DFSOrder(Enum):
+    """Enumerator that represents the type of depth-first tree traversal."""
+    PREORDER = 1
+    INORDER = 2
+    POSTORDER = 3
 
 
 class _ChildElement:
@@ -472,6 +479,64 @@ class DOMElement:
         """Slice of this element's childs as childs[start:end:step]"""
         return self.childs[start:end:step]
 
+    def bft(self):
+        """ Generator that returns each element of the tree in Breadth-first order"""
+        queue = deque([self])
+        while queue:
+            node = queue.pop()
+            yield node
+            queue.extendleft(node.childs)
+    
+    def dfs(self, order, reverse=False):
+        """Generator that returns each element of the tree in Depth-first order
+        according to the type of traversal. reverse=True means to search from right to left."""        
+        stack = deque()
+        if order == DFSOrder.PREORDER:
+            stack.append(self)
+            while stack:
+                node = stack.pop()
+                yield node
+                if reverse:
+                    stack.extend(node.childs)
+                else:
+                    stack.extend(node.childs[::-1])
+        elif order == DFSOrder.INORDER:
+            visited = set()
+            visited.add(self)
+            if reverse:
+                stack.append(self.childs[0])
+                stack.append(self)
+                stack.extend(self.childs[1:])
+            else:
+                stack.extend(self.childs[1:])
+                stack.append(self)
+                stack.append(self.childs[0])
+            while stack:
+                node = stack.pop()
+                if node in visited or not node.childs:
+                    yield node
+                else:
+                    stack.append(node)
+                    visited.add(node)
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
+        elif order == DFSOrder.POSTORDER:
+            stack.append(self)
+            visited = set()
+            while stack:
+                node = stack.pop()
+                if node in visited:
+                    yield node
+                else:
+                    visited.add(node)
+                    stack.append(node)
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
+
     # TODO: Implement Depth-first traversing with order api
     # def reverse_dfs(self):
     #     """Iterate the tree starting from current element, in reverse depth-first."""
@@ -492,8 +557,6 @@ class DOMElement:
     #                 stack.append(tag)
     #                 stack += list(set(tag.childs) - given)
     #     yield self
-
-    # TODO: Implement Breadth-first traversing
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
