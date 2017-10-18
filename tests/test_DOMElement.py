@@ -5,8 +5,9 @@
 import unittest
 
 from tempy.tags import Div, A, P, Html, Head, Body
-from tempy.tempy import DOMElement, Tag, TagAttrs, DFSOrder
+from tempy.tempy import DOMElement, Tag, TagAttrs
 from tempy.exceptions import WrongContentError, TagError
+import tempy
 
 class TestDOMelement(unittest.TestCase):
 
@@ -496,19 +497,19 @@ class TestDOMelement(unittest.TestCase):
     def test_dft(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
-        l = list(a.dfs(DFSOrder.PREORDER))
+        l = list(a.dfs_preorder())
         self.assertTrue(l == [a,b,d,c])
-        l = list(a.dfs(DFSOrder.INORDER))
+        l = list(a.dfs_inorder())
         self.assertTrue(l == [d,b,a,c])
-        l = list(a.dfs(DFSOrder.POSTORDER))
+        l = list(a.dfs_postorder())
         self.assertTrue(l == [d,b,c,a])
     
     def test_dft_reverse(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
-        l = list(a.dfs(DFSOrder.PREORDER, reverse=True))
+        l = list(a.dfs_preorder(reverse=True))
         self.assertTrue(l == [a,c,b,d])
-        l = list(a.dfs(DFSOrder.INORDER, reverse=True))
+        l = list(a.dfs_inorder(reverse=True))
         self.assertTrue(l == [c,a,d,b])
-        l = list(a.dfs(DFSOrder.POSTORDER, reverse=True))
+        l = list(a.dfs_postorder(reverse=True))
         self.assertTrue(l == [c,d,b,a])

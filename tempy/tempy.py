@@ -22,14 +22,6 @@ def render_template(template_name, start_directory=None, **kwargs):
     template = template_module.template.inject(**kwargs)
     return template.render()
 
-
-class DFSOrder(Enum):
-    """Enumerator that represents the type of depth-first tree traversal."""
-    PREORDER = 1
-    INORDER = 2
-    POSTORDER = 3
-
-
 class _ChildElement:
     """Wrapper used to manage element insertion."""
 
@@ -486,56 +478,66 @@ class DOMElement:
             node = queue.pop()
             yield node
             queue.extendleft(node.childs)
-    
-    def dfs(self, order, reverse=False):
-        """Generator that returns each element of the tree in Depth-first order
-        according to the type of traversal. reverse=True means to search from right to left."""        
+
+    def dfs_preorder(self, reverse=False):
+        """Generator that returns each element of the tree in Preorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""      
         stack = deque()
-        if order == DFSOrder.PREORDER:
+        stack.append(self)
+        while stack:
+            node = stack.pop()
+            yield node
+            if reverse:
+                stack.extend(node.childs)
+            else:
+                stack.extend(node.childs[::-1])
+
+    def dfs_inorder(self, reverse=False):
+        """Generator that returns each element of the tree in Inorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""
+        stack = deque()
+        visited = set()
+        visited.add(self)
+        if reverse:
+            stack.append(self.childs[0])
             stack.append(self)
-            while stack:
-                node = stack.pop()
+            stack.extend(self.childs[1:])
+        else:
+            stack.extend(self.childs[1:])
+            stack.append(self)
+            stack.append(self.childs[0])
+        while stack:
+            node = stack.pop()
+            if node in visited or not node.childs:
                 yield node
+            else:
+                stack.append(node)
+                visited.add(node)
                 if reverse:
                     stack.extend(node.childs)
                 else:
                     stack.extend(node.childs[::-1])
-        elif order == DFSOrder.INORDER:
-            visited = set()
-            visited.add(self)
-            if reverse:
-                stack.append(self.childs[0])
-                stack.append(self)
-                stack.extend(self.childs[1:])
+ 
+    def dfs_postorder(self, reverse=False):
+        """Generator that returns each element of the tree in Postorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""
+        stack = deque()
+        stack.append(self)
+        visited = set()
+        while stack:
+            node = stack.pop()
+            if node in visited:
+                yield node
             else:
-                stack.extend(self.childs[1:])
-                stack.append(self)
-                stack.append(self.childs[0])
-            while stack:
-                node = stack.pop()
-                if node in visited or not node.childs:
-                    yield node
+                visited.add(node)
+                stack.append(node)
+                if reverse:
+                    stack.extend(node.childs)
                 else:
-                    stack.append(node)
-                    visited.add(node)
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
-        elif order == DFSOrder.POSTORDER:
-            stack.append(self)
-            visited = set()
-            while stack:
-                node = stack.pop()
-                if node in visited:
-                    yield node
-                else:
-                    visited.add(node)
-                    stack.append(node)
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
+                    stack.extend(node.childs[::-1])
 
     # TODO: Implement Depth-first traversing with order api
     # def reverse_dfs(self):
