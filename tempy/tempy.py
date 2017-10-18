@@ -10,7 +10,6 @@ from itertools import chain
 from operator import attrgetter
 from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
 from types import GeneratorType, MappingProxyType
-from enum import Enum
 from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
                          DOMModByIndexError, WrongArgsError, IncompleteREPRError)
 
