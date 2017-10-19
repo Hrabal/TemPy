@@ -25,5 +25,10 @@ def render_list_handler():
     from templates.render_list import page
     return page.render()
 
+@app.route('/static')
+def static_files_handler():
+    from templates.static_files import page
+    return page.render()
+
 if __name__ == '__main__':
-    app.run(port=8888, debug=False)
+    app.run(port=8888, debug=True)
