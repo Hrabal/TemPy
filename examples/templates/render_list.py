@@ -10,6 +10,9 @@ page = Html()(
             )
         ),
     body=Body()(
-            *[Div()(w) for w in words]
-        )
+        'From unpacking a list: ', *[Div()(w) for w in words],
+        'From the same list: ', [Div()(w) for w in words],
+        'From and iterator: ', (Div()(w) for w in words),
+        'I feel fancy, I use map: ', list(map(lambda x: Div()(x), words)),
     )
+)
