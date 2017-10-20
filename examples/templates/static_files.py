@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import url_for
-from tempy import Html, Head, Title, Body, P, Img
+from tempy import Html, Head, Title, Body, P, Img, Br
 
 page = Html()(
     Head()(
