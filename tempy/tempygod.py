@@ -1,4 +1,4 @@
-from tempy import Tag
+from .tempy import Tag
 class TempyGod:
     def __getattribute__(self, attr):
         try:
