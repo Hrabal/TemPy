@@ -194,15 +194,30 @@ class DOMElement:
                 yield i, item._name, item.obj
 
     def _search_for_view(self, obj):
-        for item in chain(iter((self.__class__.__name__,
-                                self.root.__class__.__name__,
-                                'HtmlREPR')),
-                          obj.__class__.__dict__):
-            found = obj.__class__.__dict__.get(item)
-            if found:
-                if isinstance(found, type):
-                    if issubclass(found, TempyREPR):
-                        return found(obj)
+        """Searches for TempyREPR class declarations in the child's class.
+        Choses the best one.
+        """
+        def filter_REPR(cls_list):
+            """Checks if an object is a TempyREPR subclass"""
+            return [cls for cls in cls_list if isinstance(cls, type) and issubclass(cls, TempyREPR)]
+
+        def evaluate_tempyREPR(cls):
+            score = 0
+            if cls.__name__ == self.__class__.__name__:
+                score += 1
+            if cls.__name__ == self.root.__class__.__name__:
+                score += 1
+            for parent_cls in filter_REPR(cls.__mro__):
+                if issubclass(parent_cls, TempyPlace):
+                    if parent_cls.parent == self.parent.__class__:
+                        score += 1
+            if not score:
+                score += 1
+            return score
+
+        sorted_reprs = sorted(filter_REPR(obj.__class__.__dict__.values()), key=evaluate_tempyREPR, reverse=True)
+        if sorted_reprs:
+            return sorted_reprs[0](obj)
         return obj
 
     def _iter_child_renders(self, pretty=False):
