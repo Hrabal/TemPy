@@ -5,9 +5,9 @@ import html
 import importlib
 from uuid import uuid4
 from copy import copy
-from functools import wraps
 from itertools import chain
 from operator import attrgetter
+from functools import wraps, partial
 from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
 from types import GeneratorType, MappingProxyType
 
@@ -193,13 +193,17 @@ class DOMElement:
             else:
                 yield i, item._name, item.obj
 
+    def _filter_REPR(self, cls_list):
+        """Checks if an object is a TempyREPR subclass"""
+        return [cls for cls in cls_list if isinstance(cls, type) and issubclass(cls, TempyREPR)]
+
     def _evaluate_tempyREPR(self, child, repr_cls):
         score = 0
         if repr_cls.__name__ == self.__class__.__name__:
             score += 1
         if repr_cls.__name__ == self.root.__class__.__name__:
             score += 1
-        for parent_cls in filter_REPR(repr_cls.__mro__):
+        for parent_cls in self._filter_REPR(repr_cls.__mro__):
             if issubclass(parent_cls, TempyPlace):
                 if parent_cls._container_lookup(self, child):
                     score += 1
@@ -211,12 +215,9 @@ class DOMElement:
         """Searches for TempyREPR class declarations in the child's class.
         Choses the best one.
         """
-        def filter_REPR(cls_list):
-            """Checks if an object is a TempyREPR subclass"""
-            return [cls for cls in cls_list if isinstance(cls, type) and issubclass(cls, TempyREPR)]
 
         evaluator = partial(self._evaluate_tempyREPR, obj)
-        sorted_reprs = sorted(filter_REPR(obj.__class__.__dict__.values()), key=evaluator, reverse=True)
+        sorted_reprs = sorted(self._filter_REPR(obj.__class__.__dict__.values()), key=evaluator, reverse=True)
         if sorted_reprs:
             return sorted_reprs[0](obj)
         return obj
