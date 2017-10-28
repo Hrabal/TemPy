@@ -215,7 +215,6 @@ class DOMElement:
         """Searches for TempyREPR class declarations in the child's class.
         Choses the best one.
         """
-
         evaluator = partial(self._evaluate_tempyREPR, obj)
         sorted_reprs = sorted(self._filter_REPR(obj.__class__.__dict__.values()), key=evaluator, reverse=True)
         if sorted_reprs:
