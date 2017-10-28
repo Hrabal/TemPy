@@ -205,7 +205,7 @@ class DOMElement:
             score += 1
         for parent_cls in self._filter_REPR(repr_cls.__mro__):
             if issubclass(parent_cls, TempyPlace):
-                if parent_cls._container_lookup(self, child):
+                if parent_cls._container_lookup(parent_cls, self, child):
                     score += 1
         if not score:
             score += 1
@@ -855,8 +855,12 @@ class TempyREPR(DOMElement):
 
 
 class TempyPlace(TempyREPR):
-    """Used to identify places in the DOM."""
-    parent = DOMElement
+    """Used to identify places in the DOM.
+    Everything defined here is a placeholder."""
+    _pointer_class = DOMElement
+
+    def _container_lookup(self, container, child):
+        return False
 
 
 class Content(DOMElement):

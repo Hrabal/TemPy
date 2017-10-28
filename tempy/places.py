@@ -43,7 +43,6 @@ for tag in dir(all_tags):
     if not tag.startswith('__'):
         for place_type in (Inside, Near, Before, After):
             place_tag_name = '%s%s' % (place_type.__name__, tag)
-            place_cls = type(place_tag_name, (place_type, ), {})
-            place_cls._pointer_class = getattr(all_tags, tag)
+            place_cls = type(place_tag_name, (place_type, ), {'_pointer_class': getattr(all_tags, tag)})
             # We put the new dynamically created class inside locals to make it avaiable from the outside
             locals()[place_tag_name] = place_cls
