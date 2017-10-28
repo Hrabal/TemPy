@@ -838,6 +838,11 @@ class TempyREPR(DOMElement):
         return self.render_childs(pretty=pretty)
 
 
+class TempyPlace(TempyREPR):
+    """Used to identify places in the DOM."""
+    parent = DOMElement
+
+
 class Content(DOMElement):
     """
     Provides the ability to use a simil-tag object as content placeholder.
