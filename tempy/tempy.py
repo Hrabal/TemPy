@@ -28,13 +28,13 @@ class _ChildElement:
 
     def __init__(self, name, obj):
         super().__init__()
-        if not name and isinstance(obj, (DOMElement, Content)):
+        if not name and issubclass(obj.__class__, DOMElement):
             name = obj._name
         self._name = name
         self.obj = obj
 
 
-class DOMElement:
+class DOMElement(REPRFinder):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
@@ -97,7 +97,7 @@ class DOMElement:
         return x in self.childs
 
     def __copy__(self):
-        return self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else c for c in self.childs)
+        return self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
 
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
@@ -154,6 +154,22 @@ class DOMElement:
             except ValueError:
                 return -1
         return -1
+
+    @property
+    def index(self):
+        """Returns the position of this element in the parent's childs list.
+        If the element have no parent, returns None.
+        """
+        return self._own_index
+
+    @property
+    def stable(self):
+        if all(c.stable for c in self.childs) and self._stable:
+            self._stable = True
+            return self._stable
+        else:
+            self._stable = False
+            return self._stable
 
     @property
     def length(self):
@@ -249,7 +265,7 @@ class DOMElement:
             else:
                 idx = idx if idx is not None else len(self.childs)
             self.childs.insert(idx, child)
-            if isinstance(child, (DOMElement, Content)):
+            if issubclass(child.__class__, DOMElement):
                 child.parent = self
                 if name:
                     child._name = name
@@ -267,6 +283,11 @@ class DOMElement:
             else:
                 # Fallback for no content (Raise NoContent?)
                 return ''
+
+    def _get_non_tempy_contents(self):
+        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
+        for thing in filter(lambda x: not issubclass(x.__class__, DOMElement), self.childs):
+            yield thing
 
     def data(self, key=None, **kwargs):
         """Adds or retrieve extra data to this element, this data will not be rendered.
@@ -371,7 +392,7 @@ class DOMElement:
         idx_to = idx_to or len(self.childs)
         removed = self.childs[idx_from: idx_to]
         for child in removed:
-            if isinstance(child, (DOMElement, Content)):
+            if issubclass(child.__class__, DOMElement):
                 child.parent = None
         self.childs[idx_from: idx_to] = []
         return removed
@@ -426,7 +447,7 @@ class DOMElement:
 
     def children(self):
         """Returns Tags and Content Placehorlders childs of this element."""
-        return filter(lambda x: isinstance(x, (DOMElement, Content)), self.childs)
+        return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
     def contents(self):
         """Returns this elements childs list, unfiltered."""
