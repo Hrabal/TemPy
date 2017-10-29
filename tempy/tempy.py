@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Main Tempy classes"""
-import sys
 import html
-import importlib
-from uuid import uuid4
 from copy import copy
+from uuid import uuid4
 from itertools import chain
-from operator import attrgetter
-from functools import wraps, partial
-from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
-from types import GeneratorType, MappingProxyType
+from functools import wraps
+from collections import deque
+from types import GeneratorType
 
-from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
-                         DOMModByIndexError, WrongArgsError, IncompleteREPRError)
+from .exceptions import TagError, WrongContentError, DOMModByKeyError, DOMModByIndexError
 from .tempyrepr import REPRFinder
 
 
