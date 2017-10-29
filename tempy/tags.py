@@ -9,7 +9,7 @@ DOCTYPES = {
     'html': 'HTML',
     'html_strict': 'HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"',
     'html_transitional': 'HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"',
-    'html_frameset': 'HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"',  
+    'html_frameset': 'HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"',
     'xhtml_strict': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"',
     'xhtml_transitional': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"',
     'xhtml_frameset': 'html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd"',
@@ -33,7 +33,8 @@ class Comment(VoidTag):
 class Doctype(VoidTag):
     """Doctype is a special tag that needs special rendering.
     It is mandatory to provide a doctype code that will be tranlated into valid HTML doctype coding.
-    Avaiable doctype codes: html, html_strict, html_transitional, html_frameset, xhtml_strict, xhtml_transitional, xhtml_frameset, xhtml_1_1_dtd, xhtml_basic_1_1
+    Avaiable doctype codes: html, html_strict, html_transitional, html_frameset, xhtml_strict, xhtml_transitional,
+    xhtml_frameset, xhtml_1_1_dtd, xhtml_basic_1_1
     """
     __tag = '!DOCTYPE'
     _template = '<{tag}{type}>'
