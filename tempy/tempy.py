@@ -13,14 +13,6 @@ from types import GeneratorType, MappingProxyType
 
 from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
                          DOMModByIndexError, WrongArgsError, IncompleteREPRError)
-
-
-def render_template(template_name, start_directory=None, **kwargs):
-    if start_directory:
-        sys.path.append(start_directory)
-    template_module = importlib.import_module('templates.%s' % template_name)
-    template = template_module.template.inject(**kwargs)
-    return template.render()
 from .tempyrepr import REPRFinder
 
 
