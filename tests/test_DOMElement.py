@@ -5,7 +5,8 @@
 import unittest
 
 from tempy.tags import Div, A, P, Html, Head, Body
-from tempy.tempy import DOMElement, Tag, TagAttrs
+from tempy.tempy import DOMElement
+from tempy.elements import Tag, TagAttrs
 from tempy.exceptions import WrongContentError, TagError
 
 

@@ -3,7 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 All the HTML tags as defined in the W3C reference, in alphabetical order.
 """
-from .tempy import Tag, VoidTag
+from .elements import Tag, VoidTag
 
 DOCTYPES = {
     'html': 'HTML',
