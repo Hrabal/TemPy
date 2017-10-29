@@ -21,6 +21,7 @@ def render_template(template_name, start_directory=None, **kwargs):
     template_module = importlib.import_module('templates.%s' % template_name)
     template = template_module.template.inject(**kwargs)
     return template.render()
+from .tempyrepr import REPRFinder
 
 
 class _ChildElement:
@@ -223,8 +224,14 @@ class DOMElement(REPRFinder):
 
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
-            if not isinstance(child, (DOMElement, Content, TempyREPR)):
-                child = self._search_for_view(child)
+            if not issubclass(child.__class__, DOMElement):
+                tempyREPR_cls = self._search_for_view(child)
+                if tempyREPR_cls:
+                    # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
+                    # this trick is used to avoid circular imports
+                    class Patched(tempyREPR_cls, DOMElement):
+                        pass
+                    child = Patched(child)
             try:
                 yield child.render(pretty=pretty)
             except (AttributeError, NotImplementedError):
