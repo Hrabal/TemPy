@@ -4,8 +4,8 @@
 """
 import unittest
 
-from tempy import Tag, Content, TagAttrs
 from tempy.tags import Div, P
+from tempy.elements import Tag, Content, TagAttrs
 from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 

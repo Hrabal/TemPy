@@ -5,7 +5,7 @@ Places used by Tempy to choose the right TempyREPR to use.
 Magically created starting from the tags module.
 """
 import importlib
-from .tempy import TempyPlace
+from .tempyrepr import TempyPlace
 
 
 class Inside(TempyPlace):
