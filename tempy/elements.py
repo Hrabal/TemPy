@@ -388,7 +388,7 @@ class Content(DOMElement):
             else:
                 yield from iter([content, ])
         else:
-            raise StopIteration
+            return
 
     @property
     def length(self):
