@@ -58,7 +58,7 @@ class DOMElement(REPRFinder):
 
     def __hash__(self):
         return self.uuid
-    
+
     def __bool__(self):
         # Is it normal that without explicit __bool__ definition
         # custom classes evaluates to False?

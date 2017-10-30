@@ -121,8 +121,8 @@ class Tag(DOMElement):
 
     def __repr__(self):
         css_repr = '%s%s' % (
-            ' .css_class %s' % (self.attrs['klass']) if 'klass' in self.attrs else '',
-            ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
+            ' .css_class (%s)' % (self.attrs['class']) if self.attrs.get('class', None) else '',
+            ' .css_id (%s)' % (self.attrs['id']) if self.attrs.get('id', None) else '',
             )
         return super().__repr__()[:-1] + '%s>' % css_repr
 
