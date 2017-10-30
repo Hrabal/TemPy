@@ -97,7 +97,7 @@ class TempyTable(Table):
             row_lenght = len(row)
         except TypeError:
             row_lenght = row
-        if max(map(len, self.body)) < row_lenght:
+        if self.body.childs and max(map(len, self.body)) < row_lenght:
             raise WidgetDataError(self, 'The given data have more columns than the table.')
 
     def populate(self, data, resize_x=False, force=True, normalize=True):
