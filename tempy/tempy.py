@@ -488,7 +488,8 @@ class DOMElement(REPRFinder):
         while queue:
             node = queue.pop()
             yield node
-            queue.extendleft(node.childs)
+            if hasattr(node, 'childs'):
+                queue.extendleft(node.childs)
 
     def dfs_preorder(self, reverse=False):
         """Generator that returns each element of the tree in Preorder order.
@@ -499,10 +500,11 @@ class DOMElement(REPRFinder):
         while stack:
             node = stack.pop()
             yield node
-            if reverse:
-                stack.extend(node.childs)
-            else:
-                stack.extend(node.childs[::-1])
+            if hasattr(node, 'childs'):
+                if reverse:
+                    stack.extend(node.childs)
+                else:
+                    stack.extend(node.childs[::-1])
 
     def dfs_inorder(self, reverse=False):
         """Generator that returns each element of the tree in Inorder order.
@@ -526,10 +528,11 @@ class DOMElement(REPRFinder):
             else:
                 stack.append(node)
                 visited.add(node)
-                if reverse:
-                    stack.extend(node.childs)
-                else:
-                    stack.extend(node.childs[::-1])
+                if hasattr(node, 'childs'):
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
 
     def dfs_postorder(self, reverse=False):
         """Generator that returns each element of the tree in Postorder order.
@@ -545,10 +548,11 @@ class DOMElement(REPRFinder):
             else:
                 visited.add(node)
                 stack.append(node)
-                if reverse:
-                    stack.extend(node.childs)
-                else:
-                    stack.extend(node.childs[::-1])
+                if hasattr(node, 'childs'):
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
