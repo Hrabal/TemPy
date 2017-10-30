@@ -4,12 +4,14 @@ import importlib
 from html.parser import HTMLParser
 from .elements import Tag, VoidTag
 
+
 class TempyParser(HTMLParser):
     """Custom parser used to translate an html into Tempy Tags.
     See https://docs.python.org/3/library/html.parser.html for details on how parsing is performed.
     Every tag found by the parser is converted into a TempyTag, every subsequent element will be added
     inside this one.
-    As a result of this, unclosed tags in imput will be closed in the resulting Tempy Tree right before the parent element is closed.
+    As a result of this, unclosed tags in imput will be closed in the resulting Tempy Tree right before
+    the parent element is closed.
     This behaviour is accidental and should not be used a s a html sanitizing feature.
     """
 
@@ -21,7 +23,8 @@ class TempyParser(HTMLParser):
         self.tempy_tags = importlib.import_module('.tags', package='tempy')
 
     def _make_tempy_tag(self, tag, attrs, void):
-        """Searches in tempy.tags for the correct tag to use, if does not exists uses the TempyFacotry to create a custom tag."""
+        """Searches in tempy.tags for the correct tag to use, if does not exists uses the TempyFactory to
+        create a custom tag."""
         tempy_tag_cls = getattr(self.tempy_tags, tag.title(), None)
         if not tempy_tag_cls:
             unknow_maker = [self.unknown_tag_maker, self.unknown_tag_maker.Void][void]
