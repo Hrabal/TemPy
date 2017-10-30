@@ -1,26 +1,16 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
-import sys
+"""Main Tempy classes"""
 import html
-import importlib
-from uuid import uuid4
 from copy import copy
-from functools import wraps
+from uuid import uuid4
 from itertools import chain
-from operator import attrgetter
-from collections import Mapping, OrderedDict, Iterable, ChainMap, deque
-from types import GeneratorType, MappingProxyType
+from functools import wraps
+from collections import deque
+from types import GeneratorType
 
-from .exceptions import (TagError, WrongContentError, ContentError, DOMModByKeyError,
-                         DOMModByIndexError, WrongArgsError, IncompleteREPRError)
-
-
-def render_template(template_name, start_directory=None, **kwargs):
-    if start_directory:
-        sys.path.append(start_directory)
-    template_module = importlib.import_module('templates.%s' % template_name)
-    template = template_module.template.inject(**kwargs)
-    return template.render()
+from .exceptions import TagError, WrongContentError, DOMModByKeyError, DOMModByIndexError
+from .tempyrepr import REPRFinder
 
 
 class _ChildElement:
@@ -28,13 +18,13 @@ class _ChildElement:
 
     def __init__(self, name, obj):
         super().__init__()
-        if not name and isinstance(obj, (DOMElement, Content)):
+        if not name and issubclass(obj.__class__, DOMElement):
             name = obj._name
         self._name = name
         self.obj = obj
 
 
-class DOMElement:
+class DOMElement(REPRFinder):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
@@ -45,6 +35,7 @@ class DOMElement:
         self.parent = None
         self.content_data = {}
         self.uuid = uuid4().int
+        self._stable = True
         self._data = kwargs
         self._applied_funcs = []
         self._reverse_mro_func('init')
@@ -67,6 +58,11 @@ class DOMElement:
 
     def __hash__(self):
         return self.uuid
+    
+    def __bool__(self):
+        # Is it normal that without explicit __bool__ definition
+        # custom classes evaluates to False?
+        return True
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -97,7 +93,7 @@ class DOMElement:
         return x in self.childs
 
     def __copy__(self):
-        return self.__class__()(copy(c) if isinstance(c, (DOMElement, Content)) else c for c in self.childs)
+        return self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
 
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
@@ -156,6 +152,22 @@ class DOMElement:
         return -1
 
     @property
+    def index(self):
+        """Returns the position of this element in the parent's childs list.
+        If the element have no parent, returns None.
+        """
+        return self._own_index
+
+    @property
+    def stable(self):
+        if all(c.stable for c in self.childs) and self._stable:
+            self._stable = True
+            return self._stable
+        else:
+            self._stable = False
+            return self._stable
+
+    @property
     def length(self):
         """Returns the number of childs."""
         return len(self.childs)
@@ -193,22 +205,16 @@ class DOMElement:
             else:
                 yield i, item._name, item.obj
 
-    def _search_for_view(self, obj):
-        for item in chain(iter((self.__class__.__name__,
-                                self.root.__class__.__name__,
-                                'HtmlREPR')),
-                          obj.__class__.__dict__):
-            found = obj.__class__.__dict__.get(item)
-            if found:
-                if isinstance(found, type):
-                    if issubclass(found, TempyREPR):
-                        return found(obj)
-        return obj
-
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
-            if not isinstance(child, (DOMElement, Content, TempyREPR)):
-                child = self._search_for_view(child)
+            if not issubclass(child.__class__, DOMElement):
+                tempyREPR_cls = self._search_for_view(child)
+                if tempyREPR_cls:
+                    # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
+                    # this trick is used to avoid circular imports
+                    class Patched(tempyREPR_cls, DOMElement):
+                        pass
+                    child = Patched(child)
             try:
                 yield child.render(pretty=pretty)
             except (AttributeError, NotImplementedError):
@@ -216,8 +222,11 @@ class DOMElement:
                     yield child._render
                 else:
                     yield html.escape(str(child))
+            except Exception as ex:
+                raise ex
 
     def render_childs(self, pretty=False):
+        """Public api to render all the childs using Tempy rules"""
         return ''.join(self._iter_child_renders(pretty=pretty))
 
     def content_receiver(reverse=False):
@@ -249,7 +258,7 @@ class DOMElement:
             else:
                 idx = idx if idx is not None else len(self.childs)
             self.childs.insert(idx, child)
-            if isinstance(child, (DOMElement, Content)):
+            if issubclass(child.__class__, DOMElement):
                 child.parent = self
                 if name:
                     child._name = name
@@ -267,6 +276,11 @@ class DOMElement:
             else:
                 # Fallback for no content (Raise NoContent?)
                 return ''
+
+    def _get_non_tempy_contents(self):
+        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
+        for thing in filter(lambda x: not issubclass(x.__class__, DOMElement), self.childs):
+            yield thing
 
     def data(self, key=None, **kwargs):
         """Adds or retrieve extra data to this element, this data will not be rendered.
@@ -371,7 +385,7 @@ class DOMElement:
         idx_to = idx_to or len(self.childs)
         removed = self.childs[idx_from: idx_to]
         for child in removed:
-            if isinstance(child, (DOMElement, Content)):
+            if issubclass(child.__class__, DOMElement):
                 child.parent = None
         self.childs[idx_from: idx_to] = []
         return removed
@@ -426,7 +440,7 @@ class DOMElement:
 
     def children(self):
         """Returns Tags and Content Placehorlders childs of this element."""
-        return filter(lambda x: isinstance(x, (DOMElement, Content)), self.childs)
+        return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
     def contents(self):
         """Returns this elements childs list, unfiltered."""
@@ -539,454 +553,6 @@ class DOMElement:
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
         raise NotImplementedError
-
-
-class TagAttrs(dict):
-    """
-    Html tag attributes container, a subclass of dict with __setitiem__ and update overload.
-    Manages the manipulation and render of tag attributes, using the dict api, with few exceptions:
-    - space separated multiple value keys
-        i.e. the class atrribute, an update on this key will add the value to the list
-    - mapping type attributes
-        i.e. style attribute, an udpate will trigger the dict.update method
-
-    TagAttrs.render formats all the attributes in the proper html format.
-    """
-    _MAPPING_ATTRS = ('style', )
-    _SET_VALUES_ATTRS = ('klass', )
-    _SPECIALS = {
-        'klass': 'class',
-        'typ': 'type',
-        '_for': 'for'
-    }
-    _FORMAT = {
-        'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
-        'klass': lambda x: ' '.join(x),
-        'comment': lambda x: x
-    }
-
-    def __init__(self, *args, **kwargs):
-        for arg in args:
-            if not isinstance(arg, str):
-                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-        super().__init__(**kwargs)
-        for boolean_key in args:
-            super().__setitem__(boolean_key, bool)
-        for key in self._SET_VALUES_ATTRS:
-            if key not in self:
-                super().__setitem__(key, set())
-        for key in self._MAPPING_ATTRS:
-            if key not in self:
-                super().__setitem__(key, {})
-
-    def __setitem__(self, key, value):
-        if key in self._SET_VALUES_ATTRS:
-            self[key].add(value)
-        elif key in self._MAPPING_ATTRS:
-            self[key].update(value)
-        else:
-            super().__setitem__(key, value)
-
-    def __copy__(self):
-        return TagAttrs(**self)
-
-    def update(self, attrs=None, **kwargs):
-        if attrs is not None:
-            for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
-                self[k] = v
-        for k, v in kwargs.items():
-            self[k] = v
-
-    def render(self):
-        """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        ret = []
-        for k, v in self.items():
-            if v:
-                f_string = (' {}="{}"', ' {}')[v is bool]
-                f_args = (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))[:2+(v is bool)]
-                ret.append(f_string.format(*f_args))
-        return ''.join(ret)
-
-
-class Tag(DOMElement):
-    """
-    Provides an api for tag inner manipulation and for rendering.
-    """
-    _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
-    _needed_kwargs = None
-    _void = False
-    default_attributes = {}
-    default_data = {}
-
-    def __init__(self, *args, **kwargs):
-        default_data = copy(self.default_data)
-        default_data.update(kwargs.pop('data', {}))
-        default_attributes = copy(self.default_attributes)
-        default_attributes.update(kwargs)
-        self.attrs = TagAttrs()
-        for k in self._needed_kwargs or []:
-            try:
-                need_check = default_attributes[k]
-            except KeyError:
-                need_check = None
-            if not need_check:
-                raise TagError(self,
-                               '%s argument needed for %s' % (k,
-                                                              self.__class__))
-        self.attr(*args, **default_attributes)
-        super().__init__(**default_data)
-        self._tab_count = 0
-        self._render = None
-        self._stable = True
-        if self._void:
-            self._render = self.render()
-
-    def _get__tag(self):
-        for cls in self.__class__.__mro__:
-            try:
-                return getattr(self, '_%s__tag' % cls.__name__)
-            except AttributeError:
-                pass
-        raise TagError(self, '_*__tag not defined for this class or bases.')
-
-    def __repr__(self):
-        css_repr = '%s%s' % (
-            ' .css_class %s' % (self.attrs['klass']) if 'klass' in self.attrs else '',
-            ' .css_id %s ' % (self.attrs['id']) if 'id' in self.attrs else '',
-            )
-        return super().__repr__()[:-1] + '%s>' % css_repr
-
-    def __copy__(self):
-        new = super().__copy__()
-        new.attrs = copy(self.attrs)
-        return new
-
-    @property
-    def index(self):
-        """Returns the position of this element in the parent's childs list.
-        If the element have no parent, returns None.
-        """
-        return self._own_index
-
-    @property
-    def stable(self):
-        if all(c.stable for c in self.childs) and self._stable:
-            self._stable = True
-            return self._stable
-        else:
-            self._stable = False
-            return self._stable
-
-    def attr(self, *args, **kwargs):
-        """Add an attribute to the element"""
-        for arg in args:
-            if not isinstance(arg, str):
-                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-        self._stable = False
-        kwargs.update({k: bool for k in args})
-        self.attrs.update(kwargs)
-        return self
-
-    def remove_attr(self, attr):
-        """Removes an attribute."""
-        self._stable = False
-        self.attrs.pop(attr, None)
-        return self
-
-    def has_class(self, csscl):
-        """Checks if this element have the given css class."""
-        return csscl in self.attrs['klass']
-
-    def toggle_class(self, csscl):
-        """Same as jQuery's toggleClass function. It toggles the css class on this element."""
-        self._stable = False
-        action = ('add', 'remove')[self.has_class(csscl)]
-        return getattr(self.attrs['klass'], action)(csscl)
-
-    def add_class(self, cssclass):
-        """Adds a css class to this element."""
-        if self.has_class(cssclass):
-            return self
-        return self.toggle_class(cssclass)
-
-    def remove_class(self, cssclass):
-        """Removes the given class from this element."""
-        if not self.has_class(cssclass):
-            return self
-        return self.toggle_class(cssclass)
-
-    def css(self, *props, **kwprops):
-        """Adds css properties to this element."""
-        self._stable = False
-        styles = {}
-        if props:
-            if len(props) == 1 and isinstance(props[0], Mapping):
-                styles = props[0]
-            else:
-                raise WrongContentError(self, props, 'Arguments not valid')
-        elif kwprops:
-            styles = kwprops
-        else:
-            raise WrongContentError(self, None, 'args OR wkargs are needed')
-        return self.attr(style=styles)
-
-    def hide(self):
-        """Adds the "display: none" style attribute."""
-        self._stable = False
-        self.attrs['style']['display'] = 'none'
-        return self
-
-    def show(self, display=None):
-        """Removes the display style attribute.
-        If a display type is provided """
-        self._stable = False
-        if not display:
-            self.attrs['style'].pop('display')
-        else:
-            self.attrs['style']['display'] = display
-        return self
-
-    def toggle(self):
-        """Same as jQuery's toggle, toggles the display attribute of this element."""
-        self._stable = False
-        return self.show() if self.attrs['style']['display'] == 'none' else self.hide()
-
-    def html(self, pretty=False):
-        """Renders the inner html of this element."""
-        return self.render_childs(pretty=pretty)
-
-    def _get_non_tempy_contents(self):
-        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
-        for thing in filter(lambda x: not isinstance(x, (DOMElement, Content)), self.childs):
-            yield thing
-
-    def text(self):
-        """Renders the contents inside this element, without html tags."""
-        texts = []
-        for child in self.childs:
-            if isinstance(child, Tag):
-                texts.append(child.text())
-            elif isinstance(child, Content):
-                texts.append(child.render())
-            else:
-                texts.append(child)
-        return ' '.join(texts)
-
-    def render(self, *args, **kwargs):
-        """Renders the element and all his childrens."""
-        # args kwargs API provided for last minute content injection
-        self._reverse_mro_func('pre_render')
-        pretty = kwargs.pop('pretty', False)
-        if isinstance(pretty, bool) and pretty:
-            pretty1 = 0
-            pretty2 = pretty1 + 1
-        else:
-            pretty1 = pretty2 = False
-
-        for arg in args:
-            if isinstance(arg, dict):
-                self.inject(arg)
-        if kwargs:
-            self.inject(kwargs)
-
-        # If the tag or his contents are not changed, we skip all the work
-        if self._stable and self._render:
-            return self._render
-
-        tag_data = {
-            'tag': self._get__tag(),
-            'attrs': self.attrs.render(),
-            'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
-            'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
-        }
-        tag_data['inner'] = self.render_childs(pretty2) if not self._void and self.childs else ''
-
-        # We declare the tag is stable and have an official render:
-        self._render = self._template.format(**tag_data)
-        self._stable = True
-        return self._render
-
-
-class VoidTag(Tag):
-    """
-    A void tag, as described in W3C reference: https://www.w3.org/TR/html51/syntax.html#void-elements
-    """
-    _void = True
-    _template = '<{tag}{attrs}/>'
-
-
-class TempyREPR(DOMElement):
-    """Helper Class to provide views for custom objects.
-    Objects of classes with a nested TempyREPR subclass are rendered using the TempyREPR subclass as a template.
-
-    """
-    def __init__(self, obj):
-        super().__init__()
-        self.obj = obj
-        try:
-            self.repr()
-        except AttributeError:
-            raise IncompleteREPRError(self.__class__, 'TempyREPR subclass should implement an "repr" method.')
-
-    def __getattribute__(self, attr):
-        try:
-            return super().__getattribute__('obj').__getattribute__(attr)
-        except:
-            return super().__getattribute__(attr)
-
-    def render(self, pretty=False):
-        return self.render_childs(pretty=pretty)
-
-
-class Content(DOMElement):
-    """
-    Provides the ability to use a simil-tag object as content placeholder.
-    At render time, a content with the same name is searched in parents, the nearest one is used.
-    If no content with the same name is used, an empty string is rendered.
-    If instantiated with the named attribute content, this will override all the content injection on parents.
-    """
-    def __init__(self, name=None, content=None, t_repr=None):
-        super().__init__()
-        self._tab_count = 0
-        if not name and not content:
-            raise ContentError(self, 'Content needs at least one argument: name or content')
-        self._name = name
-        self._fixed_content = content
-        self._t_repr = t_repr
-        if self._t_repr and not isinstance(self._t_repr, DOMElement):
-            raise ContentError(self, 'template argument should be a DOMElement')
-        self.uuid = uuid4()
-        self.stable = False
-
-    def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            return False
-        comp_dicts = [{
-            '_name': t._name,
-            'content': list(t.content),
-            '_t_repr': t._t_repr,
-        } for t in (self, other)]
-        return comp_dicts[0] == comp_dicts[1]
-
-    def __copy__(self):
-        return self.__class__(self._name, self._fixed_content, self._t_repr)
-
-    @property
-    def content(self):
-        content = self._fixed_content
-        if not content and self.parent:
-            content = self.parent._find_content(self._name)
-        if isinstance(content, DOMElement) or content:
-            if isinstance(content, DOMElement):
-                yield content
-            elif type(content) in (list, tuple, GeneratorType):
-                yield from content
-            elif isinstance(content, dict):
-                yield content
-            elif isinstance(content, str):
-                yield content
-            else:
-                yield from iter([content, ])
-        else:
-            raise StopIteration
-
-    @property
-    def length(self):
-        return len(list(self.content))
-
-    def render(self, pretty=False):
-        ret = []
-        for content in self.content:
-            if content is not None:
-                if isinstance(content, DOMElement):
-                    ret.append(content.render(pretty=pretty))
-                else:
-                    if self._t_repr:
-                        ret.append(self._t_repr.inject(content).render(pretty=pretty))
-                    elif isinstance(content, dict):
-                        for k, v in content.items():
-                            if v is not None:
-                                if isinstance(v, list):
-                                    ret = ret + [str(i) for i in v if i is not None]
-                                else:
-                                    ret.append(str(v))
-                    else:
-                        ret.append(str(content))
-        return ' '.join(ret)
-
-
-class Css(Tag):
-    """Special class for the style tag.
-    Css attributes can be altered with the .attr Tag api. At render time the attr dict is transformed in valid css:
-    Css({'html': {
-            'body': {
-                'color': 'red',
-                'div': {
-                    'color': 'green',
-                    'border': '1px'
-                }
-            }
-        },
-        '#myid': {'color': 'blue'}
-    }
-    translates to:
-    <style>
-    html body {
-        color: red;
-    }
-
-    html body div {
-        color: green;
-        border: 1px;
-    }
-    #myid {
-        'color': 'blue';
-    }
-    </style>
-    """
-    _template = '<style>{css}</style>'
-
-    def __init__(self, *args, **kwargs):
-        css_styles = {}
-        if args:
-            if len(args) > 1:
-                raise WrongContentError(self, args, 'Css accepts max one positional argument.')
-            if isinstance(args[0], dict):
-                css_styles.update(args[0])
-            elif isinstance(args[0], Iterable):
-                if any(map(lambda x: not isinstance(x, dict), args[0])):
-                    raise WrongContentError(self, args, 'Unexpected arguments.')
-                css_styles = dict(ChainMap(*args[0]))
-        css_styles.update(kwargs)
-        super().__init__(css_attrs=css_styles)
-
-    def render(self, *args, **kwargs):
-        pretty = kwargs.pop('pretty', False)
-        result = []
-        nodes_to_parse = [([], self.attrs['css_attrs'])]
-
-        while nodes_to_parse:
-            parents, node = nodes_to_parse.pop(0)
-            if parents:
-                for parent in parents:
-                    if isinstance(parent, tuple):
-                        result.append(', '.join(parent))
-                    else:
-                        result.append("%s " % parent)
-                result.append('{ ')
-            else:
-                parents = []
-
-            for key, value in node.items():
-                if isinstance(value, str):
-                    result.append('%s: %s; %s' % (key, value, "\n" if pretty else ""))
-                elif hasattr(value, '__call__'):
-                    result.append('%s: %s; %s' % (key, value(), "\n" if pretty else ""))
-                elif isinstance(value, dict):
-                    nodes_to_parse.append(([p for p in parents] + [key], value))
-            if result:
-                result.append("} " + ("\n\n" if pretty else ""))
-        return self._template.format(css=''.join(result))
 
 
 class Escaped(DOMElement):

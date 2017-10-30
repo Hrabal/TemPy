@@ -1,6 +1,9 @@
-from .tags import *
-from .tempy import Content, Css, render_template, TagAttrs, TempyREPR, Escaped
+from .tools import render_template
+from .elements import Tag, VoidTag, Css, Content
+from .tempyrepr import TempyREPR
+from .places import TempyPlace
 from .t import T
 
-__version__ = '0.5.4'
+
+__version__ = '0.6.0'
 VERSION = tuple(map(int, __version__.split('.')))

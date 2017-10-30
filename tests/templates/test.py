@@ -2,6 +2,6 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
-from tempy import Div
+from tempy.tags import Div
 
 template = Div()

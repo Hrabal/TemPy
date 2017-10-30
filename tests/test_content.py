@@ -6,7 +6,7 @@ import unittest
 from copy import copy
 from collections import Counter
 from tempy.tags import Div, P
-from tempy.tempy import Content
+from tempy import Content
 from tempy.exceptions import ContentError
 
 
@@ -17,7 +17,7 @@ class TestTag(unittest.TestCase):
 
     def test_repr(self):
         c = Content(name='test')
-        self.assertEqual(len(str(c)), len('<tempy.tempy.Content 97fa6e42-bb6e-4d9b-8bad-872405209148. Named test>'))
+        self.assertEqual(len(str(c)), len('<tempy.elements.Content 97fa6e42-bb6e-4d9b-8bad-872405209148. Named test>'))
 
     def test_init(self):
         with self.assertRaises(ContentError):

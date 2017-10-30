@@ -4,19 +4,13 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "3.5-dev" # 3.5 development branch
   - "3.6"
-  - "3.6-dev" # 3.6 development branch
-  - "3.7-dev" # 3.7 development branch
   - "nightly" # currently points to 3.7-dev
 install:
   - "pip3 install coveralls"
 branches:
   only:
     - master
-    - widgets
-# before_install: TODO: make it work
-#   - bash ./preflight.sh # exclude only .md commits
 # command to run tests
 script: coverage run -m unittest discover
 after_success:
