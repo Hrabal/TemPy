@@ -78,6 +78,17 @@ class TagAttrs(dict):
                 ret.append(f_string.format(*f_args))
         return ''.join(ret)
 
+    def render_code(self):
+        def formatter(k, v):
+            k_norm = twist_specials.get(k, k)
+            if k in self._SET_VALUES_ATTRS:
+                return '%s=[%s]' % (k_norm, ', '.join("'%s'" for sub_v in v))
+            if isinstance(v, str):
+                return '%s="%s"' % (k_norm, v)
+            return '%s=%s' % (k_norm, v)
+        twist_specials = {v: k for k, v in self._SPECIALS.items()}
+        return ', '.join(formatter(k, v) for k, v in self.items() if v)
+
 
 class Tag(DOMElement):
     """
