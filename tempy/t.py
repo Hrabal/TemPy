@@ -91,5 +91,9 @@ class TempyGod(TempyFactory):
         self._parser.feed(html_string)
         return self._parser.result
 
+    def dump(self, tempy_tree, filename):
+        with open(filename, 'w') as f:
+            f.write(tempy_tree.to_code())
+
 
 T = TempyGod()
