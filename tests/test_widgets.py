@@ -25,7 +25,8 @@ class TestTempyTable(unittest.TestCase):
 
     def test_empty_creation(self):
         table = TempyTable()
-        self.assertFalse(table.body)
+        self.assertFalse(table.body.childs)
+        self.assertTrue(table.body)
         # Future non-regression, TempyTable should remain a Table Tag
         self.assertIsInstance(table, Table)
 
