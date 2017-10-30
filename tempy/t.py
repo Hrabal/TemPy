@@ -2,7 +2,7 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 import importlib
 from html.parser import HTMLParser
-from .tempy import Tag, VoidTag
+from .elements import Tag, VoidTag
 
 class TempyParser(HTMLParser):
     """Custom parser used to translate an html into Tempy Tags.
