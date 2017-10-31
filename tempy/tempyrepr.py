@@ -15,6 +15,12 @@ class REPRFinder:
             if isinstance(cls, type) and issubclass(cls, TempyREPR):
                 yield cls
 
+    def _filter_Places(self, cls_list):
+        """Filters a list of classes and yields TempyREPR subclasses"""
+        for cls in cls_list:
+            if isinstance(cls, type) and issubclass(cls, TempyPlace) and not cls._base_place:
+                yield cls
+
     def _evaluate_tempyREPR(self, child, repr_cls):
         """Assign a score ito a TempyRepr class.
         The scores depends on the current scope and position of the object in which the TempyREPR is found."""
@@ -25,12 +31,10 @@ class REPRFinder:
         elif repr_cls.__name__ == self.root.__class__.__name__:
             # One point if the REPR have the same name of the Tempy tree root
             score += 1
-
-        for parent_cls in self._filter_REPR(repr_cls.__mro__):
-            if issubclass(parent_cls, TempyPlace):
-                if parent_cls._container_lookup(parent_cls, self, child):
-                    # Two points every TempyPlace base of the REPR that match the scope
-                    score += 2
+        for parent_cls in self._filter_Places(repr_cls.__mro__[1:]):
+            if parent_cls._container_lookup(parent_cls, self, child):
+                # Two points every TempyPlace base of the REPR that match the scope
+                score += 2
         if not score:
             # Marking this class as non-specialized
             score -= 1
@@ -76,6 +80,7 @@ class TempyPlace(TempyREPR):
     """Used to identify places in the DOM.
     Everything defined here is a placeholder."""
     _pointer_class = None
+    _base_place = True
 
     def _container_lookup(self, container, child):
         return False

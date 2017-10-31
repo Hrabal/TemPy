@@ -10,7 +10,7 @@ from .tempyrepr import TempyPlace
 
 class Inside(TempyPlace):
     def _container_lookup(self, container, child):
-        if container.parent == self._pointer_class:
+        if container.parent.__class__ == self._pointer_class:
             return True
         return False
 
@@ -46,6 +46,6 @@ for tag in dir(all_tags):
     if not tag.startswith('__'):
         for place_type in (Inside, Near, Before, After):
             place_tag_name = '%s%s' % (place_type.__name__, tag)
-            place_cls = type(place_tag_name, (place_type, ), {'_pointer_class': getattr(all_tags, tag)})
+            place_cls = type(place_tag_name, (place_type, ), {'_pointer_class': getattr(all_tags, tag), '_base_place': False})
             # We put the new dynamically created class inside locals to make it avaiable from the outside
             locals()[place_tag_name] = place_cls

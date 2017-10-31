@@ -4,9 +4,10 @@
 """
 import unittest
 
-from tempy import TempyREPR
+from tempy import TempyREPR, T
 from tempy.exceptions import IncompleteREPRError
-from tempy.tags import Div, Td, P, Span, Table, Tr
+from tempy.tags import Div, Td, P, Span, Table, Tr, A, Pre
+from tempy.places import *
 
 
 class TestSingleTags(unittest.TestCase):
@@ -92,3 +93,26 @@ class TestSingleTags(unittest.TestCase):
         with self.assertRaises(IncompleteREPRError):
             a = Span()(Test())
             a.render()
+
+    def test_inside_places(self):
+        class Obj:
+            foo = 'foo'
+            bar = 'bar'
+
+            class TestA(InsideDiv):
+                def repr(self):
+                    self(self.bar)
+
+            class A(InsideSpan):
+                def repr(self):
+                    self(self.foo + 'test')
+
+            class Test2(InsideP):
+                def repr(self):
+                    self(self.bar + 'test')
+
+        inst = Obj()
+        self.assertEqual(Span()(A()(inst)).render(), '<span><a>footest</a></span>')
+        self.assertEqual(Div()(Div()(inst)).render(), '<div><div>bar</div></div>')
+        self.assertEqual(P()(T.CustomTag()(inst)).render(), '<p><customtag>bartest</customtag></p>')
+
