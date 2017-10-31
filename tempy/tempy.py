@@ -29,6 +29,8 @@ class DOMElement(REPRFinder):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
+    _from_factory = False
+
     def __init__(self, **kwargs):
         super().__init__()
         self._name = None
@@ -138,7 +140,7 @@ class DOMElement(REPRFinder):
     def to_code(self, beginning=True, pretty=False):
         ret = []
         if beginning:
-            ret.append('# -*- coding: utf-8 -*-\nfrom tempy.tags import *\n')
+            ret.append('# -*- coding: utf-8 -*-\nfrom tempy import T\nfrom tempy.tags import *\n')
         prettying = '\n' + ('\t' * self._depth) if pretty else ''
         variable_name = '%s = ' % sys.argv[0].split('/')[-1].split('.')[0] if self.is_root else ''
         ret.append(variable_name)
@@ -150,8 +152,14 @@ class DOMElement(REPRFinder):
             else:
                 childs_code.append('"%s"' % child)
         childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_code) if childs_code else '', prettying)
+        class_code = ''
+        if self._from_factory:
+            class_code += 'T.'
+            if getattr(self, '_void', False):
+                class_code += 'Void.'
+        class_code += self.__class__.__name__
         ret.append('%s(%s)%s' % (
-            self.__class__.__name__,
+            class_code,
             self.attrs.to_code(),
             childs_code
         ))

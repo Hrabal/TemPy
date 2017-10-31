@@ -67,7 +67,7 @@ class TempyFactory:
 
     def make_tempy(self, tage_name):
         base_class = [Tag, VoidTag][self._void]
-        return type(tage_name, (base_class, ), {'_%s__tag' % tage_name: tage_name.lower()})
+        return type(tage_name, (base_class, ), {'_%s__tag' % tage_name: tage_name.lower(), '_from_factory': True})
 
     def __getattribute__(self, attr):
         try:
