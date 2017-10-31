@@ -152,7 +152,7 @@ class DOMElement(REPRFinder):
         childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_code) if childs_code else '', prettying)
         ret.append('%s(%s)%s' % (
             self.__class__.__name__,
-            self.attrs.render_code(),
+            self.attrs.to_code(),
             childs_code
         ))
         return ''.join(ret)
