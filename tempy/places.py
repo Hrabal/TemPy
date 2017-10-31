@@ -18,7 +18,7 @@ class Inside(TempyPlace):
 class Near(TempyPlace):
     def _container_lookup(self, container, child):
         own_index = self._content_index(container, child)
-        for sibling in container.childs[own_index - 1:own_index + 1]:
+        for sibling in container.parent.childs[own_index - 1:own_index + 1]:
             if sibling.__class__ == self._pointer_class:
                 return True
         return False
@@ -27,7 +27,7 @@ class Near(TempyPlace):
 class Before(TempyPlace):
     def _container_lookup(self, container, child):
         own_index = self._content_index(container, child)
-        if container.childs[own_index + 1].__class__ == self._pointer_class:
+        if container.parent.childs[own_index + 1].__class__ == self._pointer_class:
             return True
         return False
 
@@ -35,7 +35,7 @@ class Before(TempyPlace):
 class After(TempyPlace):
     def _container_lookup(self, container, child):
         own_index = self._content_index(container, child)
-        if container.childs[own_index - 1].__class__ == self._pointer_class:
+        if container.parent.childs[own_index - 1].__class__ == self._pointer_class:
             return True
         return False
 

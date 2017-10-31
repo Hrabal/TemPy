@@ -116,3 +116,53 @@ class TestSingleTags(unittest.TestCase):
         self.assertEqual(Div()(Div()(inst)).render(), '<div><div>bar</div></div>')
         self.assertEqual(P()(T.CustomTag()(inst)).render(), '<p><customtag>bartest</customtag></p>')
 
+    def test_near_places(self):
+        class Obj:
+            foo = 'foo'
+            bar = 'bar'
+
+            class TestA(NearDiv):
+                def repr(self):
+                    self(self.bar)
+
+            class A(NearSpan):
+                def repr(self):
+                    self(self.foo + 'test')
+
+        inst = Obj()
+        self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
+        self.assertEqual(Pre()(Div()(inst), Div()).render(), '<pre><div>bar</div><div></div></pre>')
+
+    def test_before_places(self):
+        class Obj:
+            foo = 'foo'
+            bar = 'bar'
+
+            class TestA(BeforeDiv):
+                def repr(self):
+                    self(self.bar)
+
+            class A(BeforeSpan):
+                def repr(self):
+                    self(self.foo + 'test')
+
+        inst = Obj()
+        self.assertEqual(Pre()(A()(inst), Span()).render(), '<pre><a>footest</a><span></span></pre>')
+        self.assertEqual(Pre()(Div()(inst), Div()).render(), '<pre><div>bar</div><div></div></pre>')
+ 
+    def test_after_places(self):
+        class Obj:
+            foo = 'foo'
+            bar = 'bar'
+
+            class TestA(BeforeDiv):
+                def repr(self):
+                    self(self.bar)
+
+            class A(BeforeSpan):
+                def repr(self):
+                    self(self.foo + 'test')
+
+        inst = Obj()
+        self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
+        self.assertEqual(Pre()(Div(), Div()(inst)).render(), '<pre><div></div><div>bar</div></pre>')
