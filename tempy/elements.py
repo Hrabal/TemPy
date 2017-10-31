@@ -97,7 +97,7 @@ class Tag(DOMElement):
     """
     Provides an api for tag inner manipulation and for rendering.
     """
-    _template = '{pretty1}<{tag}{attrs}>{pretty2}{inner}{pretty1}</{tag}>'
+    _template = '{pretty}<{tag}{attrs}>{inner}{pretty}</{tag}>'
     _needed_kwargs = None
     _void = False
     default_attributes = {}
@@ -240,12 +240,6 @@ class Tag(DOMElement):
         # args kwargs API provided for last minute content injection
         self._reverse_mro_func('pre_render')
         pretty = kwargs.pop('pretty', False)
-        if isinstance(pretty, bool) and pretty:
-            pretty1 = 0
-            pretty2 = pretty1 + 1
-        else:
-            pretty1 = pretty2 = False
-
         for arg in args:
             if isinstance(arg, dict):
                 self.inject(arg)
@@ -259,10 +253,9 @@ class Tag(DOMElement):
         tag_data = {
             'tag': self._get__tag(),
             'attrs': self.attrs.render(),
-            'pretty1': '\n' + ('\t' * pretty1) if pretty else '',
-            'pretty2': '\n' + ('\t' * pretty2) if pretty2 else ''
+            'pretty': '\n' + ('\t' * self._depth) if pretty else '',
         }
-        tag_data['inner'] = self.render_childs(pretty2) if not self._void and self.childs else ''
+        tag_data['inner'] = self.render_childs(pretty) if not self._void and self.childs else ''
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
