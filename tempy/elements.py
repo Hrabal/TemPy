@@ -78,11 +78,14 @@ class TagAttrs(dict):
                 ret.append(f_string.format(*f_args))
         return ''.join(ret)
 
-    def render_code(self):
+    def to_code(self):
         def formatter(k, v):
             k_norm = twist_specials.get(k, k)
             if k in self._SET_VALUES_ATTRS:
-                return '%s=[%s]' % (k_norm, ', '.join("'%s'" for sub_v in v))
+                print(v)
+                return '%s="%s"' % (k_norm, ', '.join(v))
+            if isinstance(v, bool) or v is bool:
+                return '%s="%s"' % (k_norm, 'True')
             if isinstance(v, str):
                 return '%s="%s"' % (k_norm, v)
             return '%s=%s' % (k_norm, v)
