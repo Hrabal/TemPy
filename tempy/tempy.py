@@ -157,6 +157,10 @@ class DOMElement(REPRFinder):
         return ''.join(ret)
 
     @property
+    def _depth(self):
+        return 0 if self.is_root else self.parent._depth + 1
+
+    @property
     def is_root(self):
         return self.root == self
 
