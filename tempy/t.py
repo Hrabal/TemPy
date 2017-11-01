@@ -14,13 +14,16 @@ class TempyParser(HTMLParser):
     the parent element is closed.
     This behaviour is accidental and should not be used a s a html sanitizing feature.
     """
-
     def __init__(self):
         super().__init__()
-        self.result = []
-        self.current_tag = None
         self.unknown_tag_maker = TempyFactory()
         self.tempy_tags = importlib.import_module('.tags', package='tempy')
+        self._reset()
+
+    def _reset(self):
+        self.result = []
+        self.current_tag = None
+        return self
 
     def _make_tempy_tag(self, tag, attrs, void):
         """Searches in tempy.tags for the correct tag to use, if does not exists uses the TempyFactory to
@@ -88,7 +91,7 @@ class TempyGod(TempyFactory):
 
     def from_string(self, html_string):
         """Parses an html string and returns a list of Tempy trees."""
-        self._parser.feed(html_string)
+        self._parser._reset().feed(html_string)
         return self._parser.result
 
     def dump(self, tempy_tree, filename):
