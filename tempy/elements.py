@@ -30,6 +30,7 @@ class TagAttrs(dict):
         'typ': 'type',
         '_for': 'for'
     }
+    _TO_SPECIALS = {v: k for k, v in _SPECIALS.items()}
     _FORMAT = {
         'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
         'klass': lambda x: ' '.join(x),
@@ -82,7 +83,6 @@ class TagAttrs(dict):
         def formatter(k, v):
             k_norm = twist_specials.get(k, k)
             if k in self._SET_VALUES_ATTRS:
-                print(v)
                 return '%s="%s"' % (k_norm, ', '.join(v))
             if isinstance(v, bool) or v is bool:
                 return '%s="%s"' % (k_norm, 'True')

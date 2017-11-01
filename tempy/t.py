@@ -2,7 +2,7 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 import importlib
 from html.parser import HTMLParser
-from .elements import Tag, VoidTag
+from .elements import Tag, VoidTag, TagAttrs
 
 
 class TempyParser(HTMLParser):
@@ -29,7 +29,7 @@ class TempyParser(HTMLParser):
         if not tempy_tag_cls:
             unknow_maker = [self.unknown_tag_maker, self.unknown_tag_maker.Void][void]
             tempy_tag_cls = unknow_maker[tag]
-        attrs = {k: v or True for k, v in attrs}
+        attrs = {TagAttrs._TO_SPECIALS.get(k, k): v or True for k, v in attrs}
         tempy_tag = tempy_tag_cls(**attrs)
         if not self.current_tag:
             self.result.append(tempy_tag)
