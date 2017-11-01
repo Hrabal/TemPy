@@ -139,7 +139,7 @@ Div(klass="cssClass", bool_attr="True")(A()("non-tempy content"), T.CustomTag())
         tempy_tree = Div(klass='cssClass', bool_attr=bool)(A()('non-tempy content'), T.CustomTag())
         T.dump(tempy_tree, filename)
         with open(filename, 'r') as f:
-            self.assertEqual(f.read().strip(), result)
+            self.assertAlmostEqual(f.read().strip(), result)
         os.remove(filename)
 
         with self.assertRaises(ValueError):
