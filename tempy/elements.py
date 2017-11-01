@@ -161,6 +161,18 @@ class Tag(DOMElement):
         self.attrs.pop(attr, None)
         return self
 
+    def set_id(self, css_id):
+        self.attrs['id'] = css_id
+        return self
+
+    def id(self):
+        """Returns the tag css id"""
+        return self.attrs.get('id', None)
+
+    def is_id(self, css_id):
+        """Check if tag have the given id"""
+        return css_id == self.id()
+
     def has_class(self, csscl):
         """Checks if this element have the given css class."""
         return csscl in self.attrs['klass']
