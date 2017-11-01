@@ -5,6 +5,7 @@
 import os
 import html
 import unittest
+from collections import Counter
 
 from tempy import T, Tag, VoidTag
 from tempy.tempy import DOMElement
@@ -139,7 +140,7 @@ Div(klass="cssClass", bool_attr="True")(A()("non-tempy content"), T.CustomTag())
         tempy_tree = Div(klass='cssClass', bool_attr=bool)(A()('non-tempy content'), T.CustomTag())
         T.dump(tempy_tree, filename)
         with open(filename, 'r') as f:
-            self.assertAlmostEqual(f.read().strip(), result)
+            self.assertAlmostEqual(Counter(f.read()), Counter(result))
         os.remove(filename)
 
         with self.assertRaises(ValueError):

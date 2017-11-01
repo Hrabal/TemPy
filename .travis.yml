@@ -1,5 +1,4 @@
 # https://travis-ci.org/Hrabal/TemPy
-dist: trusty
 sudo: false
 language: python
 cache:
