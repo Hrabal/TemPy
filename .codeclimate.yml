@@ -6,7 +6,7 @@ engines:
     config: 
       python_version: 3
     config: 
-      threshold: "C"
+      threshold: "D"
   duplication:
     enabled: true
     config:
