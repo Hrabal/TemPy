@@ -3,8 +3,7 @@ sudo: false
 language: python
 cache:
   directories:
-  - "$HOME/.cache/pip"
-  - "$HOME/virtualenv
+    - "$HOME/.cache/pip"
 python:
   - "3.3"
   - "3.4"
