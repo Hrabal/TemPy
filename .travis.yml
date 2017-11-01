@@ -1,6 +1,10 @@
 # https://travis-ci.org/Hrabal/TemPy
 sudo: false
 language: python
+cache:
+  directories:
+  - "$HOME/.cache/pip"
+  - "$HOME/virtualenv
 python:
   - "3.3"
   - "3.4"
