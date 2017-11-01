@@ -9,35 +9,37 @@ from .tempyrepr import TempyPlace
 
 
 class Inside(TempyPlace):
-    def _container_lookup(self, container, child):
+    def _reprscore_container_parent(self, container, child):
         if container.parent.__class__ == self._pointer_class:
-            return True
-        return False
+            return 1
+        return 0
 
 
-class Near(TempyPlace):
-    def _container_lookup(self, container, child):
-        own_index = self._content_index(container, child)
-        for sibling in container.parent.childs[own_index - 1:own_index + 1]:
-            if sibling.__class__ == self._pointer_class:
-                return True
-        return False
+class SiblingLooker(TempyPlace):
+    @classmethod
+    def _check_container_siblings(cls, container, start=-1, stop=2):
+        container_index = cls._content_index(container.parent, container)
+        before = container.parent.childs[container_index+start:container_index]
+        after = container.parent.childs[container_index+1:container_index+stop]
+        for sibling in  before + after:
+            if sibling.__class__ == cls._pointer_class:
+                return 1
+        return 0
 
 
-class Before(TempyPlace):
-    def _container_lookup(self, container, child):
-        own_index = self._content_index(container, child)
-        if container.parent.childs[own_index + 1].__class__ == self._pointer_class:
-            return True
-        return False
+class Near(SiblingLooker):
+    def _reprscore_container_siblings(self, container, child):
+        return self._check_container_siblings(container)
 
 
-class After(TempyPlace):
-    def _container_lookup(self, container, child):
-        own_index = self._content_index(container, child)
-        if container.parent.childs[own_index - 1].__class__ == self._pointer_class:
-            return True
-        return False
+class Before(SiblingLooker):
+    def _reprscore_container_following(self, container, child):
+        return self._check_container_siblings(container, start=0)
+
+
+class After(SiblingLooker):
+    def _reprscore_container_previous(self, container, child):
+        return self._check_container_siblings(container, stop=0)
 
 
 # Creation of a TempyPlace class for every tag defined in the tags.py module

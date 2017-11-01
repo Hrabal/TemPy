@@ -125,13 +125,13 @@ class TestSingleTags(unittest.TestCase):
                 def repr(self):
                     self(self.bar)
 
-            class A(NearSpan):
+            class TestB(NearSpan):
                 def repr(self):
                     self(self.foo + 'test')
 
         inst = Obj()
         self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
-        self.assertEqual(Pre()(Div()(inst), Div()).render(), '<pre><div>bar</div><div></div></pre>')
+        self.assertEqual(Pre()(T.Custom()(inst),Div()).render(), '<pre><custom>bar</custom><div></div></pre>')
 
     def test_before_places(self):
         class Obj:

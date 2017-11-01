@@ -31,13 +31,12 @@ class REPRFinder:
         elif repr_cls.__name__ == self.root.__class__.__name__:
             # One point if the REPR have the same name of the Tempy tree root
             score += 1
+
+        # Add points defined in scorers methods of used TempyPlaces
         for parent_cls in self._filter_Places(repr_cls.__mro__[1:]):
-            if parent_cls._container_lookup(parent_cls, self, child):
-                # Two points every TempyPlace base of the REPR that match the scope
-                score += 2
-        if not score:
-            # Marking this class as non-specialized
-            score -= 1
+            for scorer in (method for method in dir(parent_cls) if method.startswith('_reprscore')):
+                score += getattr(parent_cls, scorer, lambda *args: 0)(parent_cls, self, child)
+
         return score
 
     def _search_for_view(self, obj):
