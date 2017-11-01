@@ -161,7 +161,7 @@ class DOMElement(REPRFinder):
                 child_code = child.to_code(pretty=pretty)
                 childs_to_code.append(child_code)
             else:
-                childs_to_code.append('"%s"' % child)
+                childs_to_code.append('"""%s"""' % child)
 
         childs_code = ''
         if childs_to_code:

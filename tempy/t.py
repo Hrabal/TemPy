@@ -52,7 +52,8 @@ class TempyParser(HTMLParser):
         self.current_tag = self.current_tag.parent
 
     def handle_data(self, data):
-        self.current_tag(data)
+        if self.current_tag and data.strip():
+            self.current_tag(data)
 
     def handle_comment(self, data):
         pass
@@ -94,7 +95,7 @@ class TempyGod(TempyFactory):
         self._parser._reset().feed(html_string)
         return self._parser.result
 
-    def dump(self, tempy_tree, filename):
+    def dump(self, tempy_tree_list, filename, pretty=False):
         """Dumps a Tempy object to a python file"""
         if not filename:
             raise ValueError('"filename" argument should not be none.')
@@ -104,7 +105,8 @@ class TempyGod(TempyFactory):
             filename += '.py'
         with open(filename, 'w') as f:
             f.write('# -*- coding: utf-8 -*-\nfrom tempy import T\nfrom tempy.tags import *\n')
-            f.write(tempy_tree.to_code())
+            for tempy_tree in tempy_tree_list:
+                f.write(tempy_tree.to_code(pretty=pretty))
         return filename
 
 

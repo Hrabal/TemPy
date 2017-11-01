@@ -3,6 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 Elemnts used inside Tempy Classes
 """
+import re
 from copy import copy
 from uuid import uuid4
 from types import GeneratorType
@@ -55,6 +56,9 @@ class TagAttrs(dict):
         if key in self._SET_VALUES_ATTRS:
             self[key].add(value)
         elif key in self._MAPPING_ATTRS:
+            if isinstance(value, str):
+                splitted = iter(re.split(';|:', value))
+                value = dict(zip(splitted, splitted))
             self[key].update(value)
         else:
             super().__setitem__(key, value)
@@ -83,11 +87,11 @@ class TagAttrs(dict):
         def formatter(k, v):
             k_norm = twist_specials.get(k, k)
             if k in self._SET_VALUES_ATTRS:
-                return '%s="%s"' % (k_norm, ', '.join(v))
+                return '%s="%s"' % (k_norm, ', '.join(map(str, v)))
             if isinstance(v, bool) or v is bool:
                 return '%s="%s"' % (k_norm, 'True')
             if isinstance(v, str):
-                return '%s="%s"' % (k_norm, v)
+                return '%s="""%s"""' % (k_norm, v)
             return '%s=%s' % (k_norm, v)
         twist_specials = {v: k for k, v in self._SPECIALS.items()}
         return ', '.join(formatter(k, v) for k, v in self.items() if v)

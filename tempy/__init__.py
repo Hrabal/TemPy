@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# @author: Federico Cerchiari <federicocerchiari@gmail.com>
 from .tools import render_template
 from .elements import Tag, VoidTag, Css, Content
 from .tempyrepr import TempyREPR
