@@ -166,3 +166,20 @@ class TestSingleTags(unittest.TestCase):
         inst = Obj()
         self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
         self.assertEqual(Pre()(Div(), Div()(inst)).render(), '<pre><div></div><div>bar</div></pre>')
+
+    def test_root(self):
+        class Obj:
+            foo = 'foo'
+            bar = 'bar'
+
+            class Div(TempyREPR):
+                def repr(self):
+                    self(self.bar)
+
+            class Pre(TempyREPR):
+                def repr(self):
+                    self(self.foo + 'test')
+
+        inst = Obj()
+        self.assertEqual(Pre()(Span()(A()(inst))).render(), '<pre><span><a>footest</a></span></pre>')
+        self.assertEqual(Pre()(Span()(Div()(inst))).render(), '<pre><span><div>bar</div></span></pre>')
