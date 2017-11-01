@@ -14,15 +14,30 @@ from .exceptions import TagError, WrongContentError, DOMModByKeyError, DOMModByI
 from .tempyrepr import REPRFinder
 
 
-class _ChildElement:
+class DOMGroup:
     """Wrapper used to manage element insertion."""
-
     def __init__(self, name, obj):
         super().__init__()
         if not name and issubclass(obj.__class__, DOMElement):
             name = obj._name
-        self._name = name
+        self.name = name
         self.obj = obj
+        if isinstance(obj, GeneratorType):
+            self._iterable = True
+        elif issubclass(obj.__class__, DOMElement) or isinstance(obj, str):
+            self._iterable = False
+        else:
+            try:
+                _ = (e for e in obj)
+                self._iterable = True
+            except TypeError:
+                self._iterable = False
+
+    def __iter__(self):
+        if self._iterable:
+            return iter(self.obj)
+        else:
+            return iter([self.obj, ])
 
 
 class DOMElement(REPRFinder):
@@ -214,32 +229,21 @@ class DOMElement(REPRFinder):
         return self.length == 0
 
     def _yield_items(self, items, kwitems, reverse=False):
-        """
-        Recursive generator, flattens the given items/kwitems.
-        Returns index after flattening and a _ChildElement.
-        "reverse" parameter inverts the yielding.
+        """Flattens the given items/kwitems.
+        Yields index and DOMGroup after flattening and a DOMGroup.
+        "reverse" parameter inverts the flattened yielding.
         """
         verse = (1, -1)[reverse]
         if isinstance(items, GeneratorType):
             items = list(items)
-        unnamed = (_ChildElement(None, item) for item in items[::verse])
-        named = (_ChildElement(k, v) for k, v in list(kwitems.items())[::verse])
+        unnamed = (DOMGroup(None, item) for item in items[::verse])
+        named = (DOMGroup(k, v) for k, v in list(kwitems.items())[::verse])
         contents = (unnamed, named)[::verse]
-        for i, item in enumerate(chain(*contents)):
-            if type(item.obj) in (list, tuple, GeneratorType):
-                if item._name:
-                    # TODO: implement tag named containers
-                    # Happens when iterable in kwitems
-                    # i.e: d = Div(paragraphs=[P() for _ in range(5)])
-                    # d.paragraphs -> [P(), P(), P()...]
-                    yield i, None, item.obj
-                else:
-                    yield from self._yield_items(item.obj, {})
-            elif isinstance(item.obj, DOMElement):
-                item.obj._name = item._name
-                yield i, item._name, item.obj
-            else:
-                yield i, item._name, item.obj
+        for i, group in enumerate(chain(*contents)):
+            if isinstance(group.obj, DOMElement):
+                # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
+                group.obj._name = group.name
+            yield i, group
 
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
@@ -273,33 +277,35 @@ class DOMElement(REPRFinder):
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, name, tag in inst._yield_items(tags, kwtags, reverse):
+                for i, dom_group in inst._yield_items(tags, kwtags, reverse):
                     inst._stable = False
-                    func(inst, i, name, tag)
+                    func(inst, i, dom_group)
                 return inst
             return wrapped
         return _receiver
 
-    def _insert(self, child, name=None, idx=None, prepend=False):
-        """Inserts something inside this element.
+    def _insert(self, dom_group, idx=None, prepend=False):
+        """Inserts a DOMGroup inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
         If the child is a DOMElement, correctly links the child.
-        If a name is provided, an attribute containing the child is created in this instance.
+        If the DOMGroup have a name, an attribute containing the child is created in this instance.
         """
-        if child is not None:
-            if idx and idx < 0:
-                idx = 0
-            if prepend:
-                idx = 0
-            else:
-                idx = idx if idx is not None else len(self.childs)
-            self.childs.insert(idx, child)
-            if issubclass(child.__class__, DOMElement):
-                child.parent = self
-                if name:
-                    child._name = name
-            if name:
-                setattr(self, name, child)
+        if idx and idx < 0:
+            idx = 0
+        if prepend:
+            idx = 0
+        else:
+            idx = idx if idx is not None else len(self.childs)
+        if dom_group is not None:
+            for i_group, elem in enumerate(dom_group):
+                if elem is not None:
+                    # Element insertion in this DOMElement childs
+                    self.childs.insert(idx+i_group, elem)
+                    # Managing child attributes if needed
+                    if issubclass(elem.__class__, DOMElement):
+                        elem.parent = self
+            if dom_group.name:
+                setattr(self, dom_group.name, dom_group.obj)
 
     def _find_content(self, cont_name):
         """Search for a content_name in the content data, if not found the parent is searched."""
@@ -349,26 +355,26 @@ class DOMElement(REPRFinder):
         return copy(self)
 
     @content_receiver()
-    def __call__(self, _, name, child):
+    def __call__(self, _, child):
         """Calling the object will add the given parameters as childs"""
-        self._insert(child, name=name)
+        self._insert(child)
 
     @content_receiver()
-    def after(self, i, name, sibling):
+    def after(self, i, sibling):
         """Adds siblings after the current tag."""
-        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
+        self.parent._insert(sibling, idx=self._own_index + 1 + i)
         return self
 
     @content_receiver(reverse=True)
-    def before(self, i, name, sibling):
+    def before(self, i, sibling):
         """Adds siblings before the current tag."""
-        self.parent._insert(sibling, idx=self._own_index - i, name=name)
+        self.parent._insert(sibling, idx=self._own_index - i)
         return self
 
     @content_receiver(reverse=True)
-    def prepend(self, _, name, child):
+    def prepend(self, _, child):
         """Adds childs to this tag, starting from the first position."""
-        self._insert(child, name=name, prepend=True)
+        self._insert(child, prepend=True)
         return self
 
     def prepend_to(self, father):
@@ -377,9 +383,9 @@ class DOMElement(REPRFinder):
         return self
 
     @content_receiver()
-    def append(self, _, name, child):
+    def append(self, _, child):
         """Adds childs to this tag, after the current existing childs."""
-        self._insert(child, name=name)
+        self._insert(child)
         return self
 
     def append_to(self, father):
@@ -434,9 +440,7 @@ class DOMElement(REPRFinder):
     def move(self, new_father, idx=None, prepend=None, name=None):
         """Moves this element from his father to the given one."""
         self.parent.pop(self._own_index)
-        if name:
-            self._name = name
-        new_father._insert(self, idx=idx, prepend=prepend, name=self._name)
+        new_father._insert(DOMGroup(name, self), idx=idx, prepend=prepend)
         new_father._stable = False
         return self
 
@@ -460,7 +464,7 @@ class DOMElement(REPRFinder):
                 try:
                     result.append(getattr(self, x))
                 except AttributeError:
-                    raise DOMModByKeyError(self, "Given search key invalid. No child found")
+                    raise DOMModByKeyError(self, "Given search key invalid. No child found.")
             if result:
                 for x in result:
                     self.childs.remove(x)
