@@ -16,6 +16,6 @@ script: coverage run -m unittest discover
 after_success:
   coveralls
 after_script:
-  - sleep 10 # helps travis finish logging
+  - sleep 3 # helps travis finish logging
 notifications:
   slack: tempy-dev:FaMoO57tis4weJUGWJARATJv
