@@ -139,11 +139,7 @@ class DOMElement(REPRFinder):
 
     def to_code(self, beginning=True, pretty=False):
         ret = []
-        if beginning:
-            ret.append('# -*- coding: utf-8 -*-\nfrom tempy import T\nfrom tempy.tags import *\n')
         prettying = '\n' + ('\t' * self._depth) if pretty else ''
-        variable_name = '%s = ' % sys.argv[0].split('/')[-1].split('.')[0] if self.is_root else ''
-        ret.append(variable_name)
         childs_code = []
         for child in self.childs:
             if issubclass(child.__class__, DOMElement):
