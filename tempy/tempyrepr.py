@@ -80,9 +80,3 @@ class TempyPlace(TempyREPR):
     Everything defined here is a placeholder."""
     _pointer_class = None
     _base_place = True
-
-    def _container_lookup(self, container, child):
-        return False
-
-    def _content_index(container, child):
-        return container.childs.index(child)

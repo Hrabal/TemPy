@@ -20,7 +20,7 @@ class Sibling(TempyPlace):
     """Base class for TempyPlaces that depends on the TempyREPR object's container siblings"""
     @classmethod
     def _check_container_siblings(cls, container, start=-1, stop=2):
-        container_index = cls._content_index(container.parent, container)
+        container_index = container.parent.childs.index(container)
         before = container.parent.childs[container_index+start:container_index]
         after = container.parent.childs[container_index+1:container_index+stop]
         for sibling in before + after:
