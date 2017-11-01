@@ -134,9 +134,9 @@ class TestTag(unittest.TestCase):
         result = """# -*- coding: utf-8 -*-
 from tempy import T
 from tempy.tags import *
-Div()(A()())"""
+Div(klass="cssClass", bool_attr="True")(A()("non-tempy content"), T.CustomTag())"""
         filename = 'test.py'
-        tempy_tree = Div()(A())
+        tempy_tree = Div(klass='cssClass', bool_attr=bool)(A()('non-tempy content'), T.CustomTag())
         T.dump(tempy_tree, filename)
         with open(filename, 'r') as f:
             self.assertEqual(f.read(), result)

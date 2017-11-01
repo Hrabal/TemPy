@@ -189,3 +189,13 @@ class TestTag(unittest.TestCase):
     def test__get_non_tempy_contents(self):
         d = Div()(Div(), 1, Content(name='test'), 'test', False, True, Div())
         self.assertEqual(list(d._get_non_tempy_contents()), [1, 'test', False, True])
+
+    def test_id_api(self):
+        x = Div()
+        x.set_id('cssId')
+        self.assertTrue(x.is_id('cssId'))
+        self.assertEqual(x.id(), 'cssId')
+        
+        x.set_id('anotherCssId')
+        self.assertTrue(x.is_id('anotherCssId'))
+        self.assertEqual(x.id(), 'anotherCssId')

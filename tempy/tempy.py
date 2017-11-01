@@ -140,14 +140,19 @@ class DOMElement(REPRFinder):
     def to_code(self, beginning=True, pretty=False):
         ret = []
         prettying = '\n' + ('\t' * self._depth) if pretty else ''
-        childs_code = []
+        childs_to_code = []
         for child in self.childs:
+            if isinstance(child, type) and issubclass(child, DOMElement):
+                childs_to_code.append(child.__class.__name)
             if issubclass(child.__class__, DOMElement):
                 child_code = child.to_code(beginning=False, pretty=pretty)
-                childs_code.append(child_code)
+                childs_to_code.append(child_code)
             else:
-                childs_code.append('"%s"' % child)
-        childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_code) if childs_code else '', prettying)
+                childs_to_code.append('"%s"' % child)
+
+        childs_code = ''
+        if childs_to_code:
+            childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_to_code), prettying)
         class_code = ''
         if self._from_factory:
             class_code += 'T.'
