@@ -26,8 +26,11 @@ class Comment(VoidTag):
         self._comment = comment_text
         super().__init__()
 
-    def render(self):
+    def render(self, pretty=False):
         return self._template % self._comment
+
+    def to_code(self, pretty=False):
+        return 'Comment("%s")' % self._comment
 
 
 class Doctype(VoidTag):
@@ -46,6 +49,10 @@ class Doctype(VoidTag):
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
         return '<!DOCTYPE %s>%s' % (DOCTYPES[self.type_code], '\n' if pretty else '')
+
+    def to_code(self, pretty=False):
+        return 'Doctype("%s")' % self.type_code
+        
 
 
 class Html(Tag):

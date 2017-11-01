@@ -9,7 +9,7 @@ from collections import Counter
 
 from tempy import T, Tag, VoidTag
 from tempy.tempy import DOMElement
-from tempy.tags import Div, A, Br
+from tempy.tags import Div, A, Br, Doctype, Comment
 
 
 class TestTag(unittest.TestCase):
@@ -135,12 +135,15 @@ class TestTag(unittest.TestCase):
         result = """# -*- coding: utf-8 -*-
 from tempy import T
 from tempy.tags import *
-Div(klass="cssClass", bool_attr="True")(A()("non-tempy content"), T.CustomTag())"""
+Div(klass="cssClass", bool_attr="True")(A(href="www.foo.bar")("non-tempy content"), T.CustomTag(numb_attr=9), Br(), Doctype("html"), Comment("test comment"), T.Void.TestVoid())"""
         filename = 'test.py'
-        tempy_tree = Div(klass='cssClass', bool_attr=bool)(A()('non-tempy content'), T.CustomTag())
+        tempy_tree = Div(klass='cssClass', bool_attr=bool)(A(href='www.foo.bar')('non-tempy content'), T.CustomTag(numb_attr=9), Br(), Doctype('html'), Comment('test comment'), T.Void.TestVoid())
         T.dump(tempy_tree, filename)
         with open(filename, 'r') as f:
-            self.assertAlmostEqual(Counter(f.read()), Counter(result))
+            self.assertEqual(Counter(f.read()), Counter(result))
+        os.remove(filename)
+
+        T.dump(tempy_tree, 'test')
         os.remove(filename)
 
         with self.assertRaises(ValueError):
