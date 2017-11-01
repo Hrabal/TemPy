@@ -155,11 +155,11 @@ class TestSingleTags(unittest.TestCase):
             foo = 'foo'
             bar = 'bar'
 
-            class TestA(BeforeDiv):
+            class TestA(AfterDiv):
                 def repr(self):
                     self(self.bar)
 
-            class A(BeforeSpan):
+            class A(AfterSpan):
                 def repr(self):
                     self(self.foo + 'test')
 
