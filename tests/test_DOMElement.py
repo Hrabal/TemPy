@@ -5,9 +5,9 @@
 import unittest
 
 from tempy.tags import Div, A, P, Html, Head, Body
-from tempy.tempy import DOMElement, DOMGroup
+from tempy.tempy import DOMElement, DOMGroup, Escaped
 from tempy.elements import Tag, TagAttrs
-from tempy.exceptions import WrongContentError, TagError
+from tempy.exceptions import WrongContentError, TagError, DOMModByKeyError, DOMModByIndexError
 
 
 class TestDOMelement(unittest.TestCase):
@@ -172,6 +172,14 @@ class TestDOMelement(unittest.TestCase):
         self.page(child_foo_2=new4)
         self.page.pop(['child_foo_1', 'child_foo_2'])
         self.assertTrue(new4 not in self.page and new5 not in self.page)
+
+        with self.assertRaises(DOMModByKeyError):
+            test = Div()(test_key=A())
+            test.pop('nonexistentkey')
+
+        with self.assertRaises(DOMModByIndexError):
+            test = Div()(A(), P())
+            test.pop(2)
 
     def test_empty(self):
         new = Div().append_to(self.page)
@@ -514,3 +522,8 @@ class TestDOMelement(unittest.TestCase):
         self.assertTrue(l == [c, a, d, b])
         l = list(a.dfs_postorder(reverse=True))
         self.assertTrue(l == [c, d, b, a])
+
+    def test_escaped(self):
+        html_escapable_content = '"&<>£¢ì'
+        t_escaped = Div()(Escaped(html_escapable_content))
+        self.assertEqual(t_escaped.render(), '<div>"&<>£¢ì</div>')
