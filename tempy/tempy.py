@@ -449,11 +449,12 @@ class DOMElement(REPRFinder):
         if arg is None:
             arg = len(self.childs) - 1
         if isinstance(arg, int):
-            result = self.childs.pop(arg)
+            try:
+                result = self.childs.pop(arg)
+            except IndexError:
+                raise DOMModByIndexError(self, "Given index invalid.")
             if isinstance(result, DOMElement):
                 result.parent = None
-            if result is None:
-                raise DOMModByIndexError(self, "Given index invalid.")
         else:
             result = []
             if isinstance(arg, str):
