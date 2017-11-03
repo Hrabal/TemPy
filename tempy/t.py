@@ -39,8 +39,9 @@ class TempyParser(HTMLParser):
             if not void:
                 self.current_tag = tempy_tag
         else:
-            self.current_tag(tempy_tag)
-            self.current_tag = self.current_tag.childs[-1]
+            if not tempy_tag._void:
+                self.current_tag(tempy_tag)
+                self.current_tag = self.current_tag.childs[-1]
 
     def handle_starttag(self, tag, attrs):
         self._make_tempy_tag(tag, attrs, False)
