@@ -52,7 +52,6 @@ class Doctype(VoidTag):
 
     def to_code(self, pretty=False):
         return 'Doctype("%s")' % self.type_code
-        
 
 
 class Html(Tag):
