@@ -1,6 +1,7 @@
 # TemPy
 ![TemPy Logo](tempy.png)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b35654867b91423e98511db6c22b6317)](https://www.codacy.com/app/federicocerchiari/TemPy?utm_source=github.com&utm_medium=referral&utm_content=Hrabal/TemPy&utm_campaign=badger)
 [![Release](https://img.shields.io/github/release/Hrabal/TemPy.svg)](https://img.shields.io/github/release/Hrabal/TemPy.svg)
 [![PyPI version](https://badge.fury.io/py/tem-py.svg)](https://badge.fury.io/py/tem-py) [![PyPI version](https://img.shields.io/badge/python-%3E%3D%203.3-blue.svg)](https://pypi.org/project/tem-py/) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy) [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/Hrabal/TemPy/master/LICENSE)
 ### Fast Object-Oriented HTML templating With Python!
