@@ -7,5 +7,5 @@ from .places import TempyPlace
 from .t import T
 
 
-__version__ = '0.7.1'
+__version__ = '1.0.0'
 VERSION = tuple(map(int, __version__.split('.')))
