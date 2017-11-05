@@ -55,7 +55,6 @@ class REPRFinder:
 class TempyREPR:
     """Helper Class to provide views for custom objects.
     Objects of classes with a nested TempyREPR subclass are rendered using the TempyREPR subclass as a template.
-
     """
     def __init__(self, obj):
         super().__init__()
@@ -68,7 +67,7 @@ class TempyREPR:
     def __getattribute__(self, attr):
         try:
             return super().__getattribute__('obj').__getattribute__(attr)
-        except:
+        except AttributeError:
             return super().__getattribute__(attr)
 
     def render(self, pretty=False):

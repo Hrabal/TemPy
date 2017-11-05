@@ -427,7 +427,7 @@ class Content(DOMElement):
                     if self._t_repr:
                         ret.append(self._t_repr.inject(content).render(pretty=pretty))
                     elif isinstance(content, dict):
-                        for k, v in content.items():
+                        for v in content.values():
                             if v is not None:
                                 if isinstance(v, list):
                                     ret = ret + [str(i) for i in v if i is not None]
