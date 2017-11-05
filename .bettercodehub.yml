@@ -1,6 +1,5 @@
 languages:
   - python
 exclude:
-  - /tests/.*
   - /benchmarks/.*
   - /examples/.*
