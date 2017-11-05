@@ -402,7 +402,7 @@ class Content(DOMElement):
         if isinstance(content, DOMElement) or content:
             if isinstance(content, DOMElement):
                 yield content
-            elif type(content) in (list, tuple, GeneratorType):
+            elif isinstance(content, (list, tuple, GeneratorType)):
                 yield from content
             elif isinstance(content, dict):
                 yield content

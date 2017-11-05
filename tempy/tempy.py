@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Main Tempy classes"""
-import sys
 import html
 from copy import copy
 from uuid import uuid4
