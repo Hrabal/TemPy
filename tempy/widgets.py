@@ -3,6 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 Widgets
 """
+from copy import copy
 from itertools import zip_longest
 
 import tempy.tags as tags
@@ -79,7 +80,7 @@ class TempyTable(Table):
     def __init__(self, rows=0, cols=0, data=None, caption=None,
                  head=False, foot=False, **kwargs):
         super().__init__(**kwargs)
-        self.body = None
+        self(body=Tbody())
         # Initialize empty datastructure if data is not given
         if not data:
             data = [[None for _ in range(cols)]
@@ -90,7 +91,8 @@ class TempyTable(Table):
             self.make_header(data.pop(0))
         if foot:
             self.make_footer(data.pop())
-        self.populate(data, resize_x=True)
+        if data:
+            self.populate(data, resize_x=True)
 
     def _check_row_size(self, row):
         try:
@@ -100,49 +102,46 @@ class TempyTable(Table):
         if self.body.childs and max(map(len, self.body)) < row_lenght:
             raise WidgetDataError(self, 'The given data have more columns than the table.')
 
-    def populate(self, data, resize_x=False, force=True, normalize=True):
+    def populate(self, data, resize_x=True, normalize=True):
         """Adds/Replace data in the table.
         data: an iterable of iterables in the form [[col1, col2, col3], [col1, col2, col3]]
         resize_x: if True, changes the x-size of the table according to the given data.
             If False and data have dimensions different from the existing table structure a WidgetDataError is raised.
-        force: if True, overwrites the present data, else fills only the empty cells.
         normalize: if True all the rows will have the same number of columns, if False, data structure is followed.
         """
         if data is None:
-            # Maybe raise? Empty the table?
-            raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear()')
+            raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
+        data = copy(data)
 
         if not self.body:
             # Table is empty
             self(body=Tbody())
-            for row in data:
-                self.add_row(row, resize_x=True)
-        else:
-            max_data_x = max(map(len, data))
-            if not resize_x:
-                self._check_row_size(max_data_x)
-            for t_row, d_row in zip_longest(self.body, data):
+        self.clear()
+
+        max_data_x = max(map(len, data))
+        if not resize_x:
+            self._check_row_size(max_data_x)
+
+        for t_row, d_row in zip_longest(self.body, data):
+            if not d_row:
+                t_row.remove()
+            else:
                 if not t_row:
-                    self.add_row(d_row)
-                elif not d_row and force:
-                    t_row.remove()
-                else:
-                    if normalize:
-                        d_row = AdjustableList(d_row).ljust(max_data_x, None)
-                    for t_cell, d_cell in zip_longest(t_row, d_row):
-                        if not t_cell and resize_x:
-                            t_cell = Td().append_to(t_row)
-                        if [d_cell] != t_cell.childs:
-                            if force and not t_cell.is_empty:
-                                t_cell.empty()
-                            if t_cell.is_empty and d_cell is not None:
-                                t_cell(d_cell)
+                    t_row = Tr().append_to(self.body)
+                if normalize:
+                    d_row = AdjustableList(d_row).ljust(max_data_x, None)
+                for t_cell, d_cell in zip_longest(t_row, d_row):
+                    if not t_cell and resize_x:
+                        t_cell = Td().append_to(t_row)
+                    t_cell.empty()
+                    if d_cell is not None:
+                        t_cell(d_cell)
         return self
 
     def clear(self):
         return self.body.empty()
 
-    def add_row(self, row_data, resize_x=False):
+    def add_row(self, row_data, resize_x=True):
         """Adds a row at the end of the table"""
         if not resize_x:
             self._check_row_size(row_data)

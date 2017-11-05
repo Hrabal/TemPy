@@ -54,7 +54,6 @@ class TestTempyTable(unittest.TestCase):
         self.assertIsInstance(table.footer, Tfoot)
 
     def test_populate(self):
-        # test no_resize
         table = TempyTable().populate(self.data)
         # Check table sizes
         self.assertEqual(len(table.body), 15)
@@ -66,41 +65,23 @@ class TestTempyTable(unittest.TestCase):
         table.populate(new_data)
         self.assertEqual(len(table.body), 16)
 
-        # test raise with no resize
-        new_data[0].append('test')
-        with self.assertRaises(WidgetDataError):
-            table.populate(new_data)
-
         # test resize
-        table.populate(new_data, resize_x=True)
-        self.assertEqual(len(table.body), 16)
+        print('test resize')
+        new_data.append(list(range(1, 12)))
+        table.populate(new_data)
+        self.assertEqual(len(table.body), 17)
         self.assertEqual(len(table.body[0]), 11)
         self.assertEqual(len(table.body[1]), 11)
-        self.assertTrue('test' in table.body[0][10])
-
-        # test not force
-        for row in new_data:
-            try:
-                row[10] = 'test1'
-            except:
-                row.append('test1')
-        table.populate(new_data, force=False)
-        self.assertEqual(len(table.body), 16)
-        self.assertEqual(len(table.body[0]), 11)
-        self.assertEqual(len(table.body[1]), 11)
-        self.assertFalse('test1' in table.body[0][10])
-        self.assertTrue('test1' in table.body[1][10])
-
-        # test force
-        table.populate(new_data, force=True)
-        self.assertTrue('test1' in table.body[0][10])
+        self.assertEqual(len(table.body[-1]), 11)
 
         # test non normalize:
         new_data[3].append('test2')
-        table.populate(new_data, normalize=False, resize_x=True)
-        self.assertTrue('test2' in table.body[3][11])
+        table.populate(new_data, normalize=False)
+        self.assertTrue('test2' in table.body[3][10])
+        self.assertEqual(len(table.body[1]), 10)
+        self.assertEqual(len(table.body[3]), 11)
         with self.assertRaises(IndexError):
-            table.body[0][11]
+            table.body[6][11]
 
         with self.assertRaises(WidgetDataError):
             table.populate(None)
