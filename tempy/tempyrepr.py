@@ -7,20 +7,18 @@ from functools import partial
 from .exceptions import IncompleteREPRError
 
 
+def _filter_classes(cls_list, cls_type):
+    """Filters a list of classes and yields TempyREPR subclasses"""
+    for cls in cls_list:
+        if isinstance(cls, type) and issubclass(cls, cls_type):
+            if cls_type == TempyPlace and cls._base_place:
+                pass
+            else:
+                yield cls
+
+
 class REPRFinder:
     """Collection of methods used to manage TempyREPR classes."""
-    def _filter_REPR(self, cls_list):
-        """Filters a list of classes and yields TempyREPR subclasses"""
-        for cls in cls_list:
-            if isinstance(cls, type) and issubclass(cls, TempyREPR):
-                yield cls
-
-    def _filter_Places(self, cls_list):
-        """Filters a list of classes and yields TempyREPR subclasses"""
-        for cls in cls_list:
-            if isinstance(cls, type) and issubclass(cls, TempyPlace) and not cls._base_place:
-                yield cls
-
     def _evaluate_tempyREPR(self, child, repr_cls):
         """Assign a score ito a TempyRepr class.
         The scores depends on the current scope and position of the object in which the TempyREPR is found."""
@@ -33,7 +31,7 @@ class REPRFinder:
             score += 1
 
         # Add points defined in scorers methods of used TempyPlaces
-        for parent_cls in self._filter_Places(repr_cls.__mro__[1:]):
+        for parent_cls in _filter_classes(repr_cls.__mro__[1:], TempyPlace):
             for scorer in (method for method in dir(parent_cls) if method.startswith('_reprscore')):
                 score += getattr(parent_cls, scorer, lambda *args: 0)(parent_cls, self, child)
 
@@ -45,7 +43,7 @@ class REPRFinder:
         Otherwise the original object is returned.
         """
         evaluator = partial(self._evaluate_tempyREPR, obj)
-        sorted_reprs = sorted(self._filter_REPR(obj.__class__.__dict__.values()), key=evaluator, reverse=True)
+        sorted_reprs = sorted(_filter_classes(obj.__class__.__dict__.values(), TempyREPR), key=evaluator, reverse=True)
         if sorted_reprs:
             # If we find some TempyREPR, we return the one with the best score.
             return sorted_reprs[0]

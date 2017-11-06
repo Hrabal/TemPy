@@ -96,6 +96,10 @@ class TempyGod(TempyFactory):
         self._parser._reset().feed(html_string)
         return self._parser.result
 
+    def dump_string(self, html_string, filename, pretty=False):
+        tempy_trees = self.from_string(html_string)
+        self.dump(tempy_trees, filename, pretty=pretty)
+
     def dump(self, tempy_tree_list, filename, pretty=False):
         """Dumps a Tempy object to a python file"""
         if not filename:
