@@ -26,7 +26,7 @@ class Comment(VoidTag):
         self._comment = comment_text
         super().__init__()
 
-    def render(self, pretty=False):
+    def render(self, *args, **kwargs):
         return self._template % self._comment
 
     def to_code(self, pretty=False):
