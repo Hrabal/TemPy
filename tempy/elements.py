@@ -417,7 +417,8 @@ class Content(DOMElement):
     def length(self):
         return len(list(self.content))
 
-    def render(self, pretty=False):
+    def render(self, *args, **kwargs):
+        pretty = kwargs.pop('pretty', False)
         ret = []
         for content in self.content:
             if content is not None:
