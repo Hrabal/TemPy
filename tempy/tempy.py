@@ -39,6 +39,24 @@ class DOMGroup:
             return iter([self.obj, ])
 
 
+def yield_domgroups(items, kwitems, reverse=False):
+    """Flattens the given items/kwitems.
+    Yields index and DOMGroup after flattening and a DOMGroup.
+    "reverse" parameter inverts the flattened yielding.
+    """
+    verse = (1, -1)[reverse]
+    if isinstance(items, GeneratorType):
+        items = list(items)
+    unnamed = (DOMGroup(None, item) for item in items[::verse])
+    named = (DOMGroup(k, v) for k, v in list(kwitems.items())[::verse])
+    contents = (unnamed, named)[::verse]
+    for i, group in enumerate(chain(*contents)):
+        if isinstance(group.obj, DOMElement):
+            # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
+            group.obj._name = group.name
+        yield i, group
+
+
 class DOMElement(REPRFinder):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
@@ -225,23 +243,6 @@ class DOMElement(REPRFinder):
         """True if no childs"""
         return self.length == 0
 
-    def _yield_items(self, items, kwitems, reverse=False):
-        """Flattens the given items/kwitems.
-        Yields index and DOMGroup after flattening and a DOMGroup.
-        "reverse" parameter inverts the flattened yielding.
-        """
-        verse = (1, -1)[reverse]
-        if isinstance(items, GeneratorType):
-            items = list(items)
-        unnamed = (DOMGroup(None, item) for item in items[::verse])
-        named = (DOMGroup(k, v) for k, v in list(kwitems.items())[::verse])
-        contents = (unnamed, named)[::verse]
-        for i, group in enumerate(chain(*contents)):
-            if isinstance(group.obj, DOMElement):
-                # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
-                group.obj._name = group.name
-            yield i, group
-
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
             if not issubclass(child.__class__, DOMElement):
@@ -274,7 +275,7 @@ class DOMElement(REPRFinder):
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, dom_group in inst._yield_items(tags, kwtags, reverse):
+                for i, dom_group in yield_domgroups(tags, kwtags, reverse):
                     inst._stable = False
                     func(inst, i, dom_group)
                 return inst
