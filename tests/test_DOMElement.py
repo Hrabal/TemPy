@@ -4,14 +4,13 @@
 """
 import unittest
 
+from tempy.elements import Tag, TagAttrs
+from tempy.exceptions import WrongContentError, WrongArgsError, TagError, DOMModByKeyError, DOMModByIndexError
 from tempy.tags import Div, A, P, Html, Head, Body
 from tempy.tempy import DOMElement, DOMGroup, Escaped
-from tempy.elements import Tag, TagAttrs
-from tempy.exceptions import WrongContentError, TagError, DOMModByKeyError, DOMModByIndexError
 
 
 class TestDOMelement(unittest.TestCase):
-
     def setUp(self):
         self.page = Html()
 
@@ -84,13 +83,13 @@ class TestDOMelement(unittest.TestCase):
         new1 = Div().append_to(self.page)
         new2 = Div()
         new1.after(new2)
-        self.assertEqual(new1._own_index, new2._own_index-1)
+        self.assertEqual(new1._own_index, new2._own_index - 1)
 
     def test_before(self):
         new1 = Div().append_to(self.page)
         new2 = Div()
         new1.before(new2)
-        self.assertEqual(new1._own_index, new2._own_index+1)
+        self.assertEqual(new1._own_index, new2._own_index + 1)
 
     def test_prepend(self):
         self.page(Div(), Div())
@@ -133,6 +132,52 @@ class TestDOMelement(unittest.TestCase):
         to_wrap.wrap(container)
         self.assertTrue(to_wrap in container)
         self.assertTrue(container in outermost)
+
+    def test_wrap_many(self):
+        def flatten(cnt):
+            res = []
+            for el in cnt:
+                if isinstance(el, DOMElement):
+                    res.append(el)
+                else:
+                    res.extend(el)
+            return res
+
+        def test_return_values(inp, outp):
+            self.assertEqual(len(inp), len(outp))
+            for _ in range(len(inp)):
+                t1, t2 = type(inp[_]), type(outp[_])
+                self.assertTrue(t1 == t2 or
+                                issubclass(t1, DOMElement) and issubclass(t2, DOMElement))
+
+        def test_correctly_wrapped(child, parent):
+            self.assertTrue(child in parent)
+            self.assertTrue(child.get_parent() == parent)
+
+        # check if it works correct with correct arguments
+        args = (Div(), [Div(), Div()], (Div(), Div()))
+        new = A().wrap_many(*args)
+        test_return_values(args, new)
+        for c, p in zip(flatten(new), flatten(args)):
+            test_correctly_wrapped(c, p)
+
+        # check if it raises TagError with strict and returns None without
+        args = (Div()(A()), (Div(), Div()))
+        with self.assertRaisesRegex(TagError, r'^.+arguments 0$'):
+            A().wrap_many(*args, strict=True)
+        new = A().wrap_many(*args)
+        self.assertIs(new[0], None)
+
+        args = (Div()(A()), (Div(), Div()(A())))
+        with self.assertRaisesRegex(TagError, r'^.+arguments 0, \[1\] of 1'):
+            A().wrap_many(*args, strict=True)
+        new = A().wrap_many(*args)
+        self.assertIs(new[0], None)
+
+        # check if it raises WrongArgsError
+        args = (Div(), '')
+        with self.assertRaises(WrongArgsError):
+            A().wrap_many(*args)
 
     def test_replace_with(self):
         old = Div().append_to(self.page)
