@@ -416,6 +416,12 @@ class DOMElement(REPRFinder):
 
         If on some args it must raise TagError, it will only if strict is True,
         otherwise it will do nothing with them and return Nones on their positions"""
+
+        for arg in args:
+            if not arg or not (isinstance(arg, DOMElement) or
+                                       isinstance(arg, Iterable) and isinstance(iter(arg).__next__(), DOMElement)):
+                raise WrongArgsError(self, 'Argument {} is not DOMElement nor iterable of DOMElements'.format(arg))
+
         wcopies = []
         failure = []
 
@@ -426,28 +432,20 @@ class DOMElement(REPRFinder):
                 return next_copy.wrap(tag)
             except TagError:
                 failure.append(idx)
-                return None
+                return None  # maybe should return copy of self that wasn't wrapped
 
-        arg_idx = -1
-        for arg in args:
-            arg_idx += 1
+        for arg_idx, arg in enumerate(args):
             if isinstance(arg, DOMElement):
-                wcopies.append(wrap_next(arg, arg_idx))
+                wcopies.append(wrap_next(arg, (arg_idx, -1)))
             else:
-                if not isinstance(arg, Iterable) or not arg or not isinstance(iter(arg).__next__(), DOMElement):
-                    raise WrongArgsError(self,
-                                         'Argument no {} is not DOMElement nor iterable of DOMElements'.format(arg_idx))
-                else:
-                    iter_idx = -1
-                    iter_wcopies = []
-                    for t in iter(arg):
-                        iter_idx += 1
-                        iter_wcopies.append(wrap_next(t, (arg_idx, iter_idx)))
-                    wcopies.append(type(arg)(iter_wcopies))
+                iter_wcopies = []
+                for iter_idx, t in enumerate(arg):
+                    iter_wcopies.append(wrap_next(t, (arg_idx, iter_idx)))
+                wcopies.append(type(arg)(iter_wcopies))
 
         if failure and strict:
             raise TagError(self, 'Wrapping in a non empty Tag is forbidden, failed on arguments ' +
-                           ', '.join(list(map(lambda idx: str(idx) if type(idx) is int else '[{1}] of {0}'.format(*idx),
+                           ', '.join(list(map(lambda idx: str(idx[0]) if idx[1] == -1 else '[{1}] of {0}'.format(*idx),
                                               failure))))
         return wcopies
 
