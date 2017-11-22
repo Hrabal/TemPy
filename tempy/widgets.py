@@ -190,11 +190,13 @@ class TempyTable(Table):
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
     Plain iterables will produce plain lists, nested dicts will produce nested lists.
-    Default list type is unordered. List type (ol, ul or dl) can be passed as string argument ("Ul", "Ol"),
+    Default list type is unordered. List type (ol, ul or dl) can be passed as
+    string argument ("Ul", "Ol", "Dl"),
     list tag classes (tempy.tags.Ul, tempy.tags.Ol) or "_typ" special key in the given structure:
     >>> ul = TempyList()
     >>> ol = TempyList(typ='Ol')
     >>> ol = TempyList(typ=tempy.tags.Ol)
+    >>> dl = TempyList(typ=tempy.tags.Dl)
     >>> ol = TempyList(struct={'_typ': tempy.tags.Ol})
     >>> ol = TempyList(struct={'_typ': 'Ol'})
     List building is made through the TempyList.populate method; this will trasform a python datastructure
