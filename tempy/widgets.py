@@ -9,7 +9,8 @@ from itertools import zip_longest
 import tempy.tags as tags
 from .tools import AdjustableList
 from .exceptions import WidgetDataError, WidgetError
-from .tags import Html, Table, Tbody, Thead, Caption, Tfoot, Td, Tr, Th, Li, Ul
+from .tags import Html, Table, Tbody, Thead, Caption
+from .tags import Tfoot, Td, Tr, Th, Li, Ul, Dl, Dd, Dt
 
 
 class TempyPage(Html):
@@ -189,7 +190,7 @@ class TempyTable(Table):
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
     Plain iterables will produce plain lists, nested dicts will produce nested lists.
-    Default list type is unordered. List type (ol or ul) can be passed as string argument ("Ul", "Ol"),
+    Default list type is unordered. List type (ol, ul or dl) can be passed as string argument ("Ul", "Ol"),
     list tag classes (tempy.tags.Ul, tempy.tags.Ol) or "_typ" special key in the given structure:
     >>> ul = TempyList()
     >>> ol = TempyList(typ='Ol')
@@ -207,9 +208,17 @@ class TempyListMeta:
 
     def populate(self, struct):
         """Generates the list tree.
-        struct: if a list/set/tuple is given, a flat list is generated <*l><li>v1</li><li>v2</li>...</*l>
-        If the given struct is a dict, key contaninct lists/tuples/sets/dicts will be transformed in nested
-        lists, and so on recursively, using dict keys as list items, and dict values as sublists:
+        struct: if a list/set/tuple is given, a flat list is generated
+        <*l><li>v1</li><li>v2</li>...</*l>
+        If the list type is 'Dl' a flat list without definitions is generated
+        <*l><dt>v1</dt><dt>v2</dt>...</*l>
+
+        If the given struct is a dict, key contaninct lists/tuples/sets/dicts
+        will be transformed in nested lists, and so on recursively, using dict
+        keys as list items, and dict values as sublists. If type is 'Dl' each
+        value will be transformed in definition (or list of definitions)
+        except others dict. In that case, it will be transformed in <dfn> tags.
+
         >>> struct = {'ele1': None, 'ele2': ['sub21', 'sub22'], 'ele3': {'sub31': None, 'sub32': None, '_typ': 'Ol'}}
         >>> TempyList(struct=struct)
         <ul>
@@ -228,6 +237,7 @@ class TempyListMeta:
             </li>
         </ul>
         """
+
         if struct is None:
             # Maybe raise? Empty the list?
             return self
@@ -235,13 +245,20 @@ class TempyListMeta:
         if isinstance(struct, (list, set, tuple)):
             struct = dict(zip_longest(struct, [None]))
         if not isinstance(struct, dict):
-            raise WidgetDataError(self, 'List Imput not managed, expected (dict, list), got %s' % type(struct))
+            raise WidgetDataError(self, 'List Input not managed, expected (dict, list), got %s' % type(struct))
         else:
             for k, submenu in struct.items():
-                item = Li()(k)
+                item = Dt()(k) if self._typ == Dl else Li()(k)
                 self(item)
                 if submenu:
-                    item(TempyList(typ=self._typ, struct=submenu))
+                    if self._typ == Dl:
+                        if isinstance(submenu, (list, set, tuple, dict)):
+                            for e in submenu:
+                                self(Dd()(e))
+                        elif isinstance(submenu, str):
+                            self(Dd()(submenu))
+                    else:
+                        item(TempyList(typ=self._typ, struct=submenu))
         return self
 
 
