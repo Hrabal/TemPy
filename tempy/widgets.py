@@ -249,22 +249,31 @@ class TempyListMeta:
         if not isinstance(struct, dict):
             raise WidgetDataError(self, 'List Input not managed, expected (dict, list), got %s' % type(struct))
         else:
-           self.__process_struct(struct)
+            if self._typ == Dl:
+                self.__process_dl_struct(struct)
+            else:
+                self.__process_li_struct(struct)
+
         return self
 
-    def __process_struct(self, struct):
+    def __process_li_struct(self, struct):
         for k, submenu in struct.items():
-            item = Dt()(k) if self._typ == Dl else Li()(k)
+            item = Li()(k)
             self(item)
             if submenu:
-                if self._typ == Dl:
-                    if isinstance(submenu, (list, set, tuple, dict)):
-                        for e in submenu:
-                            self(Dd()(e))
-                    else:
-                        self(Dd()(submenu))
+                item(TempyList(typ=self._typ, struct=submenu))
+
+    def __process_dl_struct(self, struct):
+        for k, submenu in struct.items():
+            item = Dt()(k)
+            self(item)
+            if submenu:
+                if isinstance(submenu, (list, set, tuple, dict)):
+                    for elem in submenu:
+                        self(Dd()(elem))
                 else:
-                    item(TempyList(typ=self._typ, struct=submenu))
+                    self(Dd()(submenu))
+
 
 class TempyList:
     """TempyList is a class factory, it works for both ul and ol lists (TODO: dl).
