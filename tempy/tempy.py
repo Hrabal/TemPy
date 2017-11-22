@@ -419,10 +419,8 @@ class DOMElement(REPRFinder):
 
         for arg in args:
             is_elem = arg and isinstance(arg, DOMElement)
-            is_elem_iter = (not is_elem
-                            and arg
-                            and isinstance(arg, Iterable)
-                            and isinstance(iter(arg).__next__(), DOMElement))
+            is_elem_iter = (not is_elem and arg and isinstance(arg, Iterable) and
+                            isinstance(iter(arg).__next__(), DOMElement))
             if not (is_elem or is_elem_iter):
                 raise WrongArgsError(self, 'Argument {} is not DOMElement nor iterable of DOMElements'.format(arg))
 
