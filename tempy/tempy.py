@@ -2,19 +2,20 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Main Tempy classes"""
 import html
+from collections import deque, Iterable
 from copy import copy
-from uuid import uuid4
-from itertools import chain
 from functools import wraps
-from collections import deque
+from itertools import chain
 from types import GeneratorType
+from uuid import uuid4
 
-from .exceptions import TagError, WrongContentError, DOMModByKeyError, DOMModByIndexError
+from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, DOMModByIndexError
 from .tempyrepr import REPRFinder
 
 
 class DOMGroup:
     """Wrapper used to manage element insertion."""
+
     def __init__(self, name, obj):
         super().__init__()
         if not name and issubclass(obj.__class__, DOMElement):
@@ -167,7 +168,7 @@ class DOMElement(REPRFinder):
         if n == 0:
             self.parent.pop(self._own_index)
             return self
-        return self.after(self * (n-1))
+        return self.after(self * (n - 1))
 
     def to_code(self, pretty=False):
         ret = []
@@ -252,6 +253,7 @@ class DOMElement(REPRFinder):
                     # this trick is used to avoid circular imports
                     class Patched(tempyREPR_cls, DOMElement):
                         pass
+
                     child = Patched(child)
             try:
                 yield child.render(pretty=pretty)
@@ -272,6 +274,7 @@ class DOMElement(REPRFinder):
         Takes args and kwargs and calls the decorated method one time for each argument provided.
         The reverse parameter should be used for prepending (relative to self) methods.
         """
+
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
@@ -279,7 +282,9 @@ class DOMElement(REPRFinder):
                     inst._stable = False
                     func(inst, i, dom_group)
                 return inst
+
             return wrapped
+
         return _receiver
 
     def _insert(self, dom_group, idx=None, prepend=False):
@@ -298,7 +303,7 @@ class DOMElement(REPRFinder):
             for i_group, elem in enumerate(dom_group):
                 if elem is not None:
                     # Element insertion in this DOMElement childs
-                    self.childs.insert(idx+i_group, elem)
+                    self.childs.insert(idx + i_group, elem)
                     # Managing child attributes if needed
                     if issubclass(elem.__class__, DOMElement):
                         elem.parent = self
@@ -393,7 +398,6 @@ class DOMElement(REPRFinder):
 
     def wrap(self, other):
         """Wraps this element inside another empty tag."""
-        # TODO: make multiple with content_receiver
         if other.childs:
             raise TagError(self, 'Wrapping in a non empty Tag is forbidden.')
         if self.parent:
@@ -401,6 +405,51 @@ class DOMElement(REPRFinder):
             self.parent.pop(self._own_index)
         other.append(self)
         return self
+
+    def wrap_many(self, *args, strict=False):
+        """Wraps different copies of this element inside all empty tags
+        listed in params or param's (non-empty) iterators.
+
+        Returns list of copies of this element wrapped inside args
+        or None if not succeeded, in the same order and same structure,
+        i.e. args = (Div(), (Div())) -> value = (A(...), (A(...)))
+
+        If on some args it must raise TagError, it will only if strict is True,
+        otherwise it will do nothing with them and return Nones on their positions"""
+
+        for arg in args:
+            is_elem = arg and isinstance(arg, DOMElement)
+            is_elem_iter = (not is_elem and arg and isinstance(arg, Iterable) and
+                            isinstance(iter(arg).__next__(), DOMElement))
+            if not (is_elem or is_elem_iter):
+                raise WrongArgsError(self, 'Argument {} is not DOMElement nor iterable of DOMElements'.format(arg))
+
+        wcopies = []
+        failure = []
+
+        def wrap_next(tag, idx):
+            nonlocal wcopies, failure
+            next_copy = self.__copy__()
+            try:
+                return next_copy.wrap(tag)
+            except TagError:
+                failure.append(idx)
+                return next_copy
+
+        for arg_idx, arg in enumerate(args):
+            if isinstance(arg, DOMElement):
+                wcopies.append(wrap_next(arg, (arg_idx, -1)))
+            else:
+                iter_wcopies = []
+                for iter_idx, t in enumerate(arg):
+                    iter_wcopies.append(wrap_next(t, (arg_idx, iter_idx)))
+                wcopies.append(type(arg)(iter_wcopies))
+
+        if failure and strict:
+            raise TagError(self, 'Wrapping in a non empty Tag is forbidden, failed on arguments ' +
+                           ', '.join(list(map(lambda idx: str(idx[0]) if idx[1] == -1 else '[{1}] of {0}'.format(*idx),
+                                              failure))))
+        return wcopies
 
     def wrap_inner(self, other):
         self.move_childs(other)
@@ -599,7 +648,6 @@ class DOMElement(REPRFinder):
 
 
 class Escaped(DOMElement):
-
     def __init__(self, content, **kwargs):
         super().__init__(**kwargs)
         self._render = content
