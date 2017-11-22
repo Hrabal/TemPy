@@ -261,7 +261,7 @@ class TempyListMeta:
                     if isinstance(submenu, (list, set, tuple, dict)):
                         for e in submenu:
                             self(Dd()(e))
-                    elif isinstance(submenu, str):
+                    else:
                         self(Dd()(submenu))
                 else:
                     item(TempyList(typ=self._typ, struct=submenu))
