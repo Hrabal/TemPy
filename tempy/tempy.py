@@ -418,8 +418,12 @@ class DOMElement(REPRFinder):
         otherwise it will do nothing with them and return Nones on their positions"""
 
         for arg in args:
-            if not arg or not (isinstance(arg, DOMElement) or
-                                       isinstance(arg, Iterable) and isinstance(iter(arg).__next__(), DOMElement)):
+            is_elem = arg and isinstance(arg, DOMElement)
+            is_elem_iter = (not is_elem
+                            and arg
+                            and isinstance(arg, Iterable)
+                            and isinstance(iter(arg).__next__(), DOMElement))
+            if not (is_elem or is_elem_iter):
                 raise WrongArgsError(self, 'Argument {} is not DOMElement nor iterable of DOMElements'.format(arg))
 
         wcopies = []
@@ -432,7 +436,7 @@ class DOMElement(REPRFinder):
                 return next_copy.wrap(tag)
             except TagError:
                 failure.append(idx)
-                return None  # maybe should return copy of self that wasn't wrapped
+                return next_copy
 
         for arg_idx, arg in enumerate(args):
             if isinstance(arg, DOMElement):

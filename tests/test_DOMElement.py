@@ -166,13 +166,14 @@ class TestDOMelement(unittest.TestCase):
         with self.assertRaisesRegex(TagError, r'^.+arguments 0$'):
             A().wrap_many(*args, strict=True)
         new = A().wrap_many(*args)
-        self.assertIs(new[0], None)
+        self.assertIs(new[0].get_parent(), None)
 
         args = (Div()(A()), (Div(), Div()(A())))
         with self.assertRaisesRegex(TagError, r'^.+arguments 0, \[1\] of 1'):
             A().wrap_many(*args, strict=True)
         new = A().wrap_many(*args)
-        self.assertIs(new[0], None)
+        self.assertIs(new[0].get_parent(), None)
+        self.assertIs(new[1][1].get_parent(), None)
 
         # check if it raises WrongArgsError
         args = (Div(), '')
