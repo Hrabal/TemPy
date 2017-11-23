@@ -46,7 +46,7 @@ Or clone/download this repository and run `python3 setup.py install`
 TemPy offers clean syntax for building pages in pure python:
 ```python
 from tempy.tags import Html, Head, Body, Meta, Link, Div, P, A
-my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
+my_text_list = ['This is Foo.', 'This is Bar.', 'Have you met my friend Baz?']
 another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
 
 # make tags instantiating TemPy objects
@@ -66,10 +66,10 @@ page = Html()(  # add tags inside the one you created calling the parent
 
 # add tags and content later
 page[1][0](A(href='www.bar.com'))  # calling the tag
-page(test=Div()) # WARNING! Correct ordering with named Tag insertion is ensured with Python >= 3.5 (because kwargs are ordered)
 page[1][0].append(A(href='www.baz.com'))  # using the API
-link = Link().append_to(page.body) # access the body as if it's a page attribute
-link.attr(href='www.python.org')('This is a link to Python') # Add attributes and content to already placed tags
+link = A().append_to(page.body[0]) # access the body as if it's a page attribute
+page.body(testDiv=Div()) # WARNING! Correct ordering with named Tag insertion is ensured with Python >= 3.5 (because kwargs are ordered)
+link.attr(href='www.python.org')('This is a link to Python.') # Add attributes and content to already placed tags
 
 page.render()
 >>> <html>
@@ -79,15 +79,16 @@ page.render()
 >>>     </head>
 >>>     <body>
 >>>         <div class="linkBox">
->>>             <a href="www.foo.com"></a>
->>>             <a href="www.bar.com"></a>
->>>             <a href="www.baz.com"></a>
->>>             <a href="www.python.org">This is a link to Python</a>
+>>>             <a href="www.foo.com">www.foo.com</a>
+>>>             <a href="www.bar.com">www.bar.com</a>
+>>>             <a href="www.baz.com">www.baz.com</a>
+>>>             <a href="www.python.org">This is a link to Python.</a>
 >>>         </div>
->>>         <p>This is foo</p>
->>>         <p>This is Bar</p>
+>>>         <p>This is Foo.</p>
+>>>         <p>This is Bar.</p>
 >>>         <p>Have you met my friend Baz?</p>
 >>>         Lorem ipsum dolor sit amet, consectetur adipiscing elit
+>>>         <div></div>
 >>>     </body>
 >>> </html>
 ```
