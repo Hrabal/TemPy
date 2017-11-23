@@ -6,7 +6,7 @@ import unittest
 from copy import copy
 
 from tempy.widgets import TempyTable, TempyList, TempyPage
-from tempy.tags import Table, Tr, Td, Ul, Ol, Li, Html, Head, Body, Thead, Tfoot
+from tempy.tags import Table, Tr, Td, Dl, Dt, Dd, Ul, Ol, Li, Html, Head, Body, Thead, Tfoot
 
 from tempy.exceptions import WidgetDataError, WidgetError
 
@@ -154,6 +154,15 @@ class TestTempyList(unittest.TestCase):
         self.assertIsInstance(li, Ul)
         self.assertEqual(len(li), 3)
         self.assertIsInstance(li[0], Li)
+        with self.assertRaises(WidgetDataError):
+            li.populate('wrong type')
+        li = TempyList(typ=Dl)
+        li.populate({1: 'one', 2:'two', 34:['three', 'four']})
+        self.assertIsInstance(li, Dl)
+        self.assertEqual(len(li), 7)
+        self.assertIsInstance(li[0], Dt)
+        self.assertIsInstance(li[1], Dd)
+        self.assertIsInstance(li[6], Dd)
         with self.assertRaises(WidgetDataError):
             li.populate('wrong type')
 
