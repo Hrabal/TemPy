@@ -105,7 +105,7 @@ class TempyGod(TempyFactory):
         if not filename:
             raise ValueError('"filename" argument should not be none.')
         if len(filename.split('.')) > 1 and not filename.endswith('.py'):
-            raise ValueError('"filename" argument should be a .py extension, if given.')
+            raise ValueError('"filename" argument should have a .py extension, if given.')
         if not filename.endswith('.py'):
             filename += '.py'
         with open(filename, 'w') as f:
