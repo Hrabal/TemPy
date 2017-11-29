@@ -4,7 +4,7 @@
 @import "{{ site.theme }}";
 
 header ul li+li+li {
-  width: none;
+  width: 100%;
 }
 
 header li {
