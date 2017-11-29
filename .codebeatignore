@@ -1,2 +1,2 @@
-examples/*
-benchmarks/*
+examples/**
+benchmarks/**
