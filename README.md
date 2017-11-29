@@ -18,10 +18,10 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
 See below for benchmarks against other templating engines.
 
+## Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 
 ### **Build, manipulate, and navigate HTML documents. With no HTML involved.**
 
-Docs published here: [hrabal.github.io/TemPy-docs](https://hrabal.github.io/TemPy-docs)
 
 Overview: 
 
