@@ -4,6 +4,8 @@ title: OOT - Object Oriented Templating
 permalink: /oot/templating/
 ---
 
+# Define TemPy templates as classes
+
 We can define a basic `tempy.tags.Html` subclass where we define the basic shared page structure (i.e: header, footer, menu and container div structure) and then use this custom page implementation as a base class for several different pages of our site.
 
 ```python
