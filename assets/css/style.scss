@@ -3,16 +3,24 @@
 
 @import "{{ site.theme }}";
 
+header ul li {
+  width: none;
+}
+
 header li {
   margin: 0px;
   width: 100%;
-  height: 1vw;
-  background: #444;
+  /*height: 1vw;*/
+  background: #f4f4f4;
   border-radius: 0px;
   border: none;
   box-shadow: none;
   line-height: 1vw;
   padding: 0vw;
+}
+
+header li hover {
+  background: goldenrod;
 }
 
 header li a {
