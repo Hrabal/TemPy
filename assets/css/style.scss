@@ -3,6 +3,14 @@
 
 @import "{{ site.theme }}";
 
+.wrapper {
+  width: 1020px;
+}
+
+section {
+  width: 720px;
+}
+
 header ul {
   border: none;
 }
