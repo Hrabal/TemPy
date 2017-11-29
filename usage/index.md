@@ -3,6 +3,8 @@ layout: default
 title: Basic Usage
 permalink: /usage/
 ---
+# Basic components: TemPy tags
+
 ```python
 from tempy.tags import *
 ```
