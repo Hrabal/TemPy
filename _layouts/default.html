@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <a href="{{ site.github.url }}"> <h1>{{ site.title | default: site.github.repository_name }}</h1> </a>
-        <img src='/assets/img/tempy.png' class="img-responsive"><br>
+        <img src='{{ site.baseurl }}/assets/img/tempy.png' class="img-responsive"><br>
 	<p>{{ site.description | default: site.github.project_tagline }}</p>
 	{% include nav.html nav=site.data.menu %}
         {% if site.github.is_project_page %}

@@ -1,5 +1,5 @@
 title: TemPy
 description: OOP Python Templating Engine.
 show_downloads: true
+baseurl: /TemPy
 theme: jekyll-theme-minimal
-base_url: https://hrabal.github.io/TemPy/

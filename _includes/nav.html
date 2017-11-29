@@ -2,7 +2,7 @@
 <ul>
 {% for item in include.nav %}
 	<li>
-		<a href="{{ base_url }}{{ item.url }}">
+		<a href="{{ site.baseurl }}{{ item.url }}">
 			{% if item.url == navurl %}
 				<b>{{ item.text }}</b>
 			{% else %}
