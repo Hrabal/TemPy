@@ -18,7 +18,7 @@ container = Div()(
     Content(content='This is a fixed content')
 )
 container.render()
-&gt;&gt;&gt; &lt;div&gt;This is a fixed content&lt;/div&gt;
+>>> <div>This is a fixed content</div>
 ```
 
 ```python
@@ -27,7 +27,7 @@ container = Div()(
 )
 container.data({'a_content_name': 'This is dynamic content'})
 container.render()
-&gt;&gt;&gt; &lt;div&gt;This is dynamic content&lt;/div&gt;
+>>> <div>This is dynamic content</div>
 ```
 
 ```python
@@ -38,7 +38,7 @@ container = Div()(
 root_container.append(container)
 root_container.inject({'a_content_name': 'This is dynamic content'})
 root_container.render()
-&gt;&gt;&gt; &lt;span&gt;&lt;div&gt;This is dynamic content&lt;/div&gt;&lt;/span&gt;
+>>> <span><div>This is dynamic content</div></span>
 ```
 
 ## Escape, sometimes you need it
