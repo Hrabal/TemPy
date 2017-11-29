@@ -1,0 +1,31 @@
+- text: Getting Started
+  url: /getting_started/
+- text: Components and basics
+  url: /usage/
+  subitems:
+    - text: TemPy Tags
+      url: /usage/tags/
+    - text: Customizing TemPy Tags
+      url: /usage/customize/
+    - text: Content and special Tags
+      url: /usage/specials/
+    - text: Using TemPy Objects
+      url: /usage/building/
+      subitems:
+        - text: TemPy API
+          url: /usage/building/api/
+- text: OOT - Object-Oriented Templating
+  url: /oot/
+  subitems:
+    - text: TempyREPR
+      url: /oot/tempyrepr/
+    - text: Object-Oriented Templating
+      url: /oot/templating/
+    - text: Putting all together
+      url: /oot/building/
+- text: Performance
+  url: /performance/
+- text: About
+  url: /about/
+- text: Licence
+  url: /licence/

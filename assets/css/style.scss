@@ -1,0 +1,104 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+body {
+	padding-top: 0px;
+	background: #444;
+	color: lightgrey;
+}
+
+header {
+    margin: 0px;
+    border: 0px;
+    padding: 0vw;
+    height: 100%;
+    width: 15vw;
+}
+
+.header {
+    margin: 1vw;
+}
+
+h1.header {
+	margin-top: 1vw;
+}
+
+section {
+    padding: 1vw;
+    margin-left: 15vw;
+    width: 70vw;
+    float: left;
+}
+
+header li {
+	margin: 0px;
+	width: 100%;
+	height: 1vw;
+	background: #444;
+	border-radius: 0px;
+	border: none;
+	box-shadow: none;
+	line-height: 1vw;
+	padding: 0vw;
+}
+
+header li a {
+	padding-left: 1vw;
+}
+
+a.buttons{
+	padding-left: 1vw;
+	margin: 5vh;
+}
+
+header li:hover {
+	background: darkgoldenrod;
+}
+
+header a{
+	color: black;
+}
+
+h1.header, a.header, a.name {
+	color: darkgoldenrod;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: darkgoldenrod;
+    margin: 36px 0 10px;
+}
+
+h1, h2, h3 {
+    border-bottom: 2px solid darkgoldenrod;
+}
+
+.highlight {
+    background-color: lightgray;
+}
+
+code {
+	color: darkgoldenrod;
+}
+
+pre code {
+	color: black;
+}
+
+ul ul {
+	margin-left: 2vw;
+	margin-bottom: 0px;
+}
+
+ul ul li {
+	background: #666;
+}
+
+a {
+    color: darkgrey;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.hljs{display:block;overflow-x:auto;padding:0.5em;background:#23241f}.hljs,.hljs-tag,.hljs-subst{color:#f8f8f2}.hljs-strong,.hljs-emphasis{color:#a8a8a2}.hljs-bullet,.hljs-quote,.hljs-number,.hljs-regexp,.hljs-literal,.hljs-link{color:#ae81ff}.hljs-code,.hljs-title,.hljs-section,.hljs-selector-class{color:#a6e22e}.hljs-strong{font-weight:bold}.hljs-emphasis{font-style:italic}.hljs-keyword,.hljs-selector-tag,.hljs-name,.hljs-attr{color:#f92672}.hljs-symbol,.hljs-attribute{color:#66d9ef}.hljs-params,.hljs-class .hljs-title{color:#f8f8f2}.hljs-string,.hljs-type,.hljs-built_in,.hljs-builtin-name,.hljs-selector-id,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-addition,.hljs-variable,.hljs-template-variable{color:#e6db74}.hljs-comment,.hljs-deletion,.hljs-meta{color:#75715e}
