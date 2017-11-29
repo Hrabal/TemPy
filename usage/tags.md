@@ -21,6 +21,7 @@ There are other 2 ways to create TemPy objects:
 
 * using the `clone()` API
 * adding subtracting or multiplying TemPy objects
+
 ```python
 from tempy.tags import Div, Br
 

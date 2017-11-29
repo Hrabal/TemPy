@@ -3,6 +3,9 @@ layout: default
 title: Performance
 permalink: /performance/
 ---
+
+# Performance
+
 Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
 
 TemPy does not parse strings, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
