@@ -3,6 +3,10 @@
 
 @import "{{ site.theme }}";
 
+header ul {
+  border: none;
+}
+
 header ul li+li+li {
   width: 100%;
 }
@@ -10,7 +14,6 @@ header ul li+li+li {
 header li {
   margin: 0px;
   width: 100%;
-  /*height: 1vw;*/
   background: #f4f4f4;
   border-radius: 0px;
   border: none;
@@ -21,17 +24,4 @@ header li {
 
 header li hover {
   background: goldenrod;
-}
-
-header li a {
-  padding-left: 1vw;
-}
-
-ul ul {
-  margin-left: 2vw;
-  margin-bottom: 0px;
-}
-
-ul ul li {
-  background: #666;
 }
