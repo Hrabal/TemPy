@@ -3,7 +3,7 @@
 
 @import "{{ site.theme }}";
 
-header ul li {
+header ul li+li+li {
   width: none;
 }
 
