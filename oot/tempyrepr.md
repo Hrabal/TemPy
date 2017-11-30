@@ -3,6 +3,16 @@ layout: default
 title: TemPy REPR
 permalink: /oot/tempyrepr/
 ---
+
+# Tempy REPR
+
+Another way to use TemPy is to define a nested `TempyREPR` subclass inside your own classes.
+
+You can think the `TempyREPR` nested class as a `__repr__` magic method equivalent: TemPy uses the `TempyREPR` nested class to represent objects just like Python uses the `__repr__` method.
+
+When an object is placed inside a tree TemPy searches for a `TempyREPR` class inside this object, if it's found, the `repr` method of this class is used as a template.
+The `TempyREPR.repr` method accepts `self` as the only argument, with a little magic this `self` is both your object and the tree element, so the TemPy API is available and your object attributes are accessible using `self`.
+
 ```python
 class MyClass:
     def __init__(self):
@@ -67,13 +77,6 @@ HomePage()(
 ).render()  # my_instance is rendered using HomePage(TempyREPR) nested class
 ```
 
-Another way to use TemPy is to define a nested `TempyREPR` subclass inside your own classes.
-
-You can think the `TempyREPR` nested class as a `__repr__` magic method equivalent: TemPy uses the `TempyREPR` nested class to represent objects just like Python uses the `__repr__` method.
-
-When an object is placed inside a tree TemPy searches for a `TempyREPR` class inside this object, if it's found, the `repr` method of this class is used as a template.
-The `TempyREPR.repr` method accepts `self` as the only argument, with a little magic this `self` is both your object and the tree element, so the TemPy API is available and your object attributes are accessible using `self`.
-
 You can define several `TempyREPR` nested classes, TemPy will search for a `TempyREPR` subclass following this priority order:
 
 1. a `TempyREPR` subclass with the same name of his TemPy container
@@ -84,23 +87,23 @@ You can define several `TempyREPR` nested classes, TemPy will search for a `Temp
 
 You can use this order to set different renderings for different situation/pages. Here is an example of how `TempyREPR` would work with SQLAlchemy models:
 
-<code id='lefty-code'>from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
+```python
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
-</code>
-<code id='lefty-code'>
+
 class Department(Base):
     __tablename__ = 'department'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-</code>
-<code id='lefty-code'>    class HtmlREPR(TempyREPR):
+    
+    class HtmlREPR(TempyREPR):
         def repr(self):
             self.attr(klass='department')
             self(self.name.title())
-</code>
-<code id='lefty-code'>
+
+
 class Employee(Base):
     __tablename__ = 'employee'
     id = Column(Integer, primary_key=True)
@@ -112,8 +115,7 @@ class Employee(Base):
         backref=backref('employees',
                          uselist=True,
                          cascade='delete,all'))
-</code>
-<code id='lefty-code'>    class Table(TempyREPR):
+    class Table(TempyREPR):
         def repr(self):
             self(
                 Tr()(
@@ -122,8 +124,8 @@ class Employee(Base):
                     Td()(self.hired_on.strftime('%Y-%m-%d'))
                 )
             )
-</code>
-<code id='lefty-code'>    class EmployeePage(TempyREPR):
+
+    class EmployeePage(TempyREPR):
         def repr(self):
             self(
                 Div(klass='employee')(
@@ -131,16 +133,18 @@ class Employee(Base):
                     Div()('Department: ', self.department),
                 )
             )
-</code>
+```
 
 Adding one or more `TempyREPR` into your models will provide the ability to just put instances of those models inside the DOM directly, and they will be rendered according to they're location.
 
 So making a table of employees will be very easy:
-<code id='lefty-code'>from tempy.tags import Table
-employees_table = Table()(Employee.query.all())</code>
-
+```python
+from tempy.tags import Table
+employees_table = Table()(Employee.query.all())
+```
 And making a employee page will be easy as well:
-<code id='lefty-code'>from tempy.widgest import TempyPage
+```python
+from tempy.widgest import TempyPage
 page = TempyPage().body(Employee.query.first())
-</code>
+```
 

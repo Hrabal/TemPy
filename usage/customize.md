@@ -52,16 +52,17 @@ Classes made with `T` are subclasses of `tempy.tempy.DOMElement` and behave like
 
 `T` can also produce TemPy tags from html strings on the fly. Using the `from_string` method it converts html strings into a list of TemPy trees:
 
-<code id='lefty-code'>from tempy import T
-html_string = '&lt;div&gt;I come from a &lt;i&gt;weird&lt;/i&gt; webservice or from an old file, &lt;b&gt;beware!&lt;/b&gt;&lt;/div&gt;'
+```python
+from tempy import T
+html_string = '<div>I come from a <i>weird</i> webservice or from an old file, <b>beware!</b></div>'
 parsed = T.from_string(html_string)
 div = parsed[0]
 div
-&gt;&gt;&gt; &lt;tempy.tags.Div 111803135243328262154888799873263607712. 4 childs.&gt;
+>>> <tempy.tags.Div 111803135243328262154888799873263607712. 4 childs.>
 div[0]
-&gt;&gt;&gt; 'I come from a '
+>>> 'I come from a '
 div[1]
-&gt;&gt;&gt; &lt;tempy.tags.I 42050800055174656216927079271212875762. Son of Div. 1 childs.&gt;
+>>> <tempy.tags.I 42050800055174656216927079271212875762. Son of Div. 1 childs.>
 div[1][0]
-&gt;&gt;&gt; 'weird'
-</code>
+>>> 'weird'
+```

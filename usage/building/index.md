@@ -3,6 +3,9 @@ layout: default
 title: Building HTML with Tempy
 permalink: /usage/building/
 ---
+
+# Using TemPy Instances
+
 TemPy object can be created and asssembled in a tree, each TemPy object can be used later inside another TemPy object.
 
 ```python

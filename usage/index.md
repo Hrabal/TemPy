@@ -3,6 +3,8 @@ layout: default
 title: Basic Usage
 permalink: /usage/
 ---
+# Basic components: TemPy tags
+
 ```python
 from tempy.tags import *
 ```
@@ -63,7 +65,6 @@ HTML tags have attributes, and so TemPy tags have too. It's possible to define t
 * during the element instantiation: `Div(some_attribute='some_value')`
 * using the `attr` API: `Div().attr(some_attribute='some_value')`
 
-```
 ```python
 # Add attributes and content to already placed tags
 link = A(id='verySpecialId')('This is a link to Python')
@@ -99,4 +100,4 @@ Calling `render` on some TemPy object will return the html representation of the
   * a `render` method will be searched and called if present into the child object.
   * if the object is a subclass of `Escaped`, the `Escaped`'s content is returned
   * if no other condition is met, `str()` will be called on the child
-* every content found will be joined using ''.join()
+* every content found will be joined using `''.join()`

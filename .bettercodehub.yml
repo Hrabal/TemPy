@@ -1,5 +1,0 @@
-languages:
-  - python
-exclude:
-  - /benchmarks/.*
-  - /examples/.*

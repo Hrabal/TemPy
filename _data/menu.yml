@@ -17,12 +17,10 @@
 - text: OOT - Object-Oriented Templating
   url: /oot/
   subitems:
+    - text: Template Objects
+      url: /oot/templating/
     - text: TempyREPR
       url: /oot/tempyrepr/
-    - text: Object-Oriented Templating
-      url: /oot/templating/
-    - text: Putting all together
-      url: /oot/building/
 - text: Performance
   url: /performance/
 - text: About
