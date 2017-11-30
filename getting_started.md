@@ -16,7 +16,7 @@ cd TemPy
 python3 setup.py install
 ```
 
-<aside class="notice">TemPy does not support Python 2.x. TemPy requires Python >= 3.3 to work.</aside>
+<aside class="info">TemPy does not support Python 2.x. TemPy requires Python >= 3.3 to work.</aside>
 
 TemPy is avaiable on PyPi, so you can pip him. [PyPi.org](https://pypi.org/project/tem-py/) page.
 

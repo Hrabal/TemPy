@@ -94,9 +94,9 @@ container.render()
 
 Calling `render` on some TemPy object will return the html representation of the tree starting from the current element including all the children.
 `tempy_object.render()` will:
-* render `tempy_object` own tag, with foud tag attributes
-* loop over `tempy_object` children to retrieve the tag inner content, for every child:
-  * a valid `TempyREPR` is searched inside the child class definition, if found it's used.
+* render `tempy_object` own tag and  attributes
+* loop over `tempy_object` children to retrieve the tag inner content, and for every child:
+  * a valid `TempyREPR` is searched inside the child class definition, and used if found to transform a non-TemPy object in a renderable object.
   * a `render` method will be searched and called if present into the child object.
   * if the object is a subclass of `Escaped`, the `Escaped`'s content is returned
   * if no other condition is met, `str()` will be called on the child

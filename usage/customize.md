@@ -5,7 +5,8 @@ permalink: /usage/customize/
 ---
 ## Subclassing Tempy tags
 
-It's possible to define custom tag subclassing either `tempy.elements.Tag` or `tempy.elements.VoidTag` providing a custom `__tag` attribute, a custom `__template` and/or a custom `render` method.
+It's possible to define custom tags subclassing `tempy.elements.Tag` or `tempy.elements.VoidTag`.
+A TemPy Tag subclass *should* implement a custom `__tag` attribute, *can* implement a custom `__template` and/or a custom `render` method.
 ```python
 from tempy.elements import Tag
 
@@ -20,6 +21,9 @@ Double()('content').render()
 ```
 
 ## TemPy Tags Factory
+```python
+from tempy import T
+```
 
 Another way to make custom tag is to use the `T` object. The T object is a multi-feature object that work as a class factory for custom tags.
 
@@ -34,7 +38,11 @@ issubclass(my_tag, Tag)
 >>> True
 my_tag().render()
 >>> <custom></custom>
+```
 
+Accessing an attribute/key of the T object will produce a TemPy Tag (of VoidTag) subclass named after the given attribute/key (in lowercase).
+
+```python
 my_tag = T['custom with spaces']
 my_tag().render()
 >>> <custom with spaces></custom with spaces>
@@ -44,8 +52,6 @@ my_void_tag = T.Void.CustomVoid
 my_void_tag().render()
 >>> <customvoid/>
 ```
-
-Accessing an attribute/key of the T object will produce a TemPy Tag (of VoidTag) subclass named after the given attribute/key (in lowercase).
 
 Classes made with `T` are subclasses of `tempy.tempy.DOMElement` and behave like any other TemPy Tag, they inherits the api and the features of TemPy objects.
 
