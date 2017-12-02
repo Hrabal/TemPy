@@ -11,9 +11,8 @@
       url: /usage/specials/
     - text: Using TemPy Objects
       url: /usage/building/
-      subitems:
-        - text: TemPy API
-          url: /usage/building/api/
+    - text: TemPy API
+      url: /usage/api/
 - text: OOT - Object-Oriented Templating
   url: /oot/
   subitems:
