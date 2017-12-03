@@ -360,6 +360,11 @@ class Css(Tag):
                 result.append("} " + ("\n\n" if pretty else ""))
         return self._template.format(css=''.join(result))
 
+    def dump(self, filename, **kwargs):
+        with open(filename, 'w') as file_to_write:
+            self._template = '{css}'
+            file_to_write.write(self.render(**kwargs))
+            self._template = '<style>{css}</style>'
 
 class Content(DOMElement):
     """
