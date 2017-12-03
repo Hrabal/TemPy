@@ -3,3 +3,6 @@ description: OOP Python Templating Engine.
 show_downloads: true
 baseurl: /TemPy
 theme: jekyll-theme-minimal
+repository: Hrabal/TemPy
+plugins:
+  - "jekyll-github-metadata"
