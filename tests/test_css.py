@@ -2,6 +2,7 @@
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
+import os
 import unittest
 from copy import copy
 from collections import Counter
@@ -62,3 +63,12 @@ class TestTag(unittest.TestCase):
         rendered_css = css.render()
         # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
         self.assertEqual(Counter(rendered_css), Counter(expected))
+
+    def test_dump(self):
+        css = Css({'div': {'color': 'blue'}})
+        expected = 'div { color: blue; } '
+        filename = 'temp.css'
+        css.dump(filename)
+        with open(filename, 'r') as f:
+            self.assertEqual(f.read(), expected)
+        os.remove(filename)

@@ -366,6 +366,7 @@ class Css(Tag):
             file_to_write.write(self.render(**kwargs))
             self._template = '<style>{css}</style>'
 
+
 class Content(DOMElement):
     """
     Provides the ability to use a simil-tag object as content placeholder.
