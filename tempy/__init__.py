@@ -6,7 +6,7 @@ from .elements import Tag, VoidTag, Css, Content
 from .tempyrepr import TempyREPR
 from .places import TempyPlace
 from .t import T
-
+from .tempy import Escaped
 
 __version__ = '1.1.0'
 VERSION = tuple(map(int, __version__.split('.')))
