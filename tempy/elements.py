@@ -54,7 +54,8 @@ class TagAttrs(dict):
 
     def __setitem__(self, key, value):
         if key in self._SET_VALUES_ATTRS:
-            self[key].add(value)
+            for v in value.split():
+                self[key].add(v)
         elif key in self._MAPPING_ATTRS:
             if isinstance(value, str):
                 splitted = iter(re.split(';|:', value))
