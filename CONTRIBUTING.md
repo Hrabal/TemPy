@@ -1,18 +1,39 @@
-## Tempy | Contibution program and guidelines
+# Tempy | Contibution program and guidelines
 
-### Guidelines
-Any contribution is welcome, fork and PR if you have some ideas you want to code or you found a bug, I'll check them out.
+## Guidelines
+Any contribution is welcome.
+The TODO list below is a general plan of what I (we!) intend to do next. You can find the actual planned activities looking  in the [Issues](https://github.com/Hrabal/TemPy/issues) of this repo.
 
-Please write tests for your new proposed features and run already written tests for any contribution you make.
-Test are important, no merge will be made without some test coverage. If you don't know how to write/run tests ask (Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html) )
+If you want to propose (or ask for) a new feature, if you want to propose a refactor of some part of code or if you find a bug please open a new Issue with your idea.
+
+Every contribution *should* have it's tests and have to pass already written tests.
+Test are important, no merge will be made without some test coverage. If you don't know how to write/run tests just AMA on our  [Slack](https://tempy-dev.slack.com) channel. 
+Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html), every PR you make will be analysed by [Travis CI](https://travis-ci.org/Hrabal/TemPy).
 
 Contact me if you want to help maintaining this project or if you are willing to suggest ideas.
+We have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask for an invitation to federicocerchiari @ gmail . com).
 
-Open an Issue to ask for features, develop some of the next goals, or report a bug.
+### Code Style
+This project does not have a coding style guideline (except [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP20](https://www.python.org/dev/peps/pep-0020/) of course) , just code as you like to code!
 
-I have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask for an invitation at federicocerchiari @ gmail . com).
+## Workflow
+Every development is tracked using Issues. If you want to work on a specific issue ask for assignement. And if you don't find an issue for what you want to work on open a new issue with your proposed development.
 
-### TODO plan:
+Small (2/3 commits, 1 contributor) contributions should follow this simple workflow:
+- Ask to be assigned to the issue
+- Fork this repo: [GitHub guide on forking](https://help.github.com/articles/fork-a-repo/)
+- Do the coding on the forked repo in the master branch
+- Make a Pull Request: [GitHub guide on making a PR](https://help.github.com/articles/about-pull-requests/)
+Some CI and code quality services will be triggered and 5/10 mins after your PR you'll see in the PR page if your contribution is breaking some tests, if it contain some code that can be made better and if it have a good test coverage.
+I'll check the PR and merge, or review your code if I have suggestions on something you wrote.
+
+Bigger developments (i.e: a new widget, a new complex feature, a deep refactor, more than one person working on the feature) etc..) will follow a different workflow:
+- Discuss the development strategy on the Issue
+- Discuss particular problems in the Slack channel
+- I'll make a new branch dedicated to this feature with no CI
+- When the feature is ready I'll perform the merge into the master branch
+
+## TODO plan:
 Planned evolution of this project:
 - [ ] `stable` concept refactor... there should be a better way!
 - [ ] New class: `CssManager` (or something like that) that extracts common style properties from a formed DOM, creates the `Css` instance and adds it in the `<head>`. Extra feature: dumps the css to a versioned file in the static folder and adds a link to this file in the page.
