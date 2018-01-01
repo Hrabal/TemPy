@@ -290,7 +290,7 @@ class VoidTag(Tag):
 
 class Css(Tag):
     """Special class for the style tag.
-    Css attributes can be altered with the .attr Tag api. At render time the attr dict is transformed in valid css:
+    Css attributes can be altered with the Css.update method. At render time the attr dict is transformed in valid css:
     Css({'html': {
             'body': {
                 'color': 'red',
@@ -332,6 +332,19 @@ class Css(Tag):
                 css_styles = dict(ChainMap(*args[0]))
         css_styles.update(kwargs)
         super().__init__(css_attrs=css_styles)
+
+    def update(self, *args, **kwargs):
+        css_styles = self.attrs['css_attrs']
+        if args:
+            if len(args) > 1:
+                raise WrongContentError(self, args, 'Css.update accepts max one positional argument.')
+            if isinstance(args[0], dict):
+                css_styles.update(args[0])
+            elif isinstance(args[0], Iterable):
+                if any(map(lambda x: not isinstance(x, dict), args[0])):
+                    raise WrongContentError(self, args, 'Unexpected arguments.')
+                css_styles = dict(ChainMap(*args[0]))
+        css_styles.update(kwargs)
 
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
