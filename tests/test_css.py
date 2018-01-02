@@ -61,7 +61,7 @@ class TestTag(unittest.TestCase):
         add_compare_dict.update(add_dict)
 
         modify_compare_dict = copy(self.css_dict)
-        modify_compare_dict.update(compare_dict)
+        modify_compare_dict.update(modify_dict)
 
         # Test add from dict
         css = Css(self.css_dict)
@@ -71,7 +71,7 @@ class TestTag(unittest.TestCase):
         # Test modify from dict
         css = Css(self.css_dict)
         css.update(modify_dict)
-        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in add_modify_dict.items()))
+        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in modify_compare_dict.items()))
 
         # Test add from unpacked dict
         css = Css(self.css_dict)
