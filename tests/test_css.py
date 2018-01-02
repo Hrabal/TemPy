@@ -53,6 +53,44 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(WrongContentError):
             Css(['test', 'wrong'])
 
+    def test_update(self):
+        add_dict = {'div': {'color': 'blue'}}
+        modify_dict = {'html': {'background-color': 'black'}}
+
+        add_compare_dict = copy(self.css_dict)
+        add_compare_dict.update(add_dict)
+
+        modify_compare_dict = copy(self.css_dict)
+        modify_compare_dict.update(modify_dict)
+
+        # Test add from dict
+        css = Css(self.css_dict)
+        css.update(add_dict)
+        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in add_compare_dict.items()))
+
+        # Test modify from dict
+        css = Css(self.css_dict)
+        css.update(modify_dict)
+        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in modify_compare_dict.items()))
+
+        # Test add from unpacked dict
+        css = Css(self.css_dict)
+        css.update(**add_dict)
+        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in add_compare_dict.items()))
+
+        # Test modify from unpacked dict
+        css = Css(self.css_dict)
+        css.update(**modify_dict)
+        self.assertTrue(all(item in css.attrs['css_attrs'].items() for item in modify_compare_dict.items()))
+
+        with self.assertRaises(WrongContentError):
+            css = Css(self.css_dict)
+            css.update('test', 'wrong')
+
+        with self.assertRaises(WrongContentError):
+            css = Css(self.css_dict)
+            css.update(['test', 'wrong'])
+
     def test_function_content(self):
         css = Css({'h1': {'color': lambda: 'TEST'}})
         self.assertTrue('TEST' in css.render())
