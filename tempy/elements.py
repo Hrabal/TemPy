@@ -320,6 +320,10 @@ class Css(Tag):
     _template = '<style>{css}</style>'
 
     def __init__(self, *args, **kwargs):
+        css_styles = self._parse__args(*args, **kwargs)
+        super().__init__(css_attrs=css_styles)
+
+    def _parse__args(self, *args, **kwargs):
         css_styles = {}
         if args:
             if len(args) > 1:
@@ -331,20 +335,11 @@ class Css(Tag):
                     raise WrongContentError(self, args, 'Unexpected arguments.')
                 css_styles = dict(ChainMap(*args[0]))
         css_styles.update(kwargs)
-        super().__init__(css_attrs=css_styles)
+        return css_styles
 
     def update(self, *args, **kwargs):
-        css_styles = self.attrs['css_attrs']
-        if args:
-            if len(args) > 1:
-                raise WrongContentError(self, args, 'Css.update accepts max one positional argument.')
-            if isinstance(args[0], dict):
-                css_styles.update(args[0])
-            elif isinstance(args[0], Iterable):
-                if any(map(lambda x: not isinstance(x, dict), args[0])):
-                    raise WrongContentError(self, args, 'Unexpected arguments.')
-                css_styles = dict(ChainMap(*args[0]))
-        css_styles.update(kwargs)
+        css_styles = self._parse__args(*args, **kwargs)
+        self.attrs['css_attrs'].update(css_styles)
 
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
