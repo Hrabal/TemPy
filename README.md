@@ -7,15 +7,15 @@
 
 ### What
 Build HTML without writing a single tag.
-TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar sintax.
+TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar syntax.
 
 ### Why?
 HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
-Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)..
-..so the idea of TemPy.
+Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow)
+... so the idea of TemPy.
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
+No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
 See below for benchmarks against other templating engines.
 
 ## Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
@@ -163,7 +163,7 @@ class BasePage(TempyPage):
             )
         )
     
-    # Your subclass can have his own methods like any other class
+    # Your subclass can have its own methods like any other class
     def make_menu(self, typ):
         return Div(klass='menu')(
                             Nav()(
@@ -209,7 +209,7 @@ class HomePage(BasePage):
                      Div()(comment for comment in current_content.comments))
 ```
 
-TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in his parent classes.
+TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in its parent classes.
 
 #### TemPy repr's
 

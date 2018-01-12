@@ -4,9 +4,9 @@
 Any contribution is welcome.
 The TODO list below is a general plan of what I (we!) intend to do next. You can find the actual planned activities looking  in the [Issues](https://github.com/Hrabal/TemPy/issues) of this repo.
 
-If you want to propose (or ask for) a new feature, if you want to propose a refactor of some part of code or if you find a bug please open a new Issue with your idea.
+If you want to propose (or ask for) a new feature, if you want to propose a refactoring of some part of the code, or if you find a bug, please open a new Issue with your idea.
 
-Every contribution *should* have it's tests and have to pass already written tests.
+Every contribution *should* have its tests and will have to pass already written tests.
 Test are important, no merge will be made without some test coverage. If you don't know how to write/run tests just AMA on our  [Slack](https://tempy-dev.slack.com) channel. 
 Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html), every PR you make will be analysed by [Travis CI](https://travis-ci.org/Hrabal/TemPy).
 
@@ -38,18 +38,18 @@ Planned evolution of this project:
 - [ ] `stable` concept refactor... there should be a better way!
 - [ ] New class: `CssManager` (or something like that) that extracts common style properties from a formed DOM, creates the `Css` instance and adds it in the `<head>`. Extra feature: dumps the css to a versioned file in the static folder and adds a link to this file in the page.
 - [x] Better exception handling.
-- [x] Manage Tempy object subclassing to use a custom object as a renderable for businnes logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
+- [x] Manage Tempy object subclassing to use a custom object as a renderable for business logic item (i.e: SQLAlchemy's declarative with a Tempy template in it that can be rendered at ease)
 - [x] TemPy widgets, see the widget branch.
 - [x] Better pretty formatting.
 - [x] Writing more tests.
 
-see [open issues](https://github.com/Hrabal/TemPy/issues) for a complete list of contribution opportunities.
+See [open issues](https://github.com/Hrabal/TemPy/issues) for a complete list of contribution opportunities.
 
 Ideas I'm thinking about:
 - [x] Html to TemPy command line converter tool, accepts plain html and makes a .py tempy module.
 - ~~Python 2 compatibility (maybe?).~~
-- [ ] Performance: always needed, maybe a `_partial_render` method that traverse the html tree in a depth-first reverse order and "stabilize" all the leafs? Is this useful?
+- [ ] Performance: always needed, maybe a `_partial_render` method that traverses the html tree in a depth-first reverse order and "stabilizes" all the leafs? Is this useful?
 - [ ] Adding .find method to the T object use with css-like selectors (i.e: `Html().find('#myid')`)?
 - [x] Adding a jQuery-ish god object `T` to use as a find method inside a DOMElement sublass (i.e: `T('#myid').some_tempy_method()`)?
 - Cache for css builder module in a separate script (i.e: `shell >>> tempy -build_css my_template.py` outputs a css in the static folder and the `CssManager` search for that version in the statics before doing any work)?
-- Any suggestion?
+- Any suggestions?
