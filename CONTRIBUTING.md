@@ -4,10 +4,10 @@
 Any contribution is welcome.
 The TODO list below is a general plan of what I (we!) intend to do next. You can find the actual planned activities looking  in the [Issues](https://github.com/Hrabal/TemPy/issues) of this repo.
 
-If you want to propose (or ask for) a new feature, if you want to propose a refactoring of some part of the code, or if you find a bug, please open a new Issue with your idea.
+If you want to propose (or ask for) a new feature, if you want to propose a refactoring of some part of the code, or if you find a bug, please open a new issue with your idea.
 
 Every contribution *should* have its tests and will have to pass already written tests.
-Test are important, no merge will be made without some test coverage. If you don't know how to write/run tests just AMA on our  [Slack](https://tempy-dev.slack.com) channel. 
+Tests are important, and no merge will be made without some test coverage. If you don't know how to write/run tests just AMA on our  [Slack](https://tempy-dev.slack.com) channel. 
 Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html), every PR you make will be analysed by [Travis CI](https://travis-ci.org/Hrabal/TemPy).
 
 Contact me if you want to help maintaining this project or if you are willing to suggest ideas.
@@ -17,7 +17,7 @@ We have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask fo
 This project does not have a coding style guideline (except [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP20](https://www.python.org/dev/peps/pep-0020/) of course) , just code as you like to code!
 
 ## Workflow
-Every development is tracked using Issues. If you want to work on a specific issue ask for assignement. And if you don't find an issue for what you want to work on open a new issue with your proposed development.
+Every development is tracked using Issues. If you want to work on a specific issue, ask for assignement. And if you don't find an issue for what you want to work on, open a new issue with your proposed development.
 
 Small (2/3 commits, 1 contributor) contributions should follow this simple workflow:
 - Ask to be assigned to the issue
