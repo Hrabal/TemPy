@@ -5,14 +5,13 @@
 [![PyPI version](https://badge.fury.io/py/tem-py.svg)](https://badge.fury.io/py/tem-py) [![PyPI version](https://img.shields.io/badge/python-%3E%3D%203.3-blue.svg)](https://pypi.org/project/tem-py/) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![codebeat badge](https://codebeat.co/badges/d8820f91-3b3e-422b-b5cf-062cb7c8d805)](https://codebeat.co/projects/github-com-hrabal-tempy-master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b35654867b91423e98511db6c22b6317)](https://www.codacy.com/app/federicocerchiari/TemPy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Hrabal/TemPy&amp;utm_campaign=Badge_Grade) [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/Hrabal/TemPy/master/LICENSE)
 ### Fast Object-Oriented HTML templating With Python!
 
-### What
+### What?
 Build HTML without writing a single tag.
 TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar syntax.
 
 ### Why?
 HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
-Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow)
-... so the idea of TemPy.
+Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow) ... so the idea of TemPy emerges.
 
 ### Weeeeeeee!
 No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
@@ -20,7 +19,7 @@ See below for benchmarks against other templating engines.
 
 ## Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 
-### **Build, manipulate, and navigate HTML documents. With no HTML involved.**
+### **Build, manipulate, and navigate HTML documents, with no HTML involved.**
 
 
 Overview: 
@@ -41,7 +40,7 @@ Or clone/download this repository and run `python3 setup.py install`
 
 ### Building the DOM
 
-#### basic usage
+#### Basic Usage
 
 TemPy offers clean syntax for building pages in pure python:
 ```python
@@ -93,8 +92,8 @@ page.render()
 >>> </html>
 ```
 
-#### Building blocks
-You can also create blocks and put them together using the manipulation api, each TemPy object can be used later inside other TemPy object:
+#### Building Blocks
+You can also create blocks and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
 ```python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
@@ -127,7 +126,7 @@ def my_content_controller(url='/content'):
 ```
 
 #### OOT - Object Oriented Templating
-TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom html tree structures to use as blocks.
+TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom HTML tree structures to use as blocks.
 
 ```python
 from tempy.widgets import TempyPage
@@ -182,7 +181,7 @@ class BasePage(TempyPage):
 
 ```
 
-..you can then sublass your custom TemPy object to add specific behavior:
+...you can then sublass your custom TemPy object to add specific behavior:
 ```python
 class HomePage(BasePage):
 
@@ -211,7 +210,7 @@ class HomePage(BasePage):
 
 TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in its parent classes.
 
-#### TemPy repr's
+#### TemPy Reprs
 
 Another way to use TemPy is to define a nested `TempyREPR` class inside your classes:
 ```python
@@ -229,14 +228,14 @@ class MyClass:
 ```
 You can think the `TempyREPR` as a `__repr__` equivalent, so when an instance is placed inside a TemPy tree, the `TempyREPR` subclass is used to render the instance.
 
-You can define several `TempyREPR` nested classes, when dealing with non-TemPy object TemPy will search for a `TempyREPR` subclass following this priority:
-* a `TempyREPR` subclass with the same name of his TemPy container
-* a `TempyREPR` subclass with the same name of his TemPy container's root
-* a `TempyREPR` subclass named `HtmlREPR`
+You can define several `TempyREPR` nested classes, and when dealing with a non-TemPy object, TemPy will search for a `TempyREPR` subclass following this priority:
+* a `TempyREPR` subclass with the same name of his TemPy container.
+* a `TempyREPR` subclass with the same name of his TemPy container's root.
+* a `TempyREPR` subclass named `HtmlREPR`.
 * the first `TempyREPR` found.
-* if none of the previous if found, the object will be rendered calling his `__str__` method
+* if none of the previous if found, the object will be rendered calling his `__str__` method.
 
-You can use this order to set different renderings for different situation/pages:
+You can use this order to set different renderings for different situations/pages:
 
 ```python
 class MyClass:
@@ -270,7 +269,7 @@ class MyClass:
             self('Hello World, this is bar: ', self.bar)
 ```
 
-### Elements api
+### Elements API
 Create DOM elements by instantiating tags:
 ```python
 page = Html()
@@ -282,7 +281,7 @@ Add elements or content by calling them like a function...
 page(Head())
 >>> <html><head></head></html>
 ```
-...or use one of the jQuery-like apis:
+...or use one of the jQuery-like APIs:
 ```python
 body = Body()
 page.append(body)
@@ -303,7 +302,7 @@ page.pop()
 >>> <html></html>
 ```
 
-Several api's are provided to modify you're existing DOM elements:
+Several APIs are provided to modify you're existing DOM elements:
 ```python
 div1 = Div()
 div2 = Div()
@@ -353,7 +352,7 @@ div2.css('background-color', 'blue')
 >>> <div id="another_dom_id" class="someHtmlClass comeOtherClass" style="width: 100px; float: left; height: 100em; background-color: blue"></div>
 ```
 
-### DOM navigation
+### DOM Navigation
 
 Every TemPy Tag content is iterable and accessible like a Python list:
 ```python
@@ -390,7 +389,7 @@ container_div[0][4].attr(id='pId')
 >>> </div>
 ```
 
-...or access elements inside a container as if it they were attributes:
+...or access elements inside a container as if they were attributes:
 ```python
 container_div = Div()
 container_div(content_div=Div())
@@ -400,7 +399,7 @@ container_div.content_div('Some content')
 ```
 
 
-..or if you feel jQuery-ish you can use:
+...or if you feel jQuery-ish you can use:
 ```python
 container_div.children()
 container_div.first()
@@ -413,11 +412,12 @@ container_div.slice()
 ```
 
 # Performance
-Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output and many other factors.
+Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output, and many other factors.
 
-TemPy does not parse strings, does not use regex and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
+TemPy does not parse strings, does not use regex, and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
-Here are a few benchmarks of TemPy in action, used in a Flask app, rendering a template (see code [here](benchmarks))
+Here are a few benchmarks of TemPy in action, used in a Flask app, rendering a template (see code [here](benchmarks)).
+
 Used HW: 2010 IMac, CPU:2,8 GHz Intel Core i7 RAM:16 GB 1067 MHz DDR3 Osx: 10.12.6.
 Benchmark made using [WRK](https://github.com/wg/wrk)
 
