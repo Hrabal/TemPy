@@ -232,4 +232,3 @@ class TestTempyPage(unittest.TestCase):
         page = TempyPage()
         page.set_title('test title')
         self.assertEqual(page.head.title.attrs['content'], 'test title')
-        
