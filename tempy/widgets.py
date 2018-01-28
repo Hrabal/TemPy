@@ -66,6 +66,14 @@ class TempyPage(Html):
         return self
 
 
+        ### wrote this ####
+
+    def set_title(Self, title):
+        """Changes the <meta> title tag."""
+        self.head.title.attr(content=title)
+        return self
+
+
 class TempyTable(Table):
     """Table widget.
     Creates a simple table structure using the give data, ora an empty table of the given size.self
