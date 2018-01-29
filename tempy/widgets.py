@@ -205,6 +205,17 @@ class TempyTable(Table):
         elif row_index >= 0 and (row_index < len(self.body.childs)):
             self.body.childs[row_index].attr(klass=css_class)
 
+    def map_col(self, col_function, col_index=None):
+        # applies to every cell
+        if col_index is None:
+            for row in self.body.childs:
+                for cell in row.childs:
+                    cell.childs[0] = col_function(cell.childs[0])
+        elif col_index >= 0:
+            for row in self.body.childs:
+                if col_index < len(row.childs):
+                    row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
+
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
     Plain iterables will produce plain lists, nested dicts will produce nested lists.

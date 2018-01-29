@@ -24,8 +24,14 @@ css_tag = Css({
 # set class for every cell
 table1.col_class('class_example_2')
 
+#applies function to upper string for every cell
+table1.map_col(lambda x: x.upper())
+
 # set class for first column of each row
 table2.col_class('class_example_1', 0)
+
+#applies function to lower string for second column
+table2.map_col(lambda x: x.lower(), 1)
 
 # set class for every row
 table3.row_class('class_example_3')
