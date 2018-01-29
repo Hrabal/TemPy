@@ -32,5 +32,11 @@ def static_files_handler():
     from templates.static_files import page
     return page.render()
 
+@app.route('/table')
+def table_handler():
+    from templates.table_example import page
+    return page.render()
+
+
 if __name__ == '__main__':
     app.run(port=8888, debug=True)

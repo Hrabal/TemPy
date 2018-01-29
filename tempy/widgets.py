@@ -68,7 +68,7 @@ class TempyPage(Html):
 
 class TempyTable(Table):
     """Table widget.
-    Creates a simple table structure using the give data, ora an empty table of the given size.self
+    Creates a simple table structure using the give data, or an empty table of the given size.self
     params:
     data: an iterable of iterables in this form [[col1, col2, col3], [col1, col2, col3]]
     rows, columns: size of the table if no data is given
@@ -82,26 +82,27 @@ class TempyTable(Table):
                  head=False, foot=False, **kwargs):
         super().__init__(**kwargs)
         self(body=Tbody())
-        # Initialize empty datastructure if data is not given
+        # Initialize empty data structure if data is not given
         if not data:
             data = [[None for _ in range(cols)]
                     for _ in range(rows + sum((head, foot)))]
+        table_data = copy(data)
         if caption:
             self.make_caption(caption)
-        if head:
-            self.make_header(data.pop(0))
-        if foot:
-            self.make_footer(data.pop())
+        if head and rows > 0:
+            self.make_header(table_data.pop(0))
+        if foot and rows > 0:
+            self.make_footer(table_data.pop())
         if data:
-            self.populate(data, resize_x=True)
+            self.populate(table_data, resize_x=True)
 
     def _check_row_size(self, row):
         try:
-            row_lenght = len(row)
+            row_length = len(row)
         except TypeError:
-            row_lenght = row
-        if self.body.childs and max(map(len, self.body)) < row_lenght:
-            raise WidgetDataError(self, 'The given data have more columns than the table.')
+            row_length = row
+        if self.body.childs and max(map(len, self.body)) < row_length:
+            raise WidgetDataError(self, 'The given data has more columns than the table column size.')
 
     def populate(self, data, resize_x=True, normalize=True):
         """Adds/Replace data in the table.
@@ -113,7 +114,6 @@ class TempyTable(Table):
         if data is None:
             raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
         data = copy(data)
-
         if not self.body:
             # Table is empty
             self(body=Tbody())
@@ -181,11 +181,20 @@ class TempyTable(Table):
         self._make_table_part('footer', footer)
 
     def make_caption(self, caption):
-        """Adds/Sobstitute the table's caption."""
+        """Adds/Substitutes the table's caption."""
         if not hasattr(self, 'caption'):
             self(caption=Caption())
         return self.caption.empty()(caption)
 
+    def col_class(self, css_class, col_index=None):
+        if col_index is None:
+            for row in self.body.childs:
+                for cell in row.childs:
+                    cell.attr(klass=css_class)
+        elif col_index >= 0:
+            for row in self.body.childs:
+                if col_index < len(row.childs):
+                    row.childs[col_index].attr(klass=css_class)
 
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
