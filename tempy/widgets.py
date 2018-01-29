@@ -187,6 +187,7 @@ class TempyTable(Table):
         return self.caption.empty()(caption)
 
     def col_class(self, css_class, col_index=None):
+        #adds css_class to every cell
         if col_index is None:
             for row in self.body.childs:
                 for cell in row.childs:
@@ -195,6 +196,14 @@ class TempyTable(Table):
             for row in self.body.childs:
                 if col_index < len(row.childs):
                     row.childs[col_index].attr(klass=css_class)
+
+    def row_class(self, css_class, row_index=None):
+        # adds css_class to every row
+        if row_index is None:
+            for row in self.body.childs:
+                row.attr(klass=css_class)
+        elif row_index >= 0 and (row_index < len(self.body.childs)):
+            self.body.childs[row_index].attr(klass=css_class)
 
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
