@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from tempy import Html, Head, Title, Body, Div, Content, Br, B, P
+
+from tempy.tags import *
 
 page = Html()(
     Head()(
