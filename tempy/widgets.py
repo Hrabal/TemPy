@@ -65,6 +65,11 @@ class TempyPage(Html):
         self.head.keywords.attr(content=', '.join(keywords))
         return self
 
+    def set_title(self, title):
+        """Changes the <meta> title tag."""
+        self.head.title.attr(content=title)
+        return self
+
 
 class TempyTable(Table):
     """Table widget.

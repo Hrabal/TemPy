@@ -227,3 +227,8 @@ class TestTempyPage(unittest.TestCase):
         page.set_doctype('html_strict')
         charset_string = 'HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"'
         self.assertTrue(charset_string in page.render())
+
+    def test_title(self):
+        page = TempyPage()
+        page.set_title('test title')
+        self.assertEqual(page.head.title.attrs['content'], 'test title')
