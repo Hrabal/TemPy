@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 from flask import Flask
 
 app = Flask(__name__)
@@ -16,8 +17,9 @@ def hello_world_handler():
 @app.route('/star_wars')
 def star_wars_handler():
     from templates.star_wars import page
-    with open('sw-people.json', 'r') as f:
-        people = list(json.load(f).values())
+    json_filename = os.path.join(app.static_folder, 'sw-people.json')
+    with open(json_filename, 'r') as f:
+        people = json.load(f)['characters']
     return page.render(characters=people)
 
 @app.route('/list')
