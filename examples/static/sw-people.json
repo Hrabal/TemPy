@@ -1,0 +1,17 @@
+{
+    "characters": {
+        "name": "Han Solo",
+        "height": "1.8 meters",
+        "mass": "80 kg",
+        "hair_color": "Brown",
+        "skin_color": "Light",
+        "eye_color": "Brown",
+        "birth_year": "29 BBY",
+        "gender": "Male",
+        "homeworld": "Corellia",
+        "created": "",
+        "edited": "",
+        "url": "http://starwars.wikia.com/wiki/Han_Solo/Legends"
+    }
+
+}
