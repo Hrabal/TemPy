@@ -36,8 +36,14 @@ table2.map_col(lambda x: x.lower(), 1)
 # set class for every row
 table3.row_class('class_example_3')
 
+#applies function to upper string for every row
+table3.map_row(lambda x: x.upper())
+
 # set class for second row
 table4.row_class('class_example_3', 1)
+
+#applies function to lower string for second row
+table4.map_row(lambda x: x.lower(), 1)
 
 page = Html()(
     Head()(

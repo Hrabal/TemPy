@@ -112,7 +112,8 @@ class TempyTable(Table):
         normalize: if True all the rows will have the same number of columns, if False, data structure is followed.
         """
         if data is None:
-            raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
+            raise WidgetDataError(self,
+                                  'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
         data = copy(data)
         if not self.body:
             # Table is empty
@@ -166,7 +167,7 @@ class TempyTable(Table):
         part_tag, inner_tag = {
             'header': (Thead, Th),
             'footer': (Tfoot, Td)
-            }.get(part)
+        }.get(part)
         part_instance = part_tag().append_to(self)
         if not hasattr(self, part):
             setattr(self, part, part_instance)
@@ -187,7 +188,7 @@ class TempyTable(Table):
         return self.caption.empty()(caption)
 
     def col_class(self, css_class, col_index=None):
-        #adds css_class to every cell
+        # adds css_class to every cell
         if col_index is None:
             for row in self.body.childs:
                 for cell in row.childs:
@@ -206,15 +207,29 @@ class TempyTable(Table):
             self.body.childs[row_index].attr(klass=css_class)
 
     def map_col(self, col_function, col_index=None):
-        # applies to every cell
+        # applies function to every cell
         if col_index is None:
             for row in self.body.childs:
                 for cell in row.childs:
-                    cell.childs[0] = col_function(cell.childs[0])
+                    if len(cell.childs) > 0:
+                        cell.childs[0] = col_function(cell.childs[0])
         elif col_index >= 0:
             for row in self.body.childs:
-                if col_index < len(row.childs):
+                if col_index < len(row.childs) and len(row.childs[col_index].childs) > 0:
                     row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
+
+    def map_row(self, row_function, row_index=None):
+        # applies function to every row
+        if row_index is None:
+            for row in self.body.childs:
+                for cell in row.childs:
+                    if len(cell.childs) > 0:
+                        cell.childs[0] = row_function(cell.childs[0])
+        elif row_index >= 0 and (row_index < len(self.body.childs)):
+            for cell in self.body.childs[row_index].childs:
+                if len(cell.childs) > 0:
+                    cell.childs[0] = row_function(cell.childs[0])
+
 
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.
@@ -231,6 +246,7 @@ class TempyListMeta:
     List building is made through the TempyList.populate method; this will trasform a python datastructure
     (list/tuple/dict/etc..) in a Tempy tree.
     """
+
     def __init__(self, struct=None):
         self._typ = self.__class__.__bases__[1]
         self._TempyList__tag = getattr(self._typ, '_%s__tag' % self._typ.__name__)
@@ -307,6 +323,7 @@ class TempyListMeta:
 class TempyList:
     """TempyList is a class factory, it works for both ul and ol lists (TODO: dl).
     See TempyListMeta for TempyList methods and docstings."""
+
     def __new__(cls, typ=None, struct=None):
         try:
             typ = struct.pop('_typ')
