@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from tempy import Html, Head, Title, Body, Div, Content, Br, B, P
+from tempy.tags import *
+from tempy.elements import *
 
 character = Div(klass='chr')(
         B()(Content('name')),
@@ -26,7 +27,7 @@ page = Html()(
         Div(klass='page')(
             'All the Star Wars characters!',
             Br(),
-            Content('characters', template=character)
+            Content('characters', t_repr=character)
             )
         )
     )

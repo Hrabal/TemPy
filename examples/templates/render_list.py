@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from tempy import Html, Head, Title, Body, Div, Content, Br, B, P
+from tempy.tags import *
 
 words = ["These", "are", "all", "in", "seperate", "divs!",]
 
