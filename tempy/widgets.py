@@ -191,13 +191,14 @@ class TempyTable(Table):
     def col_class(self, css_class, col_index=None):
         # adds css_class to every cell
         if col_index is None:
-            for row in self.body.childs:
-                for cell in row.childs:
-                    cell.attr(klass=css_class)
-        else:
-            for row in self.body.childs:
-                if self.is_col_within_bounds(col_index, row):
-                    row.childs[col_index].attr(klass=css_class)
+            gen = ((row, cell) for row in self.body.childs for cell in row.childs)
+            for (row, cell) in gen:
+                cell.attr(klass=css_class)
+            return
+
+        for row in self.body.childs:
+            if self.is_col_within_bounds(col_index, row):
+                row.childs[col_index].attr(klass=css_class)
 
     def row_class(self, css_class, row_index=None):
         # adds css_class to every row
@@ -207,35 +208,48 @@ class TempyTable(Table):
         elif self.is_row_within_bounds(row_index):
             self.body.childs[row_index].attr(klass=css_class)
 
-    def map_col(self, col_function, col_index=None):
+    def map_col(self, col_function, col_index=None, ignore_errors=True):
         # applies function to every cell
         if col_index is None:
             self.map_table(col_function)
-        else:
-            for row in self.body.childs:
-                if self.is_col_within_bounds(col_index, row):
-                    row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
+            return
 
-    def map_row(self, row_function, row_index=None):
+        gen = (row for row in self.body.childs if self.is_col_within_bounds(col_index, row))
+        try:
+            for row in gen:
+                row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
+        except:
+            if not ignore_errors:
+                raise WidgetError(cls, 'Function call error.')
+
+
+    def map_row(self, row_function, row_index=None, ignore_errors=True):
         # applies function to every row
         if row_index is None:
             self.map_table(row_function)
-        elif self.is_row_within_bounds(row_index):
-            for cell in self.body.childs[row_index].childs:
-                if len(cell.childs) > 0:
+            return
+
+        if self.is_row_within_bounds(row_index):
+            gen = (cell for cell in self.body.childs[row_index].childs if len(cell.childs) > 0)
+            try:
+                for cell in gen:
                     cell.childs[0] = row_function(cell.childs[0])
+            except:
+                if not ignore_errors:
+                    raise WidgetError(cls, 'Function call error.')
 
-    def map_table(self, format_function):
+    def map_table(self, format_function, ignore_errors=True):
         for row in self.body.childs:
-            for cell in row.childs:
-                if len(cell.childs) > 0:
-                    cell.childs[0] = format_function(cell.childs[0])
+            gen = (cell for cell in row.childs if len(cell.childs) > 0)
+            try:
+                for cell in gen:
+                    cell.childs[0] = row_function(cell.childs[0])
+            except:
+                if not ignore_errors:
+                    raise WidgetError(cls, 'Function call error.')
 
-    """
-    Makes scopes and converts Td to Th for given arguments
-    which represent lists of tuples (row_index, col_index)
-    """
-
+    """Makes scopes and converts Td to Th for given arguments
+    which represent lists of tuples (row_index, col_index)"""
     def make_scope(self, col_scope_list=None, row_scope_list=None):
         if col_scope_list is not None and len(col_scope_list) > 0:
             self.apply_scope(col_scope_list, 'col')
@@ -245,19 +259,14 @@ class TempyTable(Table):
 
     def apply_scope(self, scope_list, scope_tag):
         gen = ((row_index, col_index) for row_index, col_index in scope_list
-               if self.is_cell_within_table_bounds(row_index, col_index))
+               if self.is_row_within_bounds(row_index) and
+                  self.is_col_within_bounds(col_index, self.body.childs[row_index]))
 
         for row_index, col_index in gen:
             cell = self.body.childs[row_index].childs[col_index]
             self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
             self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
             self.body.childs[row_index].childs[col_index].attr(scope=scope_tag)
-
-    def is_cell_within_table_bounds(self, row_index, col_index):
-        if (row_index >= 0) and (row_index < len(self.body.childs)) and \
-                (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)):
-            return True
-        raise WidgetDataError(self, 'Row and column indexes should be within table bounds')
 
     def is_row_within_bounds(self, row_index):
         if row_index >= 0 and (row_index < len(self.body.childs)):
