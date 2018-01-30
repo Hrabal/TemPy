@@ -230,6 +230,30 @@ class TempyTable(Table):
                 if len(cell.childs) > 0:
                     cell.childs[0] = row_function(cell.childs[0])
 
+    """
+    Makes scopes and converts Td to Th for given arguments
+    which represent lists of tuples (row_index, col_index)
+    """
+    def make_scope(self, col_scope_list=None, row_scope_list=None):
+        if col_scope_list is not None and len(col_scope_list) > 0:
+            gen = ((row_index, col_index) for row_index, col_index in col_scope_list
+                   if (row_index >= 0) and (row_index < len(self.body.childs)) and
+                   (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)))
+            for row_index, col_index in gen:
+                cell = self.body.childs[row_index].childs[col_index]
+                self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
+                self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
+                self.body.childs[row_index].childs[col_index].attr(scope='col')
+
+        if row_scope_list is not None and len(row_scope_list) > 0:
+            gen = ((row_index, col_index) for row_index, col_index in row_scope_list
+                   if (row_index >= 0) and (row_index < len(self.body.childs)) and
+                   (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)))
+            for row_index, col_index in gen:
+                cell = self.body.childs[row_index].childs[col_index]
+                self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
+                self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
+                self.body.childs[row_index].childs[col_index].attr(scope='row')
 
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.

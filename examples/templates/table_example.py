@@ -45,6 +45,12 @@ table4.row_class('class_example_3', 1)
 #applies function to lower string for second row
 table4.map_row(lambda x: x.lower(), 1)
 
+#applies col scope to first cell
+table1.make_scope(col_scope_list=[(0, 0)])
+
+#applies col scope to last two cells in last row
+table4.make_scope(row_scope_list=[(2, 3), (2, 4), (2, 5)])
+
 page = Html()(
     Head()(
         Title()('Tempy - Table example'),
