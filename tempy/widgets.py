@@ -196,7 +196,7 @@ class TempyTable(Table):
                     cell.attr(klass=css_class)
         else:
             for row in self.body.childs:
-                if self.is_col_within_bounds(col_index, row) == True:
+                if self.is_col_within_bounds(col_index, row):
                     row.childs[col_index].attr(klass=css_class)
 
     def row_class(self, css_class, row_index=None):
@@ -213,14 +213,14 @@ class TempyTable(Table):
             self.map_table(col_function)
         else:
             for row in self.body.childs:
-                if self.is_col_within_bounds(col_index, row) == True:
+                if self.is_col_within_bounds(col_index, row):
                     row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
 
     def map_row(self, row_function, row_index=None):
         # applies function to every row
         if row_index is None:
             self.map_table(row_function)
-        elif self.is_row_within_bounds(row_index) == True:
+        elif self.is_row_within_bounds(row_index):
             for cell in self.body.childs[row_index].childs:
                 if len(cell.childs) > 0:
                     cell.childs[0] = row_function(cell.childs[0])
