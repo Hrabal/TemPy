@@ -113,7 +113,8 @@ class TempyTable(Table):
         """
         if data is None:
             raise WidgetDataError(self,
-                                  'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
+                                  'Parameter data should be non-None, to empty the table use TempyTable.clear() or '
+                                  'pass an empty list.')
         data = copy(data)
         if not self.body:
             # Table is empty
@@ -193,9 +194,9 @@ class TempyTable(Table):
             for row in self.body.childs:
                 for cell in row.childs:
                     cell.attr(klass=css_class)
-        elif col_index >= 0:
+        else:
             for row in self.body.childs:
-                if col_index < len(row.childs):
+                if self.is_col_within_bounds(col_index, row) == True:
                     row.childs[col_index].attr(klass=css_class)
 
     def row_class(self, css_class, row_index=None):
@@ -203,57 +204,71 @@ class TempyTable(Table):
         if row_index is None:
             for row in self.body.childs:
                 row.attr(klass=css_class)
-        elif row_index >= 0 and (row_index < len(self.body.childs)):
+        elif self.is_row_within_bounds(row_index):
             self.body.childs[row_index].attr(klass=css_class)
 
     def map_col(self, col_function, col_index=None):
         # applies function to every cell
         if col_index is None:
+            self.map_table(col_function)
+        else:
             for row in self.body.childs:
-                for cell in row.childs:
-                    if len(cell.childs) > 0:
-                        cell.childs[0] = col_function(cell.childs[0])
-        elif col_index >= 0:
-            for row in self.body.childs:
-                if col_index < len(row.childs) and len(row.childs[col_index].childs) > 0:
+                if self.is_col_within_bounds(col_index, row) == True:
                     row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
 
     def map_row(self, row_function, row_index=None):
         # applies function to every row
         if row_index is None:
-            for row in self.body.childs:
-                for cell in row.childs:
-                    if len(cell.childs) > 0:
-                        cell.childs[0] = row_function(cell.childs[0])
-        elif row_index >= 0 and (row_index < len(self.body.childs)):
+            self.map_table(row_function)
+        elif self.is_row_within_bounds(row_index) == True:
             for cell in self.body.childs[row_index].childs:
                 if len(cell.childs) > 0:
                     cell.childs[0] = row_function(cell.childs[0])
+
+    def map_table(self, format_function):
+        for row in self.body.childs:
+            for cell in row.childs:
+                if len(cell.childs) > 0:
+                    cell.childs[0] = format_function(cell.childs[0])
 
     """
     Makes scopes and converts Td to Th for given arguments
     which represent lists of tuples (row_index, col_index)
     """
+
     def make_scope(self, col_scope_list=None, row_scope_list=None):
         if col_scope_list is not None and len(col_scope_list) > 0:
-            gen = ((row_index, col_index) for row_index, col_index in col_scope_list
-                   if (row_index >= 0) and (row_index < len(self.body.childs)) and
-                   (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)))
-            for row_index, col_index in gen:
-                cell = self.body.childs[row_index].childs[col_index]
-                self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
-                self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
-                self.body.childs[row_index].childs[col_index].attr(scope='col')
+            self.apply_scope(col_scope_list, 'col')
 
         if row_scope_list is not None and len(row_scope_list) > 0:
-            gen = ((row_index, col_index) for row_index, col_index in row_scope_list
-                   if (row_index >= 0) and (row_index < len(self.body.childs)) and
-                   (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)))
-            for row_index, col_index in gen:
-                cell = self.body.childs[row_index].childs[col_index]
-                self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
-                self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
-                self.body.childs[row_index].childs[col_index].attr(scope='row')
+            self.apply_scope(row_scope_list, 'row')
+
+    def apply_scope(self, scope_list, scope_tag):
+        gen = ((row_index, col_index) for row_index, col_index in scope_list
+               if self.is_cell_within_table_bounds(row_index, col_index))
+
+        for row_index, col_index in gen:
+            cell = self.body.childs[row_index].childs[col_index]
+            self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
+            self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
+            self.body.childs[row_index].childs[col_index].attr(scope=scope_tag)
+
+    def is_cell_within_table_bounds(self, row_index, col_index):
+        if (row_index >= 0) and (row_index < len(self.body.childs)) and \
+                (col_index >= 0) and (col_index < len(self.body.childs[row_index].childs)):
+            return True
+        raise WidgetDataError(self, 'Row and column indexes should be within table bounds')
+
+    def is_row_within_bounds(self, row_index):
+        if row_index >= 0 and (row_index < len(self.body.childs)):
+            return True
+        raise WidgetDataError(self, 'Row index should be within table bounds')
+
+    def is_col_within_bounds(self, col_index, row):
+        if col_index >= 0 and col_index < len(row.childs) and len(row.childs[col_index].childs) > 0:
+            return True
+        raise WidgetDataError(self, 'Column index should be within table bounds')
+
 
 class TempyListMeta:
     """Widget for lists, manages the automatic generation starting from iterables and dicts.

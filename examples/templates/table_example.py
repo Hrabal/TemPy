@@ -49,7 +49,7 @@ table4.map_row(lambda x: x.lower(), 1)
 table1.make_scope(col_scope_list=[(0, 0)])
 
 #applies col scope to last two cells in last row
-table4.make_scope(row_scope_list=[(2, 3), (2, 4), (2, 5)])
+table4.make_scope(row_scope_list=[(2, 3), (2, 4)])
 
 page = Html()(
     Head()(
