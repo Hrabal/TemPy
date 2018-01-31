@@ -8,12 +8,15 @@ data = [['Name', 'Last Name', 'Age', 'Telephone'],
         ['John', 'Doe', '34', '555666777', '444555333'],
         ['Michael', 'Roberts', '22', '555766777', '244555333']]
 
+special_cell = Td()(A(href='python.org'), P()('first paragraph', P()('nested paragraph')))
+
 table1 = TempyTable(rows=3, cols=4, data=data, head=True, caption='User information', width='100%')
-table2 = TempyTable(data=data, caption='User information2', width='50%')
+table2 = TempyTable(data=data, caption='User information2', width='50%', border='1px solid black')
 table3 = TempyTable(data=data, caption='User information3', width='50%')
 table4 = TempyTable(data=data, caption='User information4', width='50%')
 
 table2.pop_cell()
+special_cell.append_to(table2.childs[0].childs[2])
 
 css_tag = Css({
                 '.class_example_1': {'color': 'blue'},
@@ -32,6 +35,9 @@ table2.col_class('class_example_1', 0)
 
 #applies function to lower string for second column
 table2.map_col(lambda x: x.lower(), 1)
+
+#applies function to upper string for last column
+table2.map_col(lambda x: x.upper(), 4)
 
 # set class for every row
 table3.row_class('class_example_3')

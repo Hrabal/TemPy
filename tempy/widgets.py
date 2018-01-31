@@ -197,7 +197,7 @@ class TempyTable(Table):
             return
 
         for row in self.body.childs:
-            if self.is_col_within_bounds(col_index, row):
+            if self.is_col_within_bounds(col_index, row) and len(row.childs[col_index].childs) > 0:
                 row.childs[col_index].attr(klass=css_class)
 
     def row_class(self, css_class, row_index=None):
@@ -212,41 +212,41 @@ class TempyTable(Table):
         # applies function to every cell
         if col_index is None:
             self.map_table(col_function)
-            return
+            return self
 
-        gen = (row for row in self.body.childs if self.is_col_within_bounds(col_index, row))
+        gen = (row for row in self.body.childs
+               if self.is_col_within_bounds(col_index, row) and len(row.childs[col_index].childs) > 0)
         try:
             for row in gen:
-                row.childs[col_index].childs[0] = col_function(row.childs[col_index].childs[0])
+                row.childs[col_index].apply_function(col_function)
         except:
             if not ignore_errors:
-                raise WidgetError(cls, 'Function call error.')
-
+                raise WidgetError(self, 'Function call error.')
 
     def map_row(self, row_function, row_index=None, ignore_errors=True):
         # applies function to every row
         if row_index is None:
             self.map_table(row_function)
-            return
+            return self
 
         if self.is_row_within_bounds(row_index):
             gen = (cell for cell in self.body.childs[row_index].childs if len(cell.childs) > 0)
             try:
                 for cell in gen:
-                    cell.childs[0] = row_function(cell.childs[0])
+                    cell.apply_function(row_function)
             except:
                 if not ignore_errors:
-                    raise WidgetError(cls, 'Function call error.')
+                    raise WidgetError(self, 'Function call error.')
 
     def map_table(self, format_function, ignore_errors=True):
         for row in self.body.childs:
             gen = (cell for cell in row.childs if len(cell.childs) > 0)
             try:
                 for cell in gen:
-                    cell.childs[0] = row_function(cell.childs[0])
+                    cell.apply_function(format_function)
             except:
                 if not ignore_errors:
-                    raise WidgetError(cls, 'Function call error.')
+                    raise WidgetError(self, 'Function call error.')
 
     """Makes scopes and converts Td to Th for given arguments
     which represent lists of tuples (row_index, col_index)"""
@@ -260,7 +260,8 @@ class TempyTable(Table):
     def apply_scope(self, scope_list, scope_tag):
         gen = ((row_index, col_index) for row_index, col_index in scope_list
                if self.is_row_within_bounds(row_index) and
-                  self.is_col_within_bounds(col_index, self.body.childs[row_index]))
+                  self.is_col_within_bounds(col_index, self.body.childs[row_index]) and
+                  len(self.body.childs[row_index].childs[col_index].childs) > 0)
 
         for row_index, col_index in gen:
             cell = self.body.childs[row_index].childs[col_index]
@@ -274,7 +275,7 @@ class TempyTable(Table):
         raise WidgetDataError(self, 'Row index should be within table bounds')
 
     def is_col_within_bounds(self, col_index, row):
-        if col_index >= 0 and col_index < len(row.childs) and len(row.childs[col_index].childs) > 0:
+        if col_index >= 0 and (col_index < len(row.childs)):
             return True
         raise WidgetDataError(self, 'Column index should be within table bounds')
 

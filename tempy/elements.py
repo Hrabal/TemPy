@@ -279,6 +279,16 @@ class Tag(DOMElement):
         self._stable = True
         return self._render
 
+    def apply_function(self, format_function):
+        gen = ((index, child) for index, child in enumerate(self.childs) if child is not None)
+        for (index, child) in gen:
+            if isinstance(child, Tag):
+                child.apply_function(format_function)
+            elif isinstance(child, Content):
+                child.apply_function(format_function)
+            else:
+                self.childs[index] = format_function(self.childs[index])
+
 
 class VoidTag(Tag):
     """
@@ -452,3 +462,24 @@ class Content(DOMElement):
                     else:
                         ret.append(str(content))
         return ' '.join(ret)
+
+    def apply_function(self, format_function):
+        gen = ((index, content) for index, content in enumerate(self.content) if content is not None)
+        for (index, content) in gen:
+            if isinstance(content, DOMElement):
+                content.apply_function(format_function)
+            else:
+                if self._t_repr:
+                    if isinstance(self._t_repr, DOMElement):
+                        self._t_repr.apply_function(format_function)
+                    else:
+                        self._t_repr = format_function(self._t_repr)
+                elif isinstance(content, dict):
+                    dict_gen = (key for key in content if content[key] is not None)
+                    for key in dict_gen:
+                        if isinstance(content[key], list):
+                            content[key] = [format_function(elem) for elem in content[key] if elem is not None]
+                        else:
+                            content[key] = format_function(content[key])
+                else:
+                    self.content[index] = format_function(self.content[index])
