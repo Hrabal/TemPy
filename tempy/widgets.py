@@ -30,9 +30,13 @@ class TempyPage(Html):
     def __init__(self, title=None, content=None, charset='UTF-8',
                  keywords=None, doctype=None, **kwargs):
         super().__init__(**kwargs)
+        self.set_title(title or '')
+        if content:
+            self.set_description(content)
         self.set_charset(charset)
-        self.set_description(content)
         self.set_keywords(keywords or [])
+        if doctype:
+            self.set_doctype(doctype)
 
     def init(self):
         self(
