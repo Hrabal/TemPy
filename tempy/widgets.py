@@ -95,6 +95,9 @@ class TempyTable(Table):
         if not data:
             data = [[None for _ in range(cols)]
                     for _ in range(rows + sum((head, foot)))]
+        else:
+            rows = len(data)
+            cols = max(map(len, data))
         table_data = copy(data)
         if caption:
             self.make_caption(caption)

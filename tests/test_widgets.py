@@ -6,15 +6,15 @@ import unittest
 from copy import copy
 
 from tempy.widgets import TempyTable, TempyList, TempyPage
-from tempy.tags import Table, Tr, Td, Dl, Dt, Dd, Ul, Ol, Li, Html, Head, Body, Thead, Tfoot
-
+from tempy.tags import (Table, Tr, Td, Dl, Dt, Dd, Ul, Ol,
+                        Li, Html, Head, Body, Thead, Tfoot)
 from tempy.exceptions import WidgetDataError, WidgetError
 
 
 class TestTempyTable(unittest.TestCase):
 
     def setUp(self):
-        self.data = [[x*y for x in range(1, 11)] for y in range(15)]
+        self.data = [[x * y for x in range(1, 11)] for y in range(15)]
 
     def verify_content(self, table):
         # Check table content
@@ -66,7 +66,6 @@ class TestTempyTable(unittest.TestCase):
         self.assertEqual(len(table.body), 16)
 
         # test resize
-        print('test resize')
         new_data.append(list(range(1, 12)))
         table.populate(new_data)
         self.assertEqual(len(table.body), 17)
