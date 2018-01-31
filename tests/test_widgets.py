@@ -129,6 +129,68 @@ class TestTempyTable(unittest.TestCase):
         r = table.pop_cell(0, 0)
         self.assertEqual(r, self.data[0][0])
 
+    def test_col_class(self):
+        table = TempyTable(data=self.data)
+
+        table.col_class('class_example')
+        self.assertEqual({'class_example'}, table.childs[0].childs[0].childs[0].attrs['klass'])
+
+        #first column of each row
+        table.col_class('class_example_new', 0)
+        self.assertEqual({'class_example_new', 'class_example'}, table.childs[0].childs[0].childs[0].attrs['klass'])
+
+    def test_row_class(self):
+        table = TempyTable(data=self.data)
+
+        table.row_class('class_example')
+        self.assertEqual({'class_example'}, table.childs[0].childs[0].attrs['klass'])
+
+        # first row for each column
+        table.row_class('class_example_new', 0)
+        self.assertEqual({'class_example_new', 'class_example'}, table.childs[0].childs[0].attrs['klass'])
+
+    def test_map_col(self):
+        table = TempyTable(data=self.data)
+
+        table.map_col(lambda x: x - 1)
+        self.assertEqual(-1, table.childs[0].childs[0].childs[0].childs[0])
+
+        # applies function x - 2 for second column
+        table.map_col(lambda x: x - 2, 1)
+        self.assertEqual(-3,  table.childs[0].childs[0].childs[1].childs[0])
+
+    def test_map_row(self):
+        table = TempyTable(data=self.data)
+
+        table.map_row(lambda x: x - 1)
+        self.assertEqual(-1,  table.childs[0].childs[0].childs[0].childs[0])
+
+        # applies function x - 2 for first row
+        table.map_row(lambda x: x - 2, 0)
+        self.assertEqual(-3,  table.childs[0].childs[0].childs[1].childs[0])
+
+    def test_make_scope(self):
+        table = TempyTable(data=self.data)
+
+        table.make_scope(col_scope_list=[(0, 0)])
+        self.assertEqual('col', table.childs[0].childs[0].childs[0].attrs['scope'])
+
+        table.make_scope(row_scope_list=[(0, 0)])
+        self.assertEqual('row', table.childs[0].childs[0].childs[0].attrs['scope'])
+
+    def test_is_row_within_bounds(self):
+        table = TempyTable(data=self.data)
+        self.assertTrue(table.is_row_within_bounds(0))
+
+        with self.assertRaises(WidgetDataError):
+            table.is_row_within_bounds(20)
+
+    def test_is_col_within_bounds(self):
+        table = TempyTable(data=self.data)
+        self.assertTrue(table.is_col_within_bounds(0, table.childs[0].childs[0]))
+        with self.assertRaises(WidgetDataError):
+            table.is_col_within_bounds(20, table.childs[0].childs[0])
+
 
 class TestTempyList(unittest.TestCase):
 

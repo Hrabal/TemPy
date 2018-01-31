@@ -73,7 +73,7 @@ class TempyPage(Html):
 
 class TempyTable(Table):
     """Table widget.
-    Creates a simple table structure using the give data, ora an empty table of the given size.self
+    Creates a simple table structure using the give data, or an empty table of the given size.self
     params:
     data: an iterable of iterables in this form [[col1, col2, col3], [col1, col2, col3]]
     rows, columns: size of the table if no data is given
@@ -87,26 +87,27 @@ class TempyTable(Table):
                  head=False, foot=False, **kwargs):
         super().__init__(**kwargs)
         self(body=Tbody())
-        # Initialize empty datastructure if data is not given
+        # Initialize empty data structure if data is not given
         if not data:
             data = [[None for _ in range(cols)]
                     for _ in range(rows + sum((head, foot)))]
+        table_data = copy(data)
         if caption:
             self.make_caption(caption)
-        if head:
-            self.make_header(data.pop(0))
-        if foot:
-            self.make_footer(data.pop())
+        if head and rows > 0:
+            self.make_header(table_data.pop(0))
+        if foot and rows > 0:
+            self.make_footer(table_data.pop())
         if data:
-            self.populate(data, resize_x=True)
+            self.populate(table_data, resize_x=True)
 
     def _check_row_size(self, row):
         try:
-            row_lenght = len(row)
+            row_length = len(row)
         except TypeError:
-            row_lenght = row
-        if self.body.childs and max(map(len, self.body)) < row_lenght:
-            raise WidgetDataError(self, 'The given data have more columns than the table.')
+            row_length = row
+        if self.body.childs and max(map(len, self.body)) < row_length:
+            raise WidgetDataError(self, 'The given data has more columns than the table column size.')
 
     def populate(self, data, resize_x=True, normalize=True):
         """Adds/Replace data in the table.
@@ -116,9 +117,10 @@ class TempyTable(Table):
         normalize: if True all the rows will have the same number of columns, if False, data structure is followed.
         """
         if data is None:
-            raise WidgetDataError(self, 'Parameter data should be non-None, to empty the table use TempyTable.clear() or pass an empty list.')
+            raise WidgetDataError(self,
+                                  'Parameter data should be non-None, to empty the table use TempyTable.clear() or '
+                                  'pass an empty list.')
         data = copy(data)
-
         if not self.body:
             # Table is empty
             self(body=Tbody())
@@ -171,7 +173,7 @@ class TempyTable(Table):
         part_tag, inner_tag = {
             'header': (Thead, Th),
             'footer': (Tfoot, Td)
-            }.get(part)
+        }.get(part)
         part_instance = part_tag().append_to(self)
         if not hasattr(self, part):
             setattr(self, part, part_instance)
@@ -186,10 +188,104 @@ class TempyTable(Table):
         self._make_table_part('footer', footer)
 
     def make_caption(self, caption):
-        """Adds/Sobstitute the table's caption."""
+        """Adds/Substitutes the table's caption."""
         if not hasattr(self, 'caption'):
             self(caption=Caption())
         return self.caption.empty()(caption)
+
+    def col_class(self, css_class, col_index=None):
+        # adds css_class to every cell
+        if col_index is None:
+            gen = ((row, cell) for row in self.body.childs for cell in row.childs)
+            for (row, cell) in gen:
+                cell.attr(klass=css_class)
+            return
+
+        for row in self.body.childs:
+            if self.is_col_within_bounds(col_index, row) and len(row.childs[col_index].childs) > 0:
+                row.childs[col_index].attr(klass=css_class)
+
+    def row_class(self, css_class, row_index=None):
+        # adds css_class to every row
+        if row_index is None:
+            for row in self.body.childs:
+                row.attr(klass=css_class)
+        elif self.is_row_within_bounds(row_index):
+            self.body.childs[row_index].attr(klass=css_class)
+
+    def map_col(self, col_function, col_index=None, ignore_errors=True):
+        # applies function to every cell
+        if col_index is None:
+            self.map_table(col_function)
+            return self
+
+        gen = (row for row in self.body.childs
+               if self.is_col_within_bounds(col_index, row) and len(row.childs[col_index].childs) > 0)
+        try:
+            for row in gen:
+                row.childs[col_index].apply_function(col_function)
+        except Exception as ex:
+            if ignore_errors:
+                pass
+            else:
+                raise ex
+
+    def map_row(self, row_function, row_index=None, ignore_errors=True):
+        # applies function to every row
+        if row_index is None:
+            self.map_table(row_function)
+            return self
+
+        if self.is_row_within_bounds(row_index):
+            gen = (cell for cell in self.body.childs[row_index].childs if len(cell.childs) > 0)
+            self.apply_function_to_cells(gen, row_function, ignore_errors)
+
+    def map_table(self, format_function, ignore_errors=True):
+        for row in self.body.childs:
+            gen = (cell for cell in row.childs if len(cell.childs) > 0)
+            self.apply_function_to_cells(gen, format_function, ignore_errors)
+
+    @staticmethod
+    def apply_function_to_cells(gen, format_function, ignore_errors):
+        try:
+            for cell in gen:
+                cell.apply_function(format_function)
+        except Exception as ex:
+            if ignore_errors:
+                pass
+            else:
+                raise ex
+
+    """Makes scopes and converts Td to Th for given arguments
+    which represent lists of tuples (row_index, col_index)"""
+    def make_scope(self, col_scope_list=None, row_scope_list=None):
+        if col_scope_list is not None and len(col_scope_list) > 0:
+            self.apply_scope(col_scope_list, 'col')
+
+        if row_scope_list is not None and len(row_scope_list) > 0:
+            self.apply_scope(row_scope_list, 'row')
+
+    def apply_scope(self, scope_list, scope_tag):
+        gen = ((row_index, col_index) for row_index, col_index in scope_list
+               if self.is_row_within_bounds(row_index) and
+               self.is_col_within_bounds(col_index, self.body.childs[row_index]) and
+               len(self.body.childs[row_index].childs[col_index].childs) > 0)
+
+        for row_index, col_index in gen:
+            cell = self.body.childs[row_index].childs[col_index]
+            self.body.childs[row_index].childs[col_index] = Th()(cell.childs[0])
+            self.body.childs[row_index].childs[col_index].attrs = copy(cell.attrs)
+            self.body.childs[row_index].childs[col_index].attr(scope=scope_tag)
+
+    def is_row_within_bounds(self, row_index):
+        if row_index >= 0 and (row_index < len(self.body.childs)):
+            return True
+        raise WidgetDataError(self, 'Row index should be within table bounds')
+
+    def is_col_within_bounds(self, col_index, row):
+        if col_index >= 0 and (col_index < len(row.childs)):
+            return True
+        raise WidgetDataError(self, 'Column index should be within table bounds')
 
 
 class TempyListMeta:
@@ -207,6 +303,7 @@ class TempyListMeta:
     List building is made through the TempyList.populate method; this will trasform a python datastructure
     (list/tuple/dict/etc..) in a Tempy tree.
     """
+
     def __init__(self, struct=None):
         self._typ = self.__class__.__bases__[1]
         self._TempyList__tag = getattr(self._typ, '_%s__tag' % self._typ.__name__)
@@ -283,6 +380,7 @@ class TempyListMeta:
 class TempyList:
     """TempyList is a class factory, it works for both ul and ol lists (TODO: dl).
     See TempyListMeta for TempyList methods and docstings."""
+
     def __new__(cls, typ=None, struct=None):
         try:
             typ = struct.pop('_typ')
