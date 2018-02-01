@@ -60,3 +60,7 @@ class DOMModByIndexError(IndexError, TagError):
 
 class DOMModByKeyError(KeyError, TagError):
     """Raised when wrong search key is given to any DOM modification method"""
+
+
+class AttrNotFoundError(TempyException):
+    """Raised when css attribute is not found in css_attrs"""

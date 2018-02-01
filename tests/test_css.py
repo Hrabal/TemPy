@@ -8,7 +8,7 @@ from copy import copy
 from collections import Counter
 
 from tempy import Css
-from tempy.exceptions import WrongContentError
+from tempy.exceptions import WrongContentError, AttrNotFoundError, WrongArgsError
 
 
 class TestTag(unittest.TestCase):
@@ -110,3 +110,65 @@ class TestTag(unittest.TestCase):
         with open(filename, 'r') as f:
             self.assertEqual(f.read(), expected)
         os.remove(filename)
+
+    def test_replace_element(self):
+        css_values = {
+            'html': {
+                'body': {
+                    'color': 'grey',
+                    'div': {
+                        'color': 'green',
+                        'border': '1px'
+                    }
+                }
+            },
+            '#myid': {'color': 'purple'}
+        }
+        css = Css({
+            'html': {
+                'body': {
+                    'color': 'red',
+                    'div': {
+                        'color': 'green',
+                        'border': '1px'
+                    }
+                }
+            },
+            '#myid': {'color': 'blue'}
+        })
+        css.replace_element('#myid', {'color': 'purple'})
+        self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
+
+        #nested example
+        css.replace_element('html body', {
+                'color': 'grey',
+                'div': {
+                    'color': 'green',
+                    'border': '1px'
+                }
+        })
+        self.assertEqual({
+                'color': 'grey',
+                'div': {
+                    'color': 'green',
+                    'border': '1px'
+                }},
+            css.attrs['css_attrs']['html']['body'])
+
+        #failed to find
+        css.replace_element('myid', {'color': 'purple'})
+        self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
+        with self.assertRaises(AttrNotFoundError):
+            css.replace_element('myid', {'color': 'purple'}, ignore_error=False)
+
+        #wrong args type
+        css.replace_element('', None)
+        self.assertEqual(css_values, css.attrs['css_attrs'])
+        with self.assertRaises(WrongArgsError):
+            css.replace_element('', None, ignore_error=False)
+
+        css.replace_element('', {'color': 'purple'})
+        self.assertEqual(css_values, css.attrs['css_attrs'])
+        with self.assertRaises(WrongArgsError):
+            css.replace_element('', {'color': 'purple'}, ignore_error=False)
+
