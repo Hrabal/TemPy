@@ -104,6 +104,8 @@ class TestTag(unittest.TestCase):
         self.assertEqual(Counter(rendered_css), expected_counter)
 
         link = A()
+        link_with_id = A(id='ex_a')
+        link_with_class = A(klass='cl_a')
         css_complex = Css({'html': {
             'body': {
                 'color': 'red',
@@ -112,15 +114,19 @@ class TestTag(unittest.TestCase):
                     'border': '1px'
                 },
                 link: {'color': 'grey'},
+                link_with_class: {'color': 'grey'},
                 A: {'color': 'yellow'}
             }
         },
-            '#myid': {'color': 'purple'}
+            '#myid': {'color': 'purple'},
+            link_with_id: {'color': 'grey'},
+            'td, tr': {'color': 'pink'}
         })
         rendered_css = css_complex.render()
-        expected_css = '<style>{ } html { } #myid { color: purple; } html body { color: red; }' \
-                       ' html body div { color: green; border: 1px; } ' \
-                       'html body #85994352 { color: grey; } html body a { color: yellow; } </style>'
+        expected_css = '<style>{ } html { } #myid { color: purple; } #ex_a { color: grey; }' \
+                       ' td, tr { color: pink; } html body { color: red; } ' \
+                       'html body div { color: green; border: 1px; } html body #89602992 { color: grey; }' \
+                       ' html body .cl_a { color: grey; } html body a { color: yellow; } </style>'
         expected_counter = Counter(x for x in expected_css if not x.isdigit())
         self.assertEqual(Counter(x for x in rendered_css if not x.isdigit()), expected_counter)
 
@@ -187,3 +193,5 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(WrongArgsError):
             css.replace_element('', {'color': 'purple'}, ignore_error=False)
 
+        css.replace_element(['html'], {'color': 'purple'})
+        self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['html'])
