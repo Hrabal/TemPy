@@ -11,7 +11,7 @@ from collections import Mapping, Iterable, ChainMap
 
 from .tempy import DOMElement
 from .exceptions import WrongArgsError, WrongContentError, ContentError, TagError, AttrNotFoundError
-
+import inspect
 
 class TagAttrs(dict):
     """
@@ -352,6 +352,15 @@ class Css(Tag):
         css_styles = self._parse__args(*args, **kwargs)
         self.attrs['css_attrs'].update(css_styles)
 
+    @staticmethod
+    def render_dom_element_to_css(element):
+        if 'id' in element.attrs:
+            return '#' + element.attrs['id']
+        if 'klass' in element.attrs and element.attrs['klass']:
+            return '.' + '.'.join(element.attrs['klass'])
+        element.attrs['id'] = id(element)
+        return '#' + str(id(element))
+
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
         result = []
@@ -359,15 +368,17 @@ class Css(Tag):
 
         while nodes_to_parse:
             parents, node = nodes_to_parse.pop(0)
-            if parents:
-                for parent in parents:
-                    if isinstance(parent, tuple):
-                        result.append(', '.join(parent))
-                    else:
-                        result.append("%s " % parent)
-                result.append('{ ')
-            else:
-                parents = []
+            gen = [parent for parent in parents] if parents else []
+            for parent in gen:
+                if isinstance(parent, tuple):
+                    result.append(', '.join(parent))
+                elif inspect.isclass(parent):
+                    result.append(getattr(parent, "_" + parent.__name__ + "__tag") + " ")
+                elif isinstance(parent, DOMElement):
+                    result.append(self.__class__.render_dom_element_to_css(parent) + " ")
+                else:
+                    result.append("%s " % parent)
+            result.append('{ ')
 
             for key, value in node.items():
                 if isinstance(value, str):
@@ -386,15 +397,15 @@ class Css(Tag):
             file_to_write.write(self.render(**kwargs))
             self._template = '<style>{css}</style>'
 
-    def replace_element(self, element, new_style, ignore_error=True):
-        if new_style is None or not isinstance(new_style, dict) or not dict:
+    def replace_element(self, selector_list, new_style, ignore_error=True):
+        if new_style is None or not isinstance(new_style, (str, dict)) or not new_style:
             if ignore_error:
                 return
             else:
-                raise WrongArgsError(self, new_style, 'Second argument should be a non-empty dictionary.')
+                raise WrongArgsError(self, new_style, 'Second argument should be a non-empty string or dictionary.')
 
         try:
-            element_node = self.find_attr(element)
+            element_node = self.find_attr(selector_list)
         except (AttrNotFoundError, WrongArgsError) as wrong_args_error:
             if ignore_error:
                 return
@@ -403,23 +414,23 @@ class Css(Tag):
                 raise
 
         if element_node:
-            element_node[element.split()[-1]] = new_style
-        elif not element_node and element in self.attrs['css_attrs']:
+            element_node[selector_list[-1]] = new_style
+        elif not element_node and selector_list[0] in self.attrs['css_attrs']:
             self.attrs['css_attrs'] = new_style
 
-    def find_attr(self, element):
-        if not isinstance(element, str) or len(element) < 1:
-            raise WrongArgsError(self, element, 'Positional argument should be a non-empty string.')
+    def find_attr(self, selector_list):
+        if not isinstance(selector_list, list) or len(selector_list) < 1:
+            raise WrongArgsError(self, selector_list, 'The provided argument should be a non-empty list.')
 
         found_node = self.attrs['css_attrs']
         parent_node = None
-        elements_hierarchy = element.split()
-        for child in elements_hierarchy:
+
+        for child in selector_list:
             if child in found_node:
                 parent_node = found_node
                 found_node = found_node[child]
             else:
-                raise AttrNotFoundError(self, element, 'Provided element does not exist in css attributes')
+                raise AttrNotFoundError(self, selector_list, 'Provided element does not exist.')
         return parent_node
 
 
