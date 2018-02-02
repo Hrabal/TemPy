@@ -13,6 +13,7 @@ from .tempy import DOMElement
 from .exceptions import WrongArgsError, WrongContentError, ContentError, TagError, AttrNotFoundError
 import inspect
 
+
 class TagAttrs(dict):
     """
     Html tag attributes container, a subclass of dict with __setitiem__ and update overload.
