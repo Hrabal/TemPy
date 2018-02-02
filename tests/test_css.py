@@ -103,6 +103,27 @@ class TestTag(unittest.TestCase):
         # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
         self.assertEqual(Counter(rendered_css), expected_counter)
 
+        link = A()
+        css_complex = Css({'html': {
+            'body': {
+                'color': 'red',
+                Div: {
+                    'color': 'green',
+                    'border': '1px'
+                },
+                link: {'color': 'grey'},
+                A: {'color': 'yellow'}
+            }
+        },
+            '#myid': {'color': 'purple'}
+        })
+        rendered_css = css_complex.render()
+        expected_css = '<style>{ } html { } #myid { color: purple; } html body { color: red; }' \
+                       ' html body div { color: green; border: 1px; } ' \
+                       'html body #85994352 { color: grey; } html body a { color: yellow; } </style>'
+        expected_counter = Counter(x for x in expected_css if not x.isdigit())
+        self.assertEqual(Counter(x for x in rendered_css if not x.isdigit()), expected_counter)
+
     def test_dump(self):
         css = Css({'div': {'color': 'blue'}})
         expected = '{ } div { color: blue; } '
