@@ -37,6 +37,11 @@ def table_handler():
     from templates.table_example import page
     return page.render()
 
+@app.route('/css')
+def css_handler():
+    from templates.css_example import page
+    return page.render()
+
 
 if __name__ == '__main__':
     app.run(port=8888, debug=True)

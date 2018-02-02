@@ -10,7 +10,8 @@ from types import GeneratorType
 from collections import Mapping, Iterable, ChainMap
 
 from .tempy import DOMElement
-from .exceptions import WrongArgsError, WrongContentError, ContentError, TagError
+from .exceptions import WrongArgsError, WrongContentError, ContentError, TagError, AttrNotFoundError
+import inspect
 
 
 class TagAttrs(dict):
@@ -24,8 +25,8 @@ class TagAttrs(dict):
 
     TagAttrs.render formats all the attributes in the proper html format.
     """
-    _MAPPING_ATTRS = ('style', )
-    _SET_VALUES_ATTRS = ('klass', )
+    _MAPPING_ATTRS = ('style',)
+    _SET_VALUES_ATTRS = ('klass',)
     _SPECIALS = {
         'klass': 'class',
         'typ': 'type',
@@ -80,7 +81,7 @@ class TagAttrs(dict):
         for k, v in self.items():
             if v:
                 f_string = (' {}="{}"', ' {}')[v is bool]
-                f_args = (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))[:2+(v is bool)]
+                f_args = (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))[:2 + (v is bool)]
                 ret.append(f_string.format(*f_args))
         return ''.join(ret)
 
@@ -94,6 +95,7 @@ class TagAttrs(dict):
             if isinstance(v, str):
                 return '%s="""%s"""' % (k_norm, v)
             return '%s=%s' % (k_norm, v)
+
         twist_specials = {v: k for k, v in self._SPECIALS.items()}
         return ', '.join(formatter(k, v) for k, v in self.items() if v)
 
@@ -142,7 +144,7 @@ class Tag(DOMElement):
         css_repr = '%s%s' % (
             ' .css_class (%s)' % (self.attrs['class']) if self.attrs.get('class', None) else '',
             ' .css_id (%s)' % (self.attrs['id']) if self.attrs.get('id', None) else '',
-            )
+        )
         return super().__repr__()[:-1] + '%s>' % css_repr
 
     def __copy__(self):
@@ -311,7 +313,7 @@ class Css(Tag):
             }
         },
         '#myid': {'color': 'blue'}
-    }
+    })
     translates to:
     <style>
     html body {
@@ -351,6 +353,15 @@ class Css(Tag):
         css_styles = self._parse__args(*args, **kwargs)
         self.attrs['css_attrs'].update(css_styles)
 
+    @staticmethod
+    def render_dom_element_to_css(element):
+        if 'id' in element.attrs:
+            return '#' + element.attrs['id']
+        if 'klass' in element.attrs and element.attrs['klass']:
+            return '.' + '.'.join(element.attrs['klass'])
+        element.attrs['id'] = id(element)
+        return '#' + str(id(element))
+
     def render(self, *args, **kwargs):
         pretty = kwargs.pop('pretty', False)
         result = []
@@ -358,15 +369,17 @@ class Css(Tag):
 
         while nodes_to_parse:
             parents, node = nodes_to_parse.pop(0)
-            if parents:
-                for parent in parents:
-                    if isinstance(parent, tuple):
-                        result.append(', '.join(parent))
-                    else:
-                        result.append("%s " % parent)
-                result.append('{ ')
-            else:
-                parents = []
+            gen = [parent for parent in parents] if parents else []
+            for parent in gen:
+                if isinstance(parent, tuple):
+                    result.append(', '.join(parent))
+                elif inspect.isclass(parent):
+                    result.append(getattr(parent, "_" + parent.__name__ + "__tag") + " ")
+                elif isinstance(parent, DOMElement):
+                    result.append(self.__class__.render_dom_element_to_css(parent) + " ")
+                else:
+                    result.append("%s " % parent)
+            result.append('{ ')
 
             for key, value in node.items():
                 if isinstance(value, str):
@@ -385,6 +398,42 @@ class Css(Tag):
             file_to_write.write(self.render(**kwargs))
             self._template = '<style>{css}</style>'
 
+    def replace_element(self, selector_list, new_style, ignore_error=True):
+        if new_style is None or not isinstance(new_style, (str, dict)) or not new_style:
+            if ignore_error:
+                return
+            else:
+                raise WrongArgsError(self, new_style, 'Second argument should be a non-empty string or dictionary.')
+
+        try:
+            element_node = self.find_attr(selector_list)
+        except (AttrNotFoundError, WrongArgsError) as wrong_args_error:
+            if ignore_error:
+                return
+            else:
+                print(wrong_args_error.__repr__())
+                raise
+
+        if element_node:
+            element_node[selector_list[-1]] = new_style
+        elif not element_node and selector_list[0] in self.attrs['css_attrs']:
+            self.attrs['css_attrs'] = new_style
+
+    def find_attr(self, selector_list):
+        if not isinstance(selector_list, list) or len(selector_list) < 1:
+            raise WrongArgsError(self, selector_list, 'The provided argument should be a non-empty list.')
+
+        found_node = self.attrs['css_attrs']
+        parent_node = None
+
+        for child in selector_list:
+            if child in found_node:
+                parent_node = found_node
+                found_node = found_node[child]
+            else:
+                raise AttrNotFoundError(self, selector_list, 'Provided element does not exist.')
+        return parent_node
+
 
 class Content(DOMElement):
     """
@@ -393,6 +442,7 @@ class Content(DOMElement):
     If no content with the same name is used, an empty string is rendered.
     If instantiated with the named attribute content, this will override all the content injection on parents.
     """
+
     def __init__(self, name=None, content=None, t_repr=None):
         super().__init__()
         self._tab_count = 0
