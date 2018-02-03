@@ -195,3 +195,50 @@ class TestTag(unittest.TestCase):
 
         css.replace_element(['html'], {'color': 'purple'})
         self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['html'])
+
+    def test_clear(self):
+        link = A()
+        css = Css({'html': {
+            'body': {
+                'color': 'red',
+                Div: {
+                    'color': 'green',
+                    'border': '1px'
+                },
+                link: {'color': 'purple'},
+                A: {'color': 'yellow'}
+            }
+        },
+            '#myid': {'color': 'blue'}
+        })
+
+        css_values = {'html': {
+            'body': {
+                'color': 'red',
+                Div: {
+                    'color': 'green',
+                    'border': '1px'
+                },
+                link: {'color': 'purple'},
+                A: {'color': 'yellow'}
+            }
+        }
+        }
+
+        css.clear(['#myid'])
+        self.assertEqual(css_values, css.attrs['css_attrs'])
+
+        # failed to find
+        css.clear(['myid'])
+        self.assertEqual(css_values, css.attrs['css_attrs'])
+        with self.assertRaises(AttrNotFoundError):
+            css.clear(['myid'], ignore_error=False)
+
+        # wrong args type
+        css.clear('')
+        self.assertEqual(css_values, css.attrs['css_attrs'])
+        with self.assertRaises(WrongArgsError):
+            css.clear('', ignore_error=False)
+
+        css.clear()
+        self.assertEqual({}, css.attrs['css_attrs'])

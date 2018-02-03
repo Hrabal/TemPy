@@ -417,7 +417,7 @@ class Css(Tag):
         if element_node:
             element_node[selector_list[-1]] = new_style
         elif not element_node and selector_list[0] in self.attrs['css_attrs']:
-            self.attrs['css_attrs'] = new_style
+            (self.attrs['css_attrs'])[selector_list[0]] = new_style
 
     def find_attr(self, selector_list):
         if not isinstance(selector_list, list) or len(selector_list) < 1:
@@ -433,6 +433,25 @@ class Css(Tag):
             else:
                 raise AttrNotFoundError(self, selector_list, 'Provided element does not exist.')
         return parent_node
+
+    def clear(self, selector_list=None, ignore_error=True):
+        if selector_list is None:
+            self.attrs['css_attrs'] = {}
+            return
+
+        try:
+            element_node = self.find_attr(selector_list)
+        except (AttrNotFoundError, WrongArgsError) as wrong_args_error:
+            if ignore_error:
+                return
+            else:
+                print(wrong_args_error.__repr__())
+                raise
+
+        if element_node:
+            element_node.pop(selector_list[-1], None)
+        elif not element_node and selector_list[0] in self.attrs['css_attrs']:
+            (self.attrs['css_attrs']).pop([selector_list[0]], None)
 
 
 class Content(DOMElement):
