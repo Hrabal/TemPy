@@ -348,7 +348,7 @@ Styles are editable in the jQuery fashion:
 ```python
 div2.css(width='100px', float='left')
 div2.css({'height': '100em'})
-div2.css('background-color', 'blue')
+div2.css({'background-color': 'blue'})
 >>> <div id="another_dom_id" class="someHtmlClass comeOtherClass" style="width: 100px; float: left; height: 100em; background-color: blue"></div>
 ```
 
