@@ -575,15 +575,15 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(t_escaped.render(), '<div>"&<>£¢ì</div>')
 
     def test_find(self):
-        tag = Div()(A(), A(), Pre(), Br(), foo=Br())
-        result = tag.find()  # will return a generator yielding all the children -> (A(),A(),Pre(),Br(),Br())
-        self.assertEqual(len(result), 5)
+        tag = Div()(A(), A(), Pre(), Br(), Div()(A()), foo=Br())
+        result = tag.find()  # will return a generator yielding all the children -> (A(),A(),Pre(),Br(),Div(),A(),Br())
+        self.assertEqual(len(result), 7)
 
         result = tag.find(names='foo')  # will return a generator yielding all the children named foo -> (Br())
         self.assertEqual(len(result), 1)
 
-        result = tag.find(A)  # will return a generator yielding all the children instances of A -> (A(),A())
-        self.assertEqual(len(result), 2)
+        result = tag.find(A)  # will return a generator yielding all the children instances of A -> (A(),A(),A())
+        self.assertEqual(len(result), 3)
 
         result = tag.find('Pre')  # will return a generator yielding all the children instances of Pre -> (Pre())
         self.assertEqual(len(result), 1)
