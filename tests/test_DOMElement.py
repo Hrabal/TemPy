@@ -6,7 +6,7 @@ import unittest
 
 from tempy.elements import Tag, TagAttrs
 from tempy.exceptions import WrongContentError, WrongArgsError, TagError, DOMModByKeyError, DOMModByIndexError
-from tempy.tags import Div, A, P, Html, Head, Body
+from tempy.tags import Div, A, P, Html, Head, Body, Pre, Br
 from tempy.tempy import DOMElement, DOMGroup, Escaped
 
 
@@ -573,3 +573,20 @@ class TestDOMelement(unittest.TestCase):
         html_escapable_content = '"&<>£¢ì'
         t_escaped = Div()(Escaped(html_escapable_content))
         self.assertEqual(t_escaped.render(), '<div>"&<>£¢ì</div>')
+
+    def test_find(self):
+        tag = Div()(A(), A(), Pre(), Br(), Div()(A()), foo=Br())
+        result = tag.find()  # will return a generator yielding all the children -> (A(),A(),Pre(),Br(),Div(),A(),Br())
+        self.assertEqual(len(result), 7)
+
+        result = tag.find(names='foo')  # will return a generator yielding all the children named foo -> (Br())
+        self.assertEqual(len(result), 1)
+
+        result = tag.find(A)  # will return a generator yielding all the children instances of A -> (A(),A(),A())
+        self.assertEqual(len(result), 3)
+
+        result = tag.find('Pre')  # will return a generator yielding all the children instances of Pre -> (Pre())
+        self.assertEqual(len(result), 1)
+
+        result = tag.find('Br', names='foo')  # will return foo -> (Br())
+        self.assertEqual(len(result), 1)

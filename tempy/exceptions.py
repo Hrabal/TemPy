@@ -6,6 +6,7 @@
 
 class TempyException(Exception):
     """Base TemPy exception class"""
+
     def __init__(self, tempy_object, *args):
         super().__init__(*args)
         self.tempy_object = tempy_object
@@ -17,6 +18,7 @@ class TagError(TempyException):
 
 class TagContentError(TagError):
     """Raised when dealing with Content or DOMElement.content_data"""
+
     def __init__(self, tag, content, *args):
         super().__init__(tag, content, *args)
         self.content = content
@@ -64,3 +66,7 @@ class DOMModByKeyError(KeyError, TagError):
 
 class AttrNotFoundError(TempyException):
     """Raised when css attribute is not found in css_attrs"""
+
+
+class ElementNotFoundError(TempyException):
+    """Raised when DOMElement is not found in find method"""

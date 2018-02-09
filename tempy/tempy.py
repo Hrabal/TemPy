@@ -9,8 +9,10 @@ from itertools import chain
 from types import GeneratorType
 from uuid import uuid4
 
-from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, DOMModByIndexError
+from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, \
+    DOMModByIndexError, ElementNotFoundError
 from .tempyrepr import REPRFinder
+import inspect
 
 
 class DOMGroup:
@@ -645,6 +647,52 @@ class DOMElement(REPRFinder):
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
         raise NotImplementedError
+
+    def find(self, selector=None, names=None):
+        """
+        @param:
+            selector => css selector / given as list (returns matching elements)
+                        or TempyClass name (returns instances of this class)
+            names => returns attributes of elements with given name
+        """
+        if selector is None and names is None:
+            found_elements = self.childs[:]
+            for child in self.childs:
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements += child.find(selector, names)
+            return found_elements
+
+        found_elements_selector = []
+        if selector is not None and inspect.isclass(selector):
+            for child in self.childs:
+                if isinstance(child, selector):
+                    found_elements_selector.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_selector += child.find(selector, names)
+
+        elif selector is not None and isinstance(selector, str):
+            for child in self.childs:
+                if (inspect.isclass(child) and selector == child.__name__) or selector == child.__class__.__name__:
+                    found_elements_selector.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_selector += child.find(selector, names)
+
+        found_elements_names = []
+        if names is not None:
+            for child in self.childs:
+                if hasattr(child, '_name') and names == child._name:
+                    found_elements_names.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_names += child.find(selector, names)
+
+        if selector is not None and names is not None:
+            set_selector = set(found_elements_selector)
+            set_names = set(found_elements_names)
+            found_elements = list(set_selector.intersection(set_names))
+        else:
+            found_elements = found_elements_selector if selector is not None else found_elements_names
+
+        return found_elements
 
 
 class Escaped(DOMElement):
