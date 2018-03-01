@@ -10,7 +10,7 @@ from types import GeneratorType
 from uuid import uuid4
 
 from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, \
-    DOMModByIndexError, ElementNotFoundError
+    DOMModByIndexError
 from .tempyrepr import REPRFinder
 import inspect
 

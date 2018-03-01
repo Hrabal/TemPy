@@ -36,7 +36,7 @@ class TagAttrs(dict):
     _TO_SPECIALS = {v: k for k, v in _SPECIALS.items()}
     _FORMAT = {
         'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
-        'klass': lambda x: ' '.join(x),
+        'klass': ' '.join,
         'comment': lambda x: x
     }
 

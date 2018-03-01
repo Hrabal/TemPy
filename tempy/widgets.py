@@ -263,9 +263,9 @@ class TempyTable(Table):
             else:
                 raise ex
 
-    """Makes scopes and converts Td to Th for given arguments
-    which represent lists of tuples (row_index, col_index)"""
     def make_scope(self, col_scope_list=None, row_scope_list=None):
+        """Makes scopes and converts Td to Th for given arguments
+        which represent lists of tuples (row_index, col_index)"""
         if col_scope_list is not None and len(col_scope_list) > 0:
             self.apply_scope(col_scope_list, 'col')
 
