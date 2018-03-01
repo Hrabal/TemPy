@@ -29,7 +29,8 @@ class TagAttrs(dict):
     _SPECIALS = {
         'klass': 'class',
         'typ': 'type',
-        '_for': 'for'
+        '_for': 'for',
+        '_async': 'async',
     }
     _TO_SPECIALS = {v: k for k, v in _SPECIALS.items()}
     _FORMAT = {
