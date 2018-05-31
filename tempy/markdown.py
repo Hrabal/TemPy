@@ -1,49 +1,34 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
-import re
+from mistune import Renderer, Markdown
+
+from .tags import A, P, Strong, Em, Code, Escaped, Pre, Blockquote
 
 
-class MarkdownParser:
-    # Main return result
-    _result = []
+class MarkdownRenderer(Renderer):
 
-    # Defaults
-    tab_width = 4
+    def placeholder(self):
+        return []
 
-    _empty_line_re = re.compile(r"^[ \t]+$", re.M)
+    def paragraph(self, text):
+        return [P()(text), ]
 
-    @property
-    def result(self):
-        for tempy_tag in self._result:
-            yield tempy_tag
+    def link(self, link, title, text):
+        return [A(href=link, title=title)(text), ]
 
-    def _reset(self):
-        self._result = []
-        pass
+    def double_emphasis(self, text):
+        return [Strong()(text), ]
 
-    def feed(self, raw_markdown):
-        # Cycle through clean text
-        for line in self._prepare_split_text(raw_markdown):
-            # TODO
-            pass
+    def emphasis(self, text):
+        return [Em()(text), ]
 
-    def _prepare_split_text(self, text):
-        # Uniform newlines
-        text = text.replace("\r\n", "\n")
-        text = text.replace("\r", "\n")
-        for line in text.splitlines():
-            if set(line).issubset({'\t', ' '}):
-                # If the line is only made of tabs and spaces, go ahead
-                continue
-            output = []
-            # Replace tabs with spaces
-            part, rest = line.split('\t', 1)
-            while rest:
-                output.append(part)
-                spaces = (' ' * (self.tab_width - len(part) % self.tab_width))
-                output.append(spaces)
-                try:
-                    part, rest = rest.split('\t', 1)
-                except ValueError:
-                    part, rest = rest, None
-            yield ''.join(output)
+    def block_code(self, code, lang=None):
+        attrs = {}
+        if lang:
+            attrs['klass'] = 'lang-%s' % lang
+        return [Pre()(Code(**attrs)(Escaped(code))), ]
+
+    def block_quote(self, text):
+        return [Blockquote(text), ]
+
+markdown_parser = Markdown(renderer=MarkdownRenderer())

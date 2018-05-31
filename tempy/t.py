@@ -3,7 +3,8 @@
 import importlib
 from html.parser import HTMLParser
 from .elements import Tag, VoidTag, TagAttrs
-from .markdown import MarkdownParser
+from .tags import P
+from .markdown import markdown_parser
 
 
 class TempyParser(HTMLParser):
@@ -92,7 +93,7 @@ class TempyGod(TempyFactory):
     def __init__(self):
         super().__init__()
         self._html_parser = TempyParser()
-        self._markdown_parser = MarkdownParser()
+        self._markdown_parser = markdown_parser
 
     def from_string(self, html_string):
         """Parses an html string and returns a list of Tempy trees."""
@@ -118,8 +119,8 @@ class TempyGod(TempyFactory):
         return filename
 
     def from_markdown(self, markdown_string):
-        self._markdown_parser._reset().feed(markdown_string)
-        return self._markdown_parser.result
+        tempy_tree = self._markdown_parser(markdown_string)
+        return tempy_tree[0] if tempy_tree else P()
 
 
 T = TempyGod()
