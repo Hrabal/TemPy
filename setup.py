@@ -38,5 +38,6 @@ setup(name='tem-py',
       keywords=['python3', 'templating', 'html', 'web'],
       download_url='https://github.com/Hrabal/TemPy/archive/%s.tar.gz' % __version__,
       python_requires='>=3.3',
-      long_description=long_description
+      long_description=long_description,
+      install_requires=['mistune', ],
       )
