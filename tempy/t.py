@@ -2,6 +2,10 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 import importlib
 from html.parser import HTMLParser
+from mistune import Markdown
+
+# Internal imports
+from .markdown import TempyMarkdownRenderer
 from .elements import Tag, VoidTag, TagAttrs
 
 
@@ -14,6 +18,7 @@ class TempyParser(HTMLParser):
     the parent element is closed.
     This behaviour is accidental and should not be used a s a html sanitizing feature.
     """
+
     def __init__(self):
         super().__init__()
         self.unknown_tag_maker = TempyFactory()
@@ -89,12 +94,13 @@ class TempyGod(TempyFactory):
 
     def __init__(self):
         super().__init__()
-        self._parser = TempyParser()
+        self._html_parser = TempyParser()
+        self._markdown_parser = Markdown(renderer=TempyMarkdownRenderer())
 
     def from_string(self, html_string):
         """Parses an html string and returns a list of Tempy trees."""
-        self._parser._reset().feed(html_string)
-        return self._parser.result
+        self._html_parser._reset().feed(html_string)
+        return self._html_parser.result
 
     def dump_string(self, html_string, filename, pretty=False):
         tempy_trees = self.from_string(html_string)
@@ -113,6 +119,9 @@ class TempyGod(TempyFactory):
             for tempy_tree in tempy_tree_list:
                 f.write(tempy_tree.to_code(pretty=pretty))
         return filename
+
+    def from_markdown(self, markdown_string):
+        return self._markdown_parser(markdown_string)
 
 
 T = TempyGod()
