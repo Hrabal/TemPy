@@ -1,0 +1,5 @@
+[run]
+source = tempy
+[report]
+omit =
+    */python?.?/*
