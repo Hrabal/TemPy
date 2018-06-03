@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This changelog starts from version 1.0.0, previous versions are considered beta versions.
 
+## [1.2.0](https://github.com/Hrabal/TemPy/compare/6cde4add75bcde5c23614573980caf7684bae76b...master) - 2018-06-03
+
+### Added
+- `T.from_markdown(some_markdown_text)` Method to convert markdown text into TemPy nodes.
+
 ## [1.1.0](https://github.com/Hrabal/TemPy/compare/6cde4add75bcde5c23614573980caf7684bae76b...master) - 2017-11-25
 
 ### Added

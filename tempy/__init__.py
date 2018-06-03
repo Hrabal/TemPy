@@ -8,7 +8,7 @@ from .places import TempyPlace
 from .t import T
 from .tempy import Escaped
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 VERSION = tuple(map(int, __version__.split('.')))
 
 if sys.version_info < (3, 3):
