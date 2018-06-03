@@ -12,6 +12,7 @@ python:
   - "nightly" # currently points to 3.7-dev
 install:
   - "pip3 install coveralls"
+  - "pip3 install -r requirements.txt"
 branches:
   only:
     - master
