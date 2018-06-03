@@ -12,6 +12,9 @@ class TempyMarkdownRenderer(Renderer):
     def placeholder(self):
         return []
 
+    def text(self, text):
+        return [text, ]
+
     def paragraph(self, text):
         return [self._tempy_tags.P()(text), ]
 
