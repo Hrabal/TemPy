@@ -3,6 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """
 import unittest
+from collections import Counter
 from tempy import T
 from tempy.tags import P
 
@@ -162,4 +163,4 @@ Markdown | Less | Pretty
     def test_img(self):
         t = '![alt text](foo.png "Title text")'
         r = T.from_markdown(t)
-        self.assertEqual(r[0].render(), '<p><img src="foo.png" alt="alt text" title="Title text"/></p>')        
+        self.assertEqual(Counter(r[0].render()), Counter('<p><img src="foo.png" alt="alt text" title="Title text"/></p>'))
