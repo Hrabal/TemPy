@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
-import re
 import importlib
-from mistune import Renderer, Markdown
+from mistune import Renderer
 
 from .tempy import Escaped
 
 
-class MarkdownRenderer(Renderer):
+class TempyMarkdownRenderer(Renderer):
     _tempy_tags = importlib.import_module('.tags', package='tempy')
 
     def placeholder(self):
@@ -114,6 +113,3 @@ class MarkdownRenderer(Renderer):
                 self._tempy_tags.Ol()(text)
             )
         ]
-
-
-markdown_parser = Markdown(renderer=MarkdownRenderer())

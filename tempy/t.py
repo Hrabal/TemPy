@@ -2,9 +2,11 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 import importlib
 from html.parser import HTMLParser
+from mistune import Markdown
+
+# Internal imports
+from .markdown import TempyMarkdownRenderer
 from .elements import Tag, VoidTag, TagAttrs
-from .tags import P
-from .markdown import markdown_parser
 
 
 class TempyParser(HTMLParser):
@@ -93,7 +95,7 @@ class TempyGod(TempyFactory):
     def __init__(self):
         super().__init__()
         self._html_parser = TempyParser()
-        self._markdown_parser = markdown_parser
+        self._markdown_parser = Markdown(renderer=TempyMarkdownRenderer())
 
     def from_string(self, html_string):
         """Parses an html string and returns a list of Tempy trees."""
@@ -119,8 +121,7 @@ class TempyGod(TempyFactory):
         return filename
 
     def from_markdown(self, markdown_string):
-        tempy_tree = self._markdown_parser(markdown_string)
-        return tempy_tree[0] if tempy_tree else P()
+        return self._markdown_parser(markdown_string)
 
 
 T = TempyGod()
