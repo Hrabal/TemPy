@@ -3,3 +3,4 @@ source = tempy
 [report]
 omit =
     */python?.?/*
+    __main__.py
