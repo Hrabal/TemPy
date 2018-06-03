@@ -34,7 +34,7 @@ class TempyMarkdownRenderer(Renderer):
         return [self._tempy_tags.Pre()(self._tempy_tags.Code(**attrs)(Escaped(code))), ]
 
     def block_quote(self, text):
-        return [self._tempy_tags.Blockquote(text), ]
+        return [self._tempy_tags.Blockquote()(text), ]
 
     def header(self, text, level, raw=None):
         HeaderTag = getattr(self._tempy_tags, 'H%s' % level, None)
@@ -54,8 +54,8 @@ class TempyMarkdownRenderer(Renderer):
     def table(self, header, body):
         return [
             self._tempy_tags.Table()(
-                self._tempy_tags.Thead(header),
-                self._tempy_tags.Tbody(body)
+                self._tempy_tags.Thead()(header),
+                self._tempy_tags.Tbody()(body)
             )
         ]
 
