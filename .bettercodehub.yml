@@ -3,3 +3,4 @@ languages:
 exclude:
   - /benchmarks/.*
   - /examples/.*
+  - /tests/.*
