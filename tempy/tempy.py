@@ -30,10 +30,11 @@ class DOMGroup:
             self._iterable = False
         else:
             try:
-                _ = (e for e in obj)
-                self._iterable = True
+                iter(obj)
             except TypeError:
                 self._iterable = False
+            else:
+                self._iterable = True
 
     def __iter__(self):
         if self._iterable:
