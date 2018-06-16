@@ -5,7 +5,6 @@ import html
 from collections import deque, Iterable
 from copy import copy
 from functools import wraps
-from itertools import chain
 from numbers import Number
 from types import GeneratorType
 
@@ -55,9 +54,11 @@ def yield_domgroups(items, kwitems, reverse=False):
     i = 0
     for typ in (kwitems, items)[::verse]:
         for item in typ:
-            if typ is not kwitems:
-                item = (None, item)
-            group = DOMGroup(*item)
+            if typ is kwitems:
+                name, item = item
+            else:
+                name, item = None, item
+            group = DOMGroup(name, item)
             if isinstance(group.obj, DOMElement):
                 # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
                 group.obj._name = group.name
