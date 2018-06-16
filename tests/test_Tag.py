@@ -77,13 +77,6 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(WrongArgsError):
             d = Div(1)
 
-    def test_needed_kargs(self):
-        class TestTag(Tag):
-           _needed_kwargs = ('test', )
-
-        with self.assertRaises(TagError):
-            TestTag()
-
     def test_parent(self):
         d = Div()
         p = P().append_to(d)

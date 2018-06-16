@@ -106,28 +106,13 @@ class Tag(DOMElement):
     Provides an api for tag inner manipulation and for rendering.
     """
     _template = '{pretty}<{tag}{attrs}>{inner}{pretty}</{tag}>'
-    _needed_kwargs = None
     _void = False
-    default_attributes = {}
-    default_data = {}
 
     def __init__(self, *args, **kwargs):
-        default_data = copy(self.default_data)
-        default_data.update(kwargs.pop('data', {}))
-        default_attributes = copy(self.default_attributes)
-        default_attributes.update(kwargs)
+        data = kwargs.pop('data', {})
         self.attrs = TagAttrs()
-        for k in self._needed_kwargs or []:
-            try:
-                need_check = default_attributes[k]
-            except KeyError:
-                need_check = None
-            if not need_check:
-                raise TagError(self,
-                               '%s argument needed for %s' % (k,
-                                                              self.__class__))
-        self.attr(*args, **default_attributes)
-        super().__init__(**default_data)
+        self.attr(*args, **kwargs)
+        super().__init__(**data)
         self._tab_count = 0
         self._render = None
         if self._void:
