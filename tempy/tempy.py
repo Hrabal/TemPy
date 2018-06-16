@@ -51,14 +51,18 @@ def yield_domgroups(items, kwitems, reverse=False):
     verse = (1, -1)[reverse]
     if isinstance(items, GeneratorType):
         items = list(items)
-    unnamed = (DOMGroup(None, item) for item in items[::verse])
-    named = (DOMGroup(k, v) for k, v in list(kwitems.items())[::verse])
-    contents = (unnamed, named)[::verse]
-    for i, group in enumerate(chain(*contents)):
-        if isinstance(group.obj, DOMElement):
-            # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
-            group.obj._name = group.name
-        yield i, group
+    kwitems = kwitems.items()
+    i = 0
+    for typ in (kwitems, items)[::verse]:
+        for item in typ:
+            if typ is not kwitems:
+                item = (None, item)
+            group = DOMGroup(*item)
+            if isinstance(group.obj, DOMElement):
+                # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
+                group.obj._name = group.name
+            yield i, group
+            i += 1
 
 
 class DOMElement(REPRFinder):
