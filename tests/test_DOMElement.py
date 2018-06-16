@@ -296,7 +296,7 @@ class TestDOMelement(unittest.TestCase):
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
         self.assertTrue(div in result)
-        self.assertFalse(div.uuid in [tag.uuid for tag in result])
+        self.assertFalse(id(div) in [id(tag) for tag in result])
         with self.assertRaises(TypeError):
             result = div * 'string'
         with self.assertRaises(ValueError):

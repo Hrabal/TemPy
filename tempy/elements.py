@@ -5,7 +5,6 @@ Elemnts used inside Tempy Classes
 """
 import re
 from copy import copy
-from uuid import uuid4
 from types import GeneratorType
 from collections import Mapping, Iterable, ChainMap
 
@@ -458,7 +457,6 @@ class Content(DOMElement):
         self._t_repr = t_repr
         if self._t_repr and not isinstance(self._t_repr, DOMElement):
             raise ContentError(self, 'template argument should be a DOMElement')
-        self.uuid = uuid4()
         self._stable = False
 
     def __eq__(self, other):

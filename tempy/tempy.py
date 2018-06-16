@@ -77,7 +77,6 @@ class DOMElement(REPRFinder):
         self.childs = []
         self.parent = None
         self.content_data = {}
-        self.uuid = uuid4().int
         self._stable = True
         self._data = kwargs
         self._applied_funcs = []
@@ -94,13 +93,13 @@ class DOMElement(REPRFinder):
         return '<%s.%s %s.%s%s%s>' % (
             self.__module__,
             type(self).__name__,
-            self.uuid,
+            id(self),
             ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
             ' %d childs.' % len(self.childs) if self.childs else '',
             ' Named %s' % self._name if self._name else '')
 
     def __hash__(self):
-        return self.uuid
+        return id(self)
 
     def __bool__(self):
         # Is it normal that without explicit __bool__ definition
@@ -112,7 +111,7 @@ class DOMElement(REPRFinder):
             return False
         comp_dicts = [{
             'name': t._name,
-            'childs': [getattr(c, 'uuid', None) for c in t.childs],
+            'childs': [id(c) for c in t.childs if isinstance(c, DOMElement)],
             'content_data': t.content_data,
         } for t in (self, other)]
         return comp_dicts[0] == comp_dicts[1]
@@ -220,7 +219,7 @@ class DOMElement(REPRFinder):
     def _own_index(self):
         if self.parent:
             try:
-                return [t.uuid for t in self.parent.childs].index(self.uuid)
+                return [id(t) for t in self.parent.childs].index(id(self))
             except ValueError:
                 return -1
         return -1
@@ -567,7 +566,7 @@ class DOMElement(REPRFinder):
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
-        return list(filter(lambda x: x.uuid != self.uuid, self.parent.childs))
+        return list(filter(lambda x: id(x) != id(self), self.parent.childs))
 
     def get_parent(self):
         """Returns this element's father"""
