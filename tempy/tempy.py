@@ -6,8 +6,8 @@ from collections import deque, Iterable
 from copy import copy
 from functools import wraps
 from itertools import chain
+from numbers import Number
 from types import GeneratorType
-from uuid import uuid4
 
 from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, \
     DOMModByIndexError
@@ -252,7 +252,9 @@ class DOMElement(REPRFinder):
 
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
-            if not issubclass(child.__class__, DOMElement):
+            if isinstance(child, (str, Number)):
+                pass
+            elif not issubclass(child.__class__, DOMElement):
                 tempyREPR_cls = self._search_for_view(child)
                 if tempyREPR_cls:
                     # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
