@@ -18,10 +18,10 @@ Templating systems are cool (Python syntax in HTML code) but not cool enough (yo
 No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
 See below for benchmarks against other templating engines.
 
-## Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
+### Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
+*****
 
-### **Build, manipulate, and navigate HTML documents, with no HTML involved.**
-
+### Build, manipulate, and navigate HTML documents, with no HTML involved.
 
 Overview: 
 
@@ -194,7 +194,7 @@ class HomePage(BasePage):
                 H3()('Hame page important content'),
                 'Look, I\'m a string!', Br(),
                 H3()('H3 is big, really big'),
-                H1()('Today's content:'),
+                H1()('Today\'s content:'),
                 self.get_dynamic_content()
             )
         )
