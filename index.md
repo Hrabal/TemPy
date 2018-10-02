@@ -62,6 +62,6 @@ page.render()
 
 ## Speed
 
-One of the main factors that leads to slow speeds when developing webapps is the template engine. TemPy has a different approach to HTML generation, resulting in a significant speed post.
+One of the main factors that leads to slow speeds when developing webapps is the template engine. TemPy has a different approach to HTML generation, resulting in a significant speed boost.
 
 No parsing and a simple structure make TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
