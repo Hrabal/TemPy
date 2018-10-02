@@ -44,7 +44,7 @@ Or clone/download this repository and run `python3 setup.py install`
 #### Basic Usage
 
 TemPy offers clean syntax for building pages in pure python:
-```python
+```Python
 from tempy.tags import Html, Head, Body, Meta, Link, Div, P, A
 my_text_list = ['This is Foo.', 'This is Bar.', 'Have you met my friend Baz?']
 another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
@@ -95,7 +95,7 @@ page.render()
 
 #### Building Blocks
 You can also create blocks and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
-```python
+```Python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
 # define some common blocks
@@ -103,7 +103,7 @@ header = Div(klass='header')(title=Div()('My website'), logo=Img(src='img.png'))
 menu = Div(klass='menu')(Li()(A(href=link)) for link in links)
 footer = Div(klass='coolFooterClass')(Img(src=img) for img in foot_imgs)
 ```
-```python
+```Python
 # --- file: pages.py
 from base_elements import header, menu, footer
 
@@ -111,7 +111,7 @@ from base_elements import header, menu, footer
 home_page = Html()(Head(), body=Body()(header, menu, content='Hello world.', footer=footer))
 content_page = Html()(Head(), body=Body()(header, menu, container=Div(klass='container'), footer=footer))
 ```
-```python
+```Python
 # --- file: my_controller.py
 from tempy.tags import Div
 from pages import home_page, content_page
@@ -209,7 +209,7 @@ class HomePage(BasePage):
                      Div()(comment for comment in current_content.comments))
 ```
 
-TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in its parent classes.
+TemPy executes each base class `__init__` method in reverse mro, so your subclass can access all the elements defined in its parent classes.
 
 #### TemPy Reprs
 
@@ -336,10 +336,10 @@ div1.slice(div2)
 ## Tag Attributes 
 Add attributes to every element at definition time or later:
 ```python
-div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' because 'class' is a Python's buildin keyword
+div = Div(id='my_html_id', class='someHtmlClass') # 'klass' because 'class' is a Python's buildin keyword
 >>> <div id="my_dom_id" class="someHtmlClass"></div>
 
-a = A(klass='someHtmlClass')('text of this link')
+a = A(class='someHtmlClass')('text of this link')
 a.attr(id='another_dom_id')
 a.attr({'href': 'www.thisisalink.com'})
 >>> <a id="another_dom_id" class="someHtmlClass" href="www.thisisalink.com">text of this link</a>
