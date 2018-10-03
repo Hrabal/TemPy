@@ -53,7 +53,7 @@ my_void_tag().render()
 >>> <customvoid/>
 ```
 
-Classes made with `T` are subclasses of `tempy.tempy.DOMElement` and behave like any other TemPy Tag, they inherits the api and the features of TemPy objects.
+Classes made with `T` are subclasses of `tempy.tempy.DOMElement` and behave like any other TemPy Tag, they inherit the api and the features of TemPy objects.
 
 
 `T` can also produce TemPy tags from html strings on the fly. Using the `from_string` method it converts html strings into a list of TemPy trees:

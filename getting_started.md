@@ -18,7 +18,7 @@ python3 setup.py install
 
 <aside class="info">TemPy does not support Python 2.x. TemPy requires Python >= 3.3 to work.</aside>
 
-TemPy is avaiable on PyPi, so you can pip him. [PyPi.org](https://pypi.org/project/tem-py/) page.
+TemPy is available on PyPi, so you can pip him. [PyPi.org](https://pypi.org/project/tem-py/) page.
 
 If you want to customize TemPy you can clone the main [GitHub repo](https://github.com/Hrabal/TemPy).
 
@@ -40,4 +40,4 @@ This form of yielding is used for speed and can be easily removed if you plan to
 
 The main feature is the possibility to have named child tags in the correct order. Naming child tags is possible in Python < 3.6, but the tag's order will probably not be correct.
 
-<aside class="success"><b>It it very reccomended to use TemPy with Python >= 3.6.</b></aside>
+<aside class="success"><b>It is very recommended to use TemPy with Python >= 3.6.</b></aside>
