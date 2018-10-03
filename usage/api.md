@@ -6,7 +6,7 @@ permalink: /usage/building/api/
 
 # TemPy objects API.
 
-Every object that inherits from `tempy.tempy.DOMElement` or `tempy.elements.Tag` have access to ta rich api to create, move, combine and modify TemPy instances to build a DOM.
+Every object that inherits from `tempy.tempy.DOMElement` or `tempy.elements.Tag` have access to a rich api to create, move, combine and modify TemPy instances to build a DOM.
 
 TemPy lets you build blocks and put them together using the manipulation api. Every child of a TemPy object manipulated using the api will follow his father.
 
