@@ -7,17 +7,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def none_handler():
-    return """Ready for some Tempy examples?
-   </br>
-   <ul>
-    <li><a href="/hello_world">Hello World</a></li>
-    <li><a href="/star_wars">Star Wars</a></li>
-    <li><a href="/list">List</a></li>
-    <li><a href="/static">Static Image</a></li>
-    <li><a href="/table">Table</a></li>
-    <li><a href="/css">CSS</a></li>
-    </ul>
-    """
+    from templates.homepage import page
+    return page.render() 
+
 
 @app.route('/hello_world')
 def hello_world_handler():
@@ -50,6 +42,11 @@ def table_handler():
 @app.route('/css')
 def css_handler():
     from templates.css_example import page
+    return page.render()
+
+@app.route('/homepage')
+def homepage_handler():
+    from templates.homepage import page
     return page.render()
 
 
