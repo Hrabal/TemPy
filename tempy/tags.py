@@ -124,3 +124,5 @@ for tag_parent_cls, tags in tags.items():
         tag_cls = type(tag_cls_name, (tag_parent_cls, ), {'_%s__tag' % tag_cls_name: tag})
         # We put the new dynamically created class inside locals to make it available from the outside
         locals()[tag_cls_name] = tag_cls
+
+del tag, tag_cls, tag_cls_name, tag_parent_cls, tags
