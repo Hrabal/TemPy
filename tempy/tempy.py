@@ -66,217 +66,193 @@ def yield_domgroups(items, kwitems, reverse=False):
             i += 1
 
 
-class DOMElement(REPRFinder):
-    """Takes care of the tree structure using the "childs" and "parent" attributes.
-    Manages the DOM manipulation with proper valorization of those two.
-    """
-    _from_factory = False
-
-    def __init__(self, **kwargs):
-        super().__init__()
-        self._name = None
-        self.childs = []
-        self.parent = None
-        self.content_data = {}
-        self._stable = True
-        self._data = kwargs
-        self._applied_funcs = []
-        self._reverse_mro_func('init')
-
-    def _reverse_mro_func(self, func_name):
-        for cls in reversed(self.__class__.__mro__):
-            func = getattr(cls, func_name, None)
-            if func and func not in self._applied_funcs:
-                self._applied_funcs.append(func)
-                func(self)
-
-    def __repr__(self):
-        return '<%s.%s %s.%s%s%s>' % (
-            self.__module__,
-            type(self).__name__,
-            id(self),
-            ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
-            ' %d childs.' % len(self.childs) if self.childs else '',
-            ' Named %s' % self._name if self._name else '')
-
-    def __hash__(self):
-        return id(self)
-
-    def __bool__(self):
-        # Is it normal that without explicit __bool__ definition
-        # custom classes evaluates to False?
-        return True
-
-    def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            return False
-        comp_dicts = [{
-            'name': t._name,
-            'childs': [id(c) for c in t.childs if isinstance(c, DOMElement)],
-            'content_data': t.content_data,
-        } for t in (self, other)]
-        return comp_dicts[0] == comp_dicts[1]
-
-    def __getitem__(self, i):
-        return self.childs[i]
-
-    def __iter__(self):
-        return iter(self.childs)
-
-    def __next__(self):
-        return next(iter(self.childs))
-
-    def __reversed__(self):
-        return iter(self.childs[::-1])
-
-    def __len__(self):
-        return len(self.childs)
-
-    def __contains__(self, x):
-        return x in self.childs
-
-    def __copy__(self):
-        return self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
-
-    def __add__(self, other):
-        """Addition produces a copy of the left operator, containig the right operator as a child."""
-        return self.clone()(other)
-
-    def __iadd__(self, other):
-        """In-place addition adds the right operand as left's child"""
-        return self(other)
-
-    def __sub__(self, other):
-        """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
-        if other not in self:
-            raise ValueError('%s is not in %s' % (other, self))
-        ret = self.clone()
-        ret.pop(other._own_index)
-        return ret
-
-    def __isub__(self, other):
-        """removes the child."""
-        if other not in self:
-            raise ValueError('%s is not in %s' % (other, self))
-        return self.pop(other._own_index)
-
-    def __mul__(self, n):
-        """Returns a list of clones."""
-        if not isinstance(n, int):
-            raise TypeError
-        if n < 0:
-            raise ValueError('Negative multiplication not permitted.')
-        return [self.clone() for i in range(n)]
-
-    def __imul__(self, n):
-        """Clones the element n times."""
-        if not self.parent:
-            return self * n
-        if n == 0:
-            self.parent.pop(self._own_index)
-            return self
-        return self.after(self * (n - 1))
-
-    def to_code(self, pretty=False):
-        ret = []
-        prettying = '\n' + ('\t' * self._depth) if pretty else ''
-        childs_to_code = []
-        for child in self.childs:
-            if issubclass(child.__class__, DOMElement):
-                child_code = child.to_code(pretty=pretty)
-                childs_to_code.append(child_code)
-            else:
-                childs_to_code.append('"""%s"""' % child)
-
-        childs_code = ''
-        if childs_to_code:
-            childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_to_code), prettying)
-        class_code = ''
-        if self._from_factory:
-            class_code += 'T.'
-            if getattr(self, '_void', False):
-                class_code += 'Void.'
-        class_code += self.__class__.__name__
-        ret.append('%s(%s)%s' % (
-            class_code,
-            self.attrs.to_code(),
-            childs_code
-        ))
-        return ''.join(ret)
-
-    @property
-    def _depth(self):
-        return 0 if self.is_root else self.parent._depth + 1
-
-    @property
-    def is_root(self):
-        return self.root == self
+class DOMNavigator:
 
     @property
     def root(self):
         return self.parent.root if self.parent else self
 
-    @property
-    def _own_index(self):
-        if self.parent:
-            try:
-                return [id(t) for t in self.parent.childs].index(id(self))
-            except ValueError:
-                return -1
-        return -1
+    def _find_content(self, cont_name):
+        """Search for a content_name in the content data, if not found the parent is searched."""
+        try:
+            a = self.content_data[cont_name]
+            return a
+        except KeyError:
+            if self.parent:
+                return self.parent._find_content(cont_name)
+            else:
+                # Fallback for no content (Raise NoContent?)
+                return ''
 
-    @property
-    def index(self):
-        """Returns the position of this element in the parent's childs list.
-        If the element have no parent, returns None.
+    def _get_non_tempy_contents(self):
+        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
+        for thing in filter(lambda x: not issubclass(x.__class__, DOMElement), self.childs):
+            yield thing
+
+    def find(self, selector=None, names=None):
         """
-        return self._own_index
+        @param:
+            selector => css selector / given as list (returns matching elements)
+                        or TempyClass name (returns instances of this class)
+            names => returns attributes of elements with given name
+        """
+        if selector is None and names is None:
+            found_elements = self.childs[:]
+            for child in self.childs:
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements += child.find(selector, names)
+            return found_elements
 
-    @property
-    def stable(self):
-        if all(c.stable for c in self.childs) and self._stable:
-            self._stable = True
-            return self._stable
+        found_elements_selector = []
+        if selector is not None and inspect.isclass(selector):
+            for child in self.childs:
+                if isinstance(child, selector):
+                    found_elements_selector.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_selector += child.find(selector, names)
+
+        elif selector is not None and isinstance(selector, str):
+            for child in self.childs:
+                if (inspect.isclass(child) and selector == child.__name__) or selector == child.__class__.__name__:
+                    found_elements_selector.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_selector += child.find(selector, names)
+
+        found_elements_names = []
+        if names is not None:
+            for child in self.childs:
+                if hasattr(child, '_name') and names == child._name:
+                    found_elements_names.append(child)
+                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
+                    found_elements_names += child.find(selector, names)
+
+        if selector is not None and names is not None:
+            set_selector = set(found_elements_selector)
+            set_names = set(found_elements_names)
+            found_elements = list(set_selector.intersection(set_names))
         else:
-            self._stable = False
-            return self._stable
+            found_elements = found_elements_selector if selector is not None else found_elements_names
 
-    @property
-    def length(self):
-        """Returns the number of childs."""
-        return len(self.childs)
+        return found_elements
 
-    @property
-    def is_empty(self):
-        """True if no childs"""
-        return self.length == 0
+    def children(self):
+        """Returns Tags and Content Placehorlders childs of this element."""
+        return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
-    def _iter_child_renders(self, pretty=False):
-        for child in self.childs:
-            if isinstance(child, (str, Number)):
-                pass
-            elif not issubclass(child.__class__, DOMElement):
-                tempyREPR_cls = self._search_for_view(child)
-                if tempyREPR_cls:
-                    # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
-                    # this trick is used to avoid circular imports
-                    class Patched(tempyREPR_cls, DOMElement):
-                        pass
+    def contents(self):
+        """Returns this elements childs list, unfiltered."""
+        return self.childs
 
-                    child = Patched(child)
-            try:
-                yield child.render(pretty=pretty)
-            except (AttributeError, NotImplementedError):
-                if isinstance(child, Escaped):
-                    yield child._render
+    def first(self):
+        """Returns the first child"""
+        return self.childs[0]
+
+    def last(self):
+        """Returns the last child"""
+        return self.childs[-1]
+
+    def next(self):
+        """Returns the next sibling."""
+        return self.parent.childs[self._own_index + 1]
+
+    def next_all(self):
+        """Returns all the next siblings as a list."""
+        return self.parent.childs[self._own_index + 1:]
+
+    def prev(self):
+        """Returns the previous sibling."""
+        return self.parent.childs[self._own_index - 1]
+
+    def prev_all(self):
+        """Returns all the previous siblings as a list."""
+        return self.parent.childs[:self._own_index]
+
+    def siblings(self):
+        """Returns all the siblings of this element as a list."""
+        return list(filter(lambda x: id(x) != id(self), self.parent.childs))
+
+    def get_parent(self):
+        """Returns this element's father"""
+        return self.parent
+
+    def slice(self, start=None, end=None, step=None):
+        """Slice of this element's childs as childs[start:end:step]"""
+        return self.childs[start:end:step]
+
+    def bft(self):
+        """ Generator that returns each element of the tree in Breadth-first order"""
+        queue = deque([self])
+        while queue:
+            node = queue.pop()
+            yield node
+            if hasattr(node, 'childs'):
+                queue.extendleft(node.childs)
+
+    def dfs_preorder(self, reverse=False):
+        """Generator that returns each element of the tree in Preorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""
+        stack = deque()
+        stack.append(self)
+        while stack:
+            node = stack.pop()
+            yield node
+            if hasattr(node, 'childs'):
+                if reverse:
+                    stack.extend(node.childs)
                 else:
-                    yield html.escape(str(child))
-            except Exception as ex:
-                raise ex
+                    stack.extend(node.childs[::-1])
 
-    def render_childs(self, pretty=False):
-        """Public api to render all the childs using Tempy rules"""
-        return ''.join(self._iter_child_renders(pretty=pretty))
+    def dfs_inorder(self, reverse=False):
+        """Generator that returns each element of the tree in Inorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""
+        stack = deque()
+        visited = set()
+        visited.add(self)
+        if reverse:
+            stack.append(self.childs[0])
+            stack.append(self)
+            stack.extend(self.childs[1:])
+        else:
+            stack.extend(self.childs[1:])
+            stack.append(self)
+            stack.append(self.childs[0])
+        while stack:
+            node = stack.pop()
+            if node in visited or not node.childs:
+                yield node
+            else:
+                stack.append(node)
+                visited.add(node)
+                if hasattr(node, 'childs'):
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
+
+    def dfs_postorder(self, reverse=False):
+        """Generator that returns each element of the tree in Postorder order.
+        Keyword arguments:
+        reverse -- if true, the search is done from right to left."""
+        stack = deque()
+        stack.append(self)
+        visited = set()
+        while stack:
+            node = stack.pop()
+            if node in visited:
+                yield node
+            else:
+                visited.add(node)
+                stack.append(node)
+                if hasattr(node, 'childs'):
+                    if reverse:
+                        stack.extend(node.childs)
+                    else:
+                        stack.extend(node.childs[::-1])
+
+
+class DOMModifier:
 
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
@@ -319,57 +295,49 @@ class DOMElement(REPRFinder):
             if dom_group.name:
                 setattr(self, dom_group.name, dom_group.obj)
 
-    def _find_content(self, cont_name):
-        """Search for a content_name in the content data, if not found the parent is searched."""
-        try:
-            a = self.content_data[cont_name]
-            return a
-        except KeyError:
-            if self.parent:
-                return self.parent._find_content(cont_name)
-            else:
-                # Fallback for no content (Raise NoContent?)
-                return ''
-
-    def _get_non_tempy_contents(self):
-        """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
-        for thing in filter(lambda x: not issubclass(x.__class__, DOMElement), self.childs):
-            yield thing
-
-    def data(self, key=None, **kwargs):
-        """Adds or retrieve extra data to this element, this data will not be rendered.
-        Every tag have a _data attribute (dict), if key is given _data[key] is returned.
-        Kwargs are used to udpate this Tag's _data."""
-        self._data.update(kwargs)
-        if key:
-            return self._data[key]
-        if not kwargs:
-            return self._data
-        return self
-
-    def inject(self, contents=None, **kwargs):
-        """
-        Adds content data in this element. This will be used in the rendering of this element's childs.
-        Multiple injections on the same key will override the content (dict.update behavior).
-        """
-        if contents and not isinstance(contents, dict):
-            raise WrongContentError(self, contents, 'contents should be a dict')
-        self._stable = False
-        if not contents:
-            contents = {}
-        if kwargs:
-            contents.update(kwargs)
-        self.content_data.update(contents)
-        return self
-
-    def clone(self):
-        """Returns a deepcopy of this element."""
-        return copy(self)
-
     @content_receiver()
     def __call__(self, _, child):
         """Calling the object will add the given parameters as childs"""
         self._insert(child)
+
+    def __add__(self, other):
+        """Addition produces a copy of the left operator, containig the right operator as a child."""
+        return self.clone()(other)
+
+    def __iadd__(self, other):
+        """In-place addition adds the right operand as left's child"""
+        return self(other)
+
+    def __sub__(self, other):
+        """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
+        if other not in self:
+            raise ValueError('%s is not in %s' % (other, self))
+        ret = self.clone()
+        ret.pop(other._own_index)
+        return ret
+
+    def __isub__(self, other):
+        """removes the child."""
+        if other not in self:
+            raise ValueError('%s is not in %s' % (other, self))
+        return self.pop(other._own_index)
+
+    def __mul__(self, n):
+        """Returns a list of clones."""
+        if not isinstance(n, int):
+            raise TypeError
+        if n < 0:
+            raise ValueError('Negative multiplication not permitted.')
+        return [self.clone() for i in range(n)]
+
+    def __imul__(self, n):
+        """Clones the element n times."""
+        if not self.parent:
+            return self * n
+        if n == 0:
+            self.parent.pop(self._own_index)
+            return self
+        return self.after(self * (n - 1))
 
     @content_receiver()
     def after(self, i, sibling):
@@ -535,171 +503,209 @@ class DOMElement(REPRFinder):
         self._detach_childs()
         return self
 
-    def children(self):
-        """Returns Tags and Content Placehorlders childs of this element."""
-        return filter(lambda x: isinstance(x, DOMElement), self.childs)
 
-    def contents(self):
-        """Returns this elements childs list, unfiltered."""
-        return self.childs
+class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
+    """Takes care of the tree structure using the "childs" and "parent" attributes.
+    Manages the DOM manipulation with proper valorization of those two.
+    """
+    _from_factory = False
 
-    def first(self):
-        """Returns the first child"""
-        return self.childs[0]
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._name = None
+        self.childs = []
+        self.parent = None
+        self.content_data = {}
+        self._stable = True
+        self._data = kwargs
+        self._applied_funcs = []
+        self._reverse_mro_func('init')
 
-    def last(self):
-        """Returns the last child"""
-        return self.childs[-1]
+    def _reverse_mro_func(self, func_name):
+        for cls in reversed(self.__class__.__mro__):
+            func = getattr(cls, func_name, None)
+            if func and func not in self._applied_funcs:
+                self._applied_funcs.append(func)
+                func(self)
 
-    def next(self):
-        """Returns the next sibling."""
-        return self.parent.childs[self._own_index + 1]
+    def __repr__(self):
+        return '<%s.%s %s.%s%s%s>' % (
+            self.__module__,
+            type(self).__name__,
+            id(self),
+            ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
+            ' %d childs.' % len(self.childs) if self.childs else '',
+            ' Named %s' % self._name if self._name else '')
 
-    def next_all(self):
-        """Returns all the next siblings as a list."""
-        return self.parent.childs[self._own_index + 1:]
+    def __hash__(self):
+        return id(self)
 
-    def prev(self):
-        """Returns the previous sibling."""
-        return self.parent.childs[self._own_index - 1]
+    def __bool__(self):
+        # Is it normal that without explicit __bool__ definition
+        # custom classes evaluates to False?
+        return True
 
-    def prev_all(self):
-        """Returns all the previous siblings as a list."""
-        return self.parent.childs[:self._own_index]
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        comp_dicts = [{
+            'name': t._name,
+            'childs': [id(c) for c in t.childs if isinstance(c, DOMElement)],
+            'content_data': t.content_data,
+        } for t in (self, other)]
+        return comp_dicts[0] == comp_dicts[1]
 
-    def siblings(self):
-        """Returns all the siblings of this element as a list."""
-        return list(filter(lambda x: id(x) != id(self), self.parent.childs))
+    def __getitem__(self, i):
+        return self.childs[i]
 
-    def get_parent(self):
-        """Returns this element's father"""
-        return self.parent
+    def __iter__(self):
+        return iter(self.childs)
 
-    def slice(self, start=None, end=None, step=None):
-        """Slice of this element's childs as childs[start:end:step]"""
-        return self.childs[start:end:step]
+    def __next__(self):
+        return next(iter(self.childs))
 
-    def bft(self):
-        """ Generator that returns each element of the tree in Breadth-first order"""
-        queue = deque([self])
-        while queue:
-            node = queue.pop()
-            yield node
-            if hasattr(node, 'childs'):
-                queue.extendleft(node.childs)
+    def __reversed__(self):
+        return iter(self.childs[::-1])
 
-    def dfs_preorder(self, reverse=False):
-        """Generator that returns each element of the tree in Preorder order.
-        Keyword arguments:
-        reverse -- if true, the search is done from right to left."""
-        stack = deque()
-        stack.append(self)
-        while stack:
-            node = stack.pop()
-            yield node
-            if hasattr(node, 'childs'):
-                if reverse:
-                    stack.extend(node.childs)
-                else:
-                    stack.extend(node.childs[::-1])
+    def __contains__(self, x):
+        return x in self.childs
 
-    def dfs_inorder(self, reverse=False):
-        """Generator that returns each element of the tree in Inorder order.
-        Keyword arguments:
-        reverse -- if true, the search is done from right to left."""
-        stack = deque()
-        visited = set()
-        visited.add(self)
-        if reverse:
-            stack.append(self.childs[0])
-            stack.append(self)
-            stack.extend(self.childs[1:])
+    def __len__(self):
+        return len(self.childs)
+
+    def __copy__(self):
+        return self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
+
+    def to_code(self, pretty=False):
+        ret = []
+        prettying = '\n' + ('\t' * self._depth) if pretty else ''
+        childs_to_code = []
+        for child in self.childs:
+            if issubclass(child.__class__, DOMElement):
+                child_code = child.to_code(pretty=pretty)
+                childs_to_code.append(child_code)
+            else:
+                childs_to_code.append('"""%s"""' % child)
+
+        childs_code = ''
+        if childs_to_code:
+            childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_to_code), prettying)
+        class_code = ''
+        if self._from_factory:
+            class_code += 'T.'
+            if getattr(self, '_void', False):
+                class_code += 'Void.'
+        class_code += self.__class__.__name__
+        ret.append('%s(%s)%s' % (
+            class_code,
+            self.attrs.to_code(),
+            childs_code
+        ))
+        return ''.join(ret)
+
+    @property
+    def _depth(self):
+        return 0 if self.is_root else self.parent._depth + 1
+
+    @property
+    def is_root(self):
+        return self.root == self
+
+    @property
+    def _own_index(self):
+        if self.parent:
+            try:
+                return [id(t) for t in self.parent.childs].index(id(self))
+            except ValueError:
+                return -1
+        return -1
+
+    @property
+    def index(self):
+        """Returns the position of this element in the parent's childs list.
+        If the element have no parent, returns None.
+        """
+        return self._own_index
+
+    @property
+    def stable(self):
+        if all(c.stable for c in self.childs) and self._stable:
+            self._stable = True
+            return self._stable
         else:
-            stack.extend(self.childs[1:])
-            stack.append(self)
-            stack.append(self.childs[0])
-        while stack:
-            node = stack.pop()
-            if node in visited or not node.childs:
-                yield node
-            else:
-                stack.append(node)
-                visited.add(node)
-                if hasattr(node, 'childs'):
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
+            self._stable = False
+            return self._stable
 
-    def dfs_postorder(self, reverse=False):
-        """Generator that returns each element of the tree in Postorder order.
-        Keyword arguments:
-        reverse -- if true, the search is done from right to left."""
-        stack = deque()
-        stack.append(self)
-        visited = set()
-        while stack:
-            node = stack.pop()
-            if node in visited:
-                yield node
-            else:
-                visited.add(node)
-                stack.append(node)
-                if hasattr(node, 'childs'):
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
+    @property
+    def length(self):
+        """Returns the number of childs."""
+        return len(self.childs)
+
+    @property
+    def is_empty(self):
+        """True if no childs"""
+        return self.length == 0
+
+    def _iter_child_renders(self, pretty=False):
+        for child in self.childs:
+            if isinstance(child, (str, Number)):
+                pass
+            elif not issubclass(child.__class__, DOMElement):
+                tempyREPR_cls = self._search_for_view(child)
+                if tempyREPR_cls:
+                    # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
+                    # this trick is used to avoid circular imports
+                    class Patched(tempyREPR_cls, DOMElement):
+                        pass
+
+                    child = Patched(child)
+            try:
+                yield child.render(pretty=pretty)
+            except (AttributeError, NotImplementedError):
+                if isinstance(child, Escaped):
+                    yield child._render
+                else:
+                    yield html.escape(str(child))
+            except Exception as ex:
+                raise ex
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
         raise NotImplementedError
 
-    def find(self, selector=None, names=None):
+    def render_childs(self, pretty=False):
+        """Public api to render all the childs using Tempy rules"""
+        return ''.join(self._iter_child_renders(pretty=pretty))
+
+    def data(self, key=None, **kwargs):
+        """Adds or retrieve extra data to this element, this data will not be rendered.
+        Every tag have a _data attribute (dict), if key is given _data[key] is returned.
+        Kwargs are used to udpate this Tag's _data."""
+        self._data.update(kwargs)
+        if key:
+            return self._data[key]
+        if not kwargs:
+            return self._data
+        return self
+
+    def inject(self, contents=None, **kwargs):
         """
-        @param:
-            selector => css selector / given as list (returns matching elements)
-                        or TempyClass name (returns instances of this class)
-            names => returns attributes of elements with given name
+        Adds content data in this element. This will be used in the rendering of this element's childs.
+        Multiple injections on the same key will override the content (dict.update behavior).
         """
-        if selector is None and names is None:
-            found_elements = self.childs[:]
-            for child in self.childs:
-                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
-                    found_elements += child.find(selector, names)
-            return found_elements
+        if contents and not isinstance(contents, dict):
+            raise WrongContentError(self, contents, 'contents should be a dict')
+        self._stable = False
+        if not contents:
+            contents = {}
+        if kwargs:
+            contents.update(kwargs)
+        self.content_data.update(contents)
+        return self
 
-        found_elements_selector = []
-        if selector is not None and inspect.isclass(selector):
-            for child in self.childs:
-                if isinstance(child, selector):
-                    found_elements_selector.append(child)
-                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
-                    found_elements_selector += child.find(selector, names)
-
-        elif selector is not None and isinstance(selector, str):
-            for child in self.childs:
-                if (inspect.isclass(child) and selector == child.__name__) or selector == child.__class__.__name__:
-                    found_elements_selector.append(child)
-                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
-                    found_elements_selector += child.find(selector, names)
-
-        found_elements_names = []
-        if names is not None:
-            for child in self.childs:
-                if hasattr(child, '_name') and names == child._name:
-                    found_elements_names.append(child)
-                if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
-                    found_elements_names += child.find(selector, names)
-
-        if selector is not None and names is not None:
-            set_selector = set(found_elements_selector)
-            set_names = set(found_elements_names)
-            found_elements = list(set_selector.intersection(set_names))
-        else:
-            found_elements = found_elements_selector if selector is not None else found_elements_names
-
-        return found_elements
+    def clone(self):
+        """Returns a deepcopy of this element."""
+        return copy(self)
 
 
 class Escaped(DOMElement):
