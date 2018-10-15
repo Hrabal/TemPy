@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This changelog starts from version 1.0.0, previous versions are considered beta versions.
 
+## [1.3.0](https://github.com/Hrabal/TemPy/compare/1.2.0...1.3.0) - 2018-10-16
+
+### Added
+- Cleaned up the tags import pollution
+- 2x speed increase. Important refactor on element insertion.
+- Partial namespaces refactor and better method organization (no changes in the api).
+
 ## [1.2.0](https://github.com/Hrabal/TemPy/compare/1.1.0...1.2.0) - 2018-06-03
 
 ### Added
