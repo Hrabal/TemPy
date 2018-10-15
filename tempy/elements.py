@@ -40,18 +40,17 @@ class TagAttrs(dict):
     }
 
     def __init__(self, *args, **kwargs):
-        for arg in args:
-            if not isinstance(arg, str):
-                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
+        super().__setitem__('klass', set())
+        super().__setitem__('style', {})
         super().__init__(**kwargs)
-        for boolean_key in args:
-            super().__setitem__(boolean_key, bool)
-        for key in self._SET_VALUES_ATTRS:
-            if key not in self:
-                super().__setitem__(key, set())
-        for key in self._MAPPING_ATTRS:
-            if key not in self:
-                super().__setitem__(key, {})
+        if not args:
+            pass
+        else:
+            for arg in args:
+                if not isinstance(arg, str):
+                    raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
+            for boolean_key in args:
+                super().__setitem__(boolean_key, bool)
 
     def __setitem__(self, key, value):
         if key in self._SET_VALUES_ATTRS:
@@ -110,7 +109,10 @@ class Tag(DOMElement):
     def __init__(self, *args, **kwargs):
         data = kwargs.pop('data', {})
         self.attrs = TagAttrs()
-        self.attr(*args, **kwargs)
+        if args:
+            self.attr(*args)
+        if kwargs:
+            self.attr(**kwargs)
         super().__init__(**data)
         self._tab_count = 0
         self._render = None
@@ -242,7 +244,7 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
-        self._reverse_mro_func('pre_render')
+        #self._reverse_mro_func('pre_render')
         pretty = kwargs.pop('pretty', False)
         for arg in args:
             if isinstance(arg, dict):

@@ -4,66 +4,14 @@
 import html
 from collections import deque, Iterable
 from copy import copy
+from types import GeneratorType
 from functools import wraps
 from numbers import Number
-from types import GeneratorType
 
 from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, \
     DOMModByIndexError
 from .tempyrepr import REPRFinder
 import inspect
-
-
-class DOMGroup:
-    """Wrapper used to manage element insertion."""
-
-    def __init__(self, name, obj):
-        super().__init__()
-        if not name and issubclass(obj.__class__, DOMElement):
-            name = obj._name
-        self.name = name
-        self.obj = obj
-        if isinstance(obj, GeneratorType):
-            self._iterable = True
-        elif issubclass(obj.__class__, DOMElement) or isinstance(obj, str):
-            self._iterable = False
-        else:
-            try:
-                iter(obj)
-            except TypeError:
-                self._iterable = False
-            else:
-                self._iterable = True
-
-    def __iter__(self):
-        if self._iterable:
-            return iter(self.obj)
-        else:
-            return iter([self.obj, ])
-
-
-def yield_domgroups(items, kwitems, reverse=False):
-    """Flattens the given items/kwitems.
-    Yields index and DOMGroup after flattening and a DOMGroup.
-    "reverse" parameter inverts the flattened yielding.
-    """
-    verse = (1, -1)[reverse]
-    if isinstance(items, GeneratorType):
-        items = list(items)
-    kwitems = kwitems.items()
-    i = 0
-    for typ in (kwitems, items)[::verse]:
-        for item in typ:
-            if typ is kwitems:
-                name, item = item
-            else:
-                name, item = None, item
-            group = DOMGroup(name, item)
-            if isinstance(group.obj, DOMElement):
-                # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
-                group.obj._name = group.name
-            yield i, group
-            i += 1
 
 
 class DOMNavigator:
@@ -263,16 +211,28 @@ class DOMModifier:
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                for i, dom_group in yield_domgroups(tags, kwtags, reverse):
-                    inst._stable = False
-                    func(inst, i, dom_group)
+                verse = (1, -1)[reverse]
+                kwtags = kwtags.items()
+                i = 0
+                for typ in (kwtags, tags)[::verse]:
+                    for item in typ:
+                        if typ is kwtags:
+                            name, item = item
+                        else:
+                            name, item = None, item
+                        if isinstance(item, DOMElement) and name:
+                            # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
+                            item._name = name
+                        inst._stable = False
+                        func(inst, i, item, name)
+                        i += 1
                 return inst
 
             return wrapped
 
         return _receiver
 
-    def _insert(self, dom_group, idx=None, prepend=False):
+    def _insert(self, dom_group, idx=None, prepend=False, name=None):
         """Inserts a DOMGroup inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
         If the child is a DOMElement, correctly links the child.
@@ -285,6 +245,8 @@ class DOMModifier:
         else:
             idx = idx if idx is not None else len(self.childs)
         if dom_group is not None:
+            if not isinstance(dom_group, Iterable) or isinstance(dom_group, (DOMElement, str)):
+                dom_group = [dom_group, ]
             for i_group, elem in enumerate(dom_group):
                 if elem is not None:
                     # Element insertion in this DOMElement childs
@@ -292,13 +254,13 @@ class DOMModifier:
                     # Managing child attributes if needed
                     if issubclass(elem.__class__, DOMElement):
                         elem.parent = self
-            if dom_group.name:
-                setattr(self, dom_group.name, dom_group.obj)
+                    if name:
+                        setattr(self, name, elem)
 
     @content_receiver()
-    def __call__(self, _, child):
+    def __call__(self, _, child, name=None):
         """Calling the object will add the given parameters as childs"""
-        self._insert(child)
+        self._insert(child, name=name)
 
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
@@ -340,21 +302,21 @@ class DOMModifier:
         return self.after(self * (n - 1))
 
     @content_receiver()
-    def after(self, i, sibling):
+    def after(self, i, sibling, name=None):
         """Adds siblings after the current tag."""
-        self.parent._insert(sibling, idx=self._own_index + 1 + i)
+        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
         return self
 
     @content_receiver(reverse=True)
-    def before(self, i, sibling):
+    def before(self, i, sibling, name=None):
         """Adds siblings before the current tag."""
-        self.parent._insert(sibling, idx=self._own_index - i)
+        self.parent._insert(sibling, idx=self._own_index - i, name=name)
         return self
 
     @content_receiver(reverse=True)
-    def prepend(self, _, child):
+    def prepend(self, _, child, name=None):
         """Adds childs to this tag, starting from the first position."""
-        self._insert(child, prepend=True)
+        self._insert(child, prepend=True, name=name)
         return self
 
     def prepend_to(self, father):
@@ -363,9 +325,9 @@ class DOMModifier:
         return self
 
     @content_receiver()
-    def append(self, _, child):
+    def append(self, _, child, name=None):
         """Adds childs to this tag, after the current existing childs."""
-        self._insert(child)
+        self._insert(child, name=name)
         return self
 
     def append_to(self, father):
@@ -464,7 +426,7 @@ class DOMModifier:
     def move(self, new_father, idx=None, prepend=None, name=None):
         """Moves this element from his father to the given one."""
         self.parent.pop(self._own_index)
-        new_father._insert(DOMGroup(name, self), idx=idx, prepend=prepend)
+        new_father._insert(self, idx=idx, prepend=prepend, name=name)
         new_father._stable = False
         return self
 
@@ -518,15 +480,13 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self.content_data = {}
         self._stable = True
         self._data = kwargs
-        self._applied_funcs = []
-        self._reverse_mro_func('init')
-
-    def _reverse_mro_func(self, func_name):
+        self._applied_funcs = set()
         for cls in reversed(self.__class__.__mro__):
-            func = getattr(cls, func_name, None)
-            if func and func not in self._applied_funcs:
-                self._applied_funcs.append(func)
-                func(self)
+            try:
+                cls.init(self)
+                self._applied_funcs.add(cls.init)
+            except AttributeError:
+                pass
 
     def __repr__(self):
         return '<%s.%s %s.%s%s%s>' % (

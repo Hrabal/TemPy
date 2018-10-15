@@ -7,7 +7,7 @@ import unittest
 from tempy.elements import Tag, TagAttrs
 from tempy.exceptions import WrongContentError, WrongArgsError, TagError, DOMModByKeyError, DOMModByIndexError
 from tempy.tags import Div, A, P, Html, Head, Body, Pre, Br
-from tempy.tempy import DOMElement, DOMGroup, Escaped
+from tempy.tempy import DOMElement, Escaped
 
 
 class TestDOMelement(unittest.TestCase):
@@ -111,7 +111,7 @@ class TestDOMelement(unittest.TestCase):
     def test__insert_negative_index(self):
         d = Div()
         child = Div()
-        d._insert(DOMGroup(None, child), idx=-1)
+        d._insert(child, idx=-1)
         self.assertEqual(child._own_index, 0)
 
     def test_append_to(self):
