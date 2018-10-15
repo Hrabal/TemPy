@@ -24,7 +24,7 @@ class TestSingleTags(unittest.TestCase):
                     self(
                         P()(self.foo),
                         P()(self.bar)
-                        )
+                    )
 
             class Table(TempyREPR):
                 def repr(self):
@@ -33,14 +33,14 @@ class TestSingleTags(unittest.TestCase):
                             Td()(row[0]),
                             Td()(row[1])
                         ) for row in self.rows
-                        )
+                    )
 
             class CustomDOMElement(TempyREPR):
                 def repr(self):
                     self(
                         Div()(P()(self.foo)),
                         P()(self.bar)
-                        )
+                    )
 
         self.test_model = Test
 
@@ -55,7 +55,7 @@ class TestSingleTags(unittest.TestCase):
                     self(
                         Div()(self.foo),
                         Div()(self.bar)
-                        )
+                    )
 
         test_instance = Test()
         a = Span()(test_instance)
@@ -113,7 +113,11 @@ class TestSingleTags(unittest.TestCase):
 
         inst = Obj()
         self.assertEqual(Span()(A()(inst)).render(), '<span><a>footest</a></span>')
+
+        inst = Obj()
         self.assertEqual(Div()(Div()(inst)).render(), '<div><div>bar</div></div>')
+
+        inst = Obj()
         self.assertEqual(P()(T.CustomTag()(inst)).render(), '<p><customtag>bartest</customtag></p>')
 
     def test_near_places(self):
@@ -131,7 +135,9 @@ class TestSingleTags(unittest.TestCase):
 
         inst = Obj()
         self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
-        self.assertEqual(Pre()(T.Custom()(inst),Div()).render(), '<pre><custom>bar</custom><div></div></pre>')
+
+        inst = Obj()
+        self.assertEqual(Pre()(T.Custom()(inst), Div()).render(), '<pre><custom>bar</custom><div></div></pre>')
 
     def test_before_places(self):
         class Obj:
@@ -148,8 +154,10 @@ class TestSingleTags(unittest.TestCase):
 
         inst = Obj()
         self.assertEqual(Pre()(A()(inst), Span()).render(), '<pre><a>footest</a><span></span></pre>')
+
+        inst = Obj()
         self.assertEqual(Pre()(Div()(inst), Div()).render(), '<pre><div>bar</div><div></div></pre>')
- 
+
     def test_after_places(self):
         class Obj:
             foo = 'foo'
@@ -165,6 +173,8 @@ class TestSingleTags(unittest.TestCase):
 
         inst = Obj()
         self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
+
+        inst = Obj()
         self.assertEqual(Pre()(Div(), Div()(inst)).render(), '<pre><div></div><div>bar</div></pre>')
 
     def test_root(self):
