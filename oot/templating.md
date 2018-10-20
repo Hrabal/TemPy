@@ -84,4 +84,4 @@ class HomePage(BasePage):
                      Div()(comment for comment in current_content.comments))
 ```
 
-All the work is made defining a custom `init` method. This method will be called when creating new instances of our class, the concept is similar to Python's `__init__` magic method. TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in his parent classes. It' like the first thing every `init` does is calling `super().init`.
+All the work is in defining your custom `init` method. This method will be called when creating new instances of our class. The concept is similar to Python's `__init__` magic method. TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in the parent classes. It's like the first thing every `init` does is calling `super().init`.
