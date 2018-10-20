@@ -11,7 +11,7 @@ Build HTML without writing a single tag.
 TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar syntax.
 
 ### Why?
-HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
+HTML is like SQL: we all use it, we know it works, we all recognize its importance, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
 Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow) ... so the idea of TemPy emerges.
 
 ### Weeeeeeee!
@@ -413,7 +413,7 @@ container_div.slice()
 ```
 
 # Performance
-Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output, and many other factors.
+Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the output, and many other factors.
 
 TemPy does not parse strings, does not use regex, and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
 
