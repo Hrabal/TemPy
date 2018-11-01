@@ -11,31 +11,52 @@ section {
   width: 720px;
 }
 
-header ul {
+.menuUl {
+  background: white;
   border: none;
 }
 
-header ul li+li+li {
+.menuItem {
   width: 100%;
-}
-
-header ul ul li {
-  background: #bbbbbb;
-}
-
-header li {
-  margin: 0px;
-  width: 100%;
-  background: #f4f4f4;
-  border-radius: 0px;
   border: none;
-  box-shadow: none;
-  line-height: 1vw;
-  padding: 0vw;
+  border-bottom: 1px #ffa816 solid;
+  padding-top: 14px;
+  -webkit-transition: .5s;
 }
 
-header li hover {
-  background: goldenrod;
+.menuItem:hover {
+  background-color: #f8f8f8;
+  -webkit-transition: .5s;
+}
+
+.menuItem:hover a {
+  color: #ffa816;
+  font-weight: bold; 
+  font-size: 14px;
+  -webkit-transition: 1s;
+}
+
+.menuItem a{
+  font-weight: bold;
+  font-size: 13px;
+  -webkit-transition: 1s;
+}
+
+.subMenu {
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: 1s;
+  position: absolute;
+}
+
+.current {
+  background-color: #696969;
+}
+
+.current a {
+  color: #ffa816;
+  font-weight: bold; 
+  font-size: 14px;
 }
 
 .info, .success, .warning, .error, .validation {
