@@ -1,7 +1,11 @@
 ---
 layout: default
 ---
-![image-title-here](/assets/img/tempy.png){:class="img-responsive"}
+
+TemPy documentation.
+======
+
+
 ```python
 from tempy.tags import Html, Head, Body, Meta, Link, Div, P, A
 my_text_list = ['This is foo', 'This is Bar', 'Have you met my friend Baz?']
@@ -30,38 +34,64 @@ Templating systems are cool (Python syntax in html code) but not cool enough (yo
 
 ...that's where the idea of TemPy comes in.
 
-TemPy lets the developer build the DOM using only Python objects and classes. It provides a simple but complete API to dynamically create, navigate, modify and manage "HTML" templates and objects in a pure Python.
-
-Navigating the DOM and manipulating tags is possible in a Python or jQuery-style syntax. Later, your controllers can serve the page by just calling the `render()` method on the root element.
+TemPy lets the developer build the DOM using only Python objects and classes. It provides a simple but complete API to dynamically create, navigate, modify and manage "HTML" templates and objects in pure Python.
 
 TemPy is designed to offer Object-Oriented Templating, giving the developer the ability to use and manage html templates following the OOP paradigms. Subclassing, overriding and all the other OOP techniques will make HTML templating more flexible and maintainable.
 
+Navigating the DOM and manipulating tags is possible in a Python or jQuery-style syntax. TemPy makes it easier to use different html structures for different contents, add dynamic contents and manage every content exception, add dynamic formatting in the template code.
+
+Later, your controllers can serve the page by just calling the `render()` method on the root element, so this code...
+
+```python
+Html()(
+    Head()(
+        Meta(charset="utf-8"),
+        Link(href="my.css", typ="text/css", rel="stylesheet")
+    ),
+    Body()(
+        Div(klass="linkBox")(
+            A(href="www.foo.com")("A link to www.foo.com"),
+            A(href="www.bar.com")("A link to www.bar.com"),
+            A(href="www.baz.com")("A link to www.baz.com"),
+            A(href="www.python.org")("This is a link to Python")
+        ),
+        P("This is foo"),
+        P("This is Bar"),
+        P("Have you met my friend Baz?"),
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    )
+).render()
 ```
-page.render()
->>> <html>
->>>     <head>
->>>         <meta charset="utf-8"/>
->>>         <link href="my.css" type="text/css" rel="stylesheet"/>
->>>     </head>
->>>     <body>
->>>         <div class="linkBox">
->>>             <a href="www.foo.com"></a>
->>>             <a href="www.bar.com"></a>
->>>             <a href="www.baz.com"></a>
->>>             <a href="www.python.org">This is a link to Python</a>
->>>         </div>
->>>         <p>This is foo</p>
->>>         <p>This is Bar</p>
->>>         <p>Have you met my friend Baz?</p>
->>>         Lorem ipsum dolor sit amet, consectetur adipiscing elit
->>>     </body>
->>> </html>
+
+..will generate this html output:
+
+```html
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link href="my.css" type="text/css" rel="stylesheet"/>
+    </head>
+    <body>
+        <div class="linkBox">
+            <a href="www.foo.com">A link to www.foo.com</a>
+            <a href="www.bar.com">A link to www.bar.com</a>
+            <a href="www.baz.com">A link to www.baz.com</a>
+            <a href="www.python.org">This is a link to Python</a>
+        </div>
+        <p>This is foo</p>
+        <p>This is Bar</p>
+        <p>Have you met my friend Baz?</p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit
+    </body>
+</html>
 ```
 
 
 
 ## Speed
 
-One of the main factors that leads to slow speeds when developing webapps is the template engine. TemPy has a different approach to HTML generation, resulting in a significant speed boost.
+TemPy's philosophy is to provide a different approach to HTML generation, with performance in mind.
+
+One of the main factors that leads to slow speeds when developing webapps is the template engine. TemPy has a different approach to HTML generation, resulting in a significant speed boost in many occasions.
 
 No parsing and a simple structure make TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
