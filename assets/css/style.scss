@@ -62,7 +62,7 @@ section {
   display: block;
 }
 
-.current .submenu {
+.superCurrent .submenu {
   background-color: #969696;
   display: block;
 }
@@ -71,7 +71,11 @@ section {
   background-color: #696969;
 }
 
-.current a {
+.superCurrent {
+ background-color: #636363; 
+}
+
+.current a, .superCurrent a {
   color: #ffa816;
   font-weight: bold; 
   font-size: 14px;

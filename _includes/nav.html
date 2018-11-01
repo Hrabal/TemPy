@@ -1,17 +1,23 @@
 {% assign navurl = page.url | remove: 'index.html' %}
 {% if include.childof %}
-	{% assign subMenuClass="submenu" %}
+	{% assign MenuClass="submenu" %}
 {% else %}
-	{% assign subMenuClass="mainmenu" %}
+	{% assign MenuClass="mainmenu" %}
 {% endif %}
-<ul class="{{ subMenuClass }}">
+<ul class="{{ MenuClass }}">
 {% for item in include.nav %}
-	{% if item.url == navurl %}
-		{% assign class="current" %}
-	{% else %}
-		{% assign class="" %}
+	{% assign ItemClass="" %}
+	{% if item.subitems %}
+		{% for subitem in item.subitems %}
+			{% if subitem.url == navurl %}
+				{% assign ItemClass="superCurrent" %}
+			{% endif %}
+		{% endfor %}
 	{% endif %}
-	<li class="menuItem {{ class }}">
+	{% if item.url == navurl %}
+		{% assign ItemClass="current" %}
+	{% endif %}
+	<li class="menuItem {{ ItemClass }}">
 		<a href="{{ site.baseurl }}{{ item.url }}">{{ item.text }}</a>
 		{% if item.subitems %}
 			{% include nav.html nav=item.subitems childof=item.id%}
