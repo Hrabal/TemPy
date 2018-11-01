@@ -1,21 +1,21 @@
 {% assign navurl = page.url | remove: 'index.html' %}
-<ul class="menuUl
 {% if include.childof %}
-	subMenu
+	{% assign subMenuClass="submenu" %}
+{% else %}
+	{% assign subMenuClass="mainmenu" %}
 {% endif %}
-">
+<ul class="{{ subMenuClass }}">
 {% for item in include.nav %}
-	<li class="menuItem 
-			{% if item.url == navurl %}
-				current
-			{% endif %}
-		">
-		<a href="{{ site.baseurl }}{{ item.url }}">
-		{{ item.text }}
-		</a>
-	</li>
-	{% if item.subitems %}
-		{% include nav.html nav=item.subitems childof=item.id%}
+	{% if item.url == navurl %}
+		{% assign class="current" %}
+	{% else %}
+		{% assign class="" %}
 	{% endif %}
+	<li class="menuItem {{ class }}">
+		<a href="{{ site.baseurl }}{{ item.url }}">{{ item.text }}</a>
+		{% if item.subitems %}
+			{% include nav.html nav=item.subitems childof=item.id%}
+		{% endif %}
+	</li>
 {% endfor %}
 </ul>

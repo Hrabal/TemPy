@@ -11,9 +11,11 @@ section {
   width: 720px;
 }
 
-.menuUl {
+.mainmenu, .submenu {
   background: white;
   border: none;
+  height: auto;
+  border-radius: 0;
 }
 
 .menuItem {
@@ -22,31 +24,46 @@ section {
   border-bottom: 1px #ffa816 solid;
   padding-top: 14px;
   -webkit-transition: .5s;
+  display: inline-block;
+  float: initial;
+  height: auto;
 }
 
 .menuItem:hover {
-  background-color: #f8f8f8;
   -webkit-transition: .5s;
 }
 
-.menuItem:hover a {
+.menuItem:hover > a {
   color: #ffa816;
   font-weight: bold; 
   font-size: 14px;
   -webkit-transition: 1s;
 }
 
-.menuItem a{
+.menuItem > a {
   font-weight: bold;
   font-size: 13px;
   -webkit-transition: 1s;
 }
 
-.subMenu {
-  visibility: hidden;
-  opacity: 0;
+.submenu {
+  display: none;
+  background-color: #969696;
+}
+
+.submenu .menuItem > a {
+  color: white;
+}
+
+.submenu .menuItem:hover > a {
+  color: #ffa816;
+  font-weight: bold; 
+  font-size: 14px;
   -webkit-transition: 1s;
-  position: absolute;
+}
+
+.mainmenu li:hover .submenu {
+  display: block;
 }
 
 .current {
