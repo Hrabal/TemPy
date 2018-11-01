@@ -5,6 +5,12 @@
 
 .wrapper {
   width: 1020px;
+  margin: 0 auto;
+}
+
+header {
+  top: -25px;
+  overflow-y: scroll;
 }
 
 section {
