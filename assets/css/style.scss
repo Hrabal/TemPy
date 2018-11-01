@@ -29,10 +29,6 @@ section {
   height: auto;
 }
 
-.menuItem:hover {
-  -webkit-transition: .5s;
-}
-
 .menuItem:hover > a {
   color: #ffa816;
   font-weight: bold; 
@@ -63,6 +59,11 @@ section {
 }
 
 .mainmenu li:hover .submenu {
+  display: block;
+}
+
+.current .submenu {
+  background-color: #969696;
   display: block;
 }
 
