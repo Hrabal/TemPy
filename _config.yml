@@ -4,5 +4,7 @@ show_downloads: true
 baseurl: /TemPy
 theme: jekyll-theme-minimal
 repository: Hrabal/TemPy
+url: "https://hrabal.github.io/TemPy/"
 plugins:
   - "jekyll-github-metadata"
+  - "jekyll-sitemap"
