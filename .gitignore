@@ -5,3 +5,5 @@ playground/*.*
 build/
 dist/
 *.egg-info
+_site/
+Gemfile.lock
