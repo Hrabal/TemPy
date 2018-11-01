@@ -111,6 +111,14 @@ section {
   background-color: #FFBABA;
 }
 
-code {
-  font-weight: bold;
+.highlight {
+  background-color: white;
+}
+
+pre.highlight {
+  background-color: white;
+  border: 0px;
+  overflow-x: visible; 
+  padding-left: 5px;
+  border-left: solid 1px #ffa816;
 }
