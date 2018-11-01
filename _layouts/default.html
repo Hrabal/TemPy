@@ -11,20 +11,23 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="{{ base.url | prepend: site.url }}'/assets/js/main.js'" type="text/javascript"></script>
   </head>
   <body>
     <div class="wrapper">
       <header>
-        <a href="{{ site.github.url }}"> <h1>{{ site.title | default: site.github.repository_name }}</h1> </a>
-        <img src='{{ site.baseurl }}/assets/img/tempy.png' class="img-responsive"><br>
-	<p>{{ site.description | default: site.github.project_tagline }}</p>
-	{% include nav.html nav=site.data.menu %}
-        {% if site.github.is_project_page %}
-          <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ github_name }}</small></a></p>
-        {% endif %}
+        <a href="{{ site.github.url }}">
+          <img src='{{ site.baseurl }}/assets/img/tempy.png' class="img-responsive">
+        </a>
+        <center><p>{{ site.description | default: site.github.project_tagline }}</p></center>
+        {% include nav.html nav=site.data.menu %}
 
-        {% if site.github.is_user_page %}
-          <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
+        {% if site.github.is_project_page %}
+          <br><center>
+            <a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ github_name }}</small>
+            </a>
+          </center><br>
         {% endif %}
 
         {% if site.show_downloads %}
@@ -34,18 +37,20 @@
             <li><a href="{{ site.github.repository_url }}">View On <strong>GitHub</strong></a></li>
           </ul>
         {% endif %}
+        <div>
+        {% if site.github.is_project_page %}
+          <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+        {% endif %}
+          <p>
+            <small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small>
+          </p>
+        </div>
       </header>
       <section>
 
       {{ content }}
 
       </section>
-      <footer>
-        {% if site.github.is_project_page %}
-        <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
     </div>
     <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
 
