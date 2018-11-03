@@ -82,6 +82,9 @@ A TemPy Tag subclass:
  * *can* implement a custom `render` method.
  * *can* implement a custom `__init__` method.
 
+<aside class="error">If you override the __init__ method always call super.__init__() as first action.</aside>
+<aside class="error">If you override the render method please pay attention to infinite recursion.</aside>
+
 ```python
 from tempy.elements import Tag
 

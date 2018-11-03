@@ -17,9 +17,6 @@
     - text: Using TemPy Objects
       url: /usage/building/
       id: usage_building
-    - text: TemPy API
-      url: /usage/api/
-      id: usage_api
 - text: OOT - Object-Oriented Templating
   url: /oot/
   id: oot
