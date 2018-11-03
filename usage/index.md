@@ -9,44 +9,75 @@ permalink: /usage/
 from tempy.tags import *
 ```
 
-TemPy offers clean syntax for building pages in pure python. Every TemPy object is a container of other objects, when rendered TemPy objects will produce an html tag containing the `str` representation of all his children.
+Tag creation is made by instantiating TemPy tags fond in the `tempy.tags` module:
+
 ```python
+from tempy import tags
+
+my_div = tags.Div()
+```
+
+TemPy offers clean syntax for building pages in pure python. Every TemPy object is a container of other (TemPy or not) objects, when rendered TemPy objects will produce an html tag containing the `str` representation of all his children.
+
+```python
+from tempy.tags import Div, Span
 # Create some TemPy objects/tags
-div = Div()(Span())
+div = Div()()
+
+# Add content inside the created tag
+div(Span())
+
+# ..add every kind of object
+div('Hello ')
+div(1)
 
 # Render starting from the root element
 div.render()
->>> <div><span></span></div>
+>>> <div><span></span>Hello 1</div>
 ```
 
 TemPy objects can be arranged together dynamically to build the DOM tree. Every TemPy instance is a node of the DOM, and can be father or child of other TemPy objects.
 
+Every instance of a TemPy tag can be created and then later you can put content inside it, or can be put inside another TemPy tag instance.
+
 ```python
-# Create non empty TemPy objects/tags
+from tempy.tags import Div, Span, A
+# Create empty TemPy instances:
+my_span = Span()
+my_div = Div()
+
+# Create non-empty TemPy instances:
 container = Div()(
-    'content: ', Div()('this is the content')
+    'Hello ', Div()('World!')
 )
 
-# Build the TemPy tree calling your objects
-div(span)
-span(A(href='www.bar.com')('this is the link text'))
-container(test=div)
+# Build the TemPy tree putting instances inside one another 
+# calling your objects with other objects as arguments
+my_div(my_span)
+my_span(A(href='www.bar.com')('this is the link text'))
+
+# Add objects inside TemPy instances using a named argument
+# so they can be accessed as attributes later
+container(test=my_div)
+assert container.test == my_div
 ```
+
 TemPy trees can also be arranged using the TemPy api on every DOM element:
+
 ```python
+# ..following the code above, you can add content using the append method of the father
 container.append(A(href='www.baz.com')('another useful link'))
 
-# If you gave a name to a TemPy object call him by name
-link = Link().append_to(container.test)
+# Or you can make and add a tag to a container using the append_to method of the child
+link = A(href='www.greatsite.com')('GreatWebSite!').append_to(container)
 ```
 
 Every HTML tag have his corresponding TemPy class, to create a tag just instantiate the TemPy class: `Div()` will produce an object that can contain other objects (TemPy objects or not) and can be rendered into and HTML string.
 
-TemPy tags can have attributes, that will be rendered inside the tag, it's possible to define attributes when instantiating the object (`Div(attribute='value')`) or later using the api (`Div().attr(attribute='value')`).
+Once a TemPy tag or widget is instantiated you can add tags and content by calling the instance as if it's a function: `div(Span())`.
+Element creation and insertion can be performed in a single instruction: `Div()(Span())`.
 
-Once a TemPy tag or widget is instantiated you can add tags and content by calling the instance as if it's a function: `div(Span())`. Element creation and insertion can be performed in a single instruction: `Div()(Span())`.
-
-It's possible to add elements inside TemPy objects:
+It's possible to add elements inside TemPy objects in several ways:
 
 * single objects: `Div()(Span())`
 * lists: `Div()(['something', Span(), 1])`
@@ -60,6 +91,8 @@ It's possible to add elements inside TemPy objects:
 
 ### Attributes 
 
+
+TemPy tags can have attributes that will be rendered inside the tag.
 HTML tags have attributes, and so TemPy tags have too. It's possible to define tag attributes in different ways:
 
 * during the element instantiation: `Div(some_attribute='some_value')`
@@ -72,6 +105,7 @@ link.attr(href='www.python.org')
 link.render()
 >>> <a id="verySpecialId" href="www.python.org">This is a link to Python</a>
 ```
+
 
 ### Rendering
 

@@ -10,6 +10,8 @@ permalink: /getting_started/
 pip3 install tem-py
 ```
 
+..or, if you want the latest unreleased version, clone TemPy from GitHub:
+
 ```shell
 git clone https://github.com/Hrabal/TemPy.git
 cd TemPy
@@ -22,7 +24,8 @@ TemPy is available on PyPi, so you can pip it. [PyPi.org](https://pypi.org/proje
 
 If you want to customize TemPy you can clone the main [GitHub repo](https://github.com/Hrabal/TemPy).
 
-Now that you have TemPy, just import some tags:
+Now that you have TemPy, just import and use some tags:
+
 ```python
 from tempy.tags import Div, A
 ```
@@ -38,6 +41,6 @@ This form of yielding is used for speed and can be easily removed if you plan to
 
 **Python >= 3.6 is preferred**, some useful features depends on the preserved order of kwargs proposed in [PEP 468](https://www.python.org/dev/peps/pep-0468/).
 
-The main feature is the ability to have named child tags in the correct order. Naming child tags is possible in Python < 3.6, but the tag's order will probably not be correct.
+The feature enabled by using TemPy with Python >= 3.6 is the ability to have named child tags in the correct order. Naming child tags is possible in Python < 3.6, but the tag's order will probably not be correct.
 
 <aside class="success"><b>It is highly recommended to use TemPy with Python >= 3.6.</b></aside>
