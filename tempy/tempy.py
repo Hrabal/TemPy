@@ -4,7 +4,6 @@
 import html
 from collections import deque, Iterable
 from copy import copy
-from types import GeneratorType
 from functools import wraps
 from numbers import Number
 
