@@ -246,13 +246,19 @@ class Tag(DOMElement):
         # args kwargs API provided for last minute content injection
         #self._reverse_mro_func('pre_render')
         pretty = kwargs.pop('pretty', False)
+        if pretty and self._stable != 'pretty':
+            self._stable = False
+
         for arg in args:
+            self._stable = False
             if isinstance(arg, dict):
                 self.inject(arg)
         if kwargs:
+            self._stable = False
             self.inject(kwargs)
 
-        # If the tag or his contents are not changed, we skip all the work
+        # If the tag or his contents are not changed and we already have rendered it
+        # with the same attrs we skip all the work
         if self._stable and self._render:
             return self._render
 
@@ -265,7 +271,7 @@ class Tag(DOMElement):
 
         # We declare the tag is stable and have an official render:
         self._render = self._template.format(**tag_data)
-        self._stable = True
+        self._stable = 'pretty' if pretty else True
         return self._render
 
     def apply_function(self, format_function):
