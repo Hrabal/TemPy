@@ -8,14 +8,14 @@
 
 ### What?
 Build HTML without writing a single tag.
-TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery-similar syntax.
+TemPy dynamically generates HTML, and accesses it in a pure Python, or jQuery fashion. Navigating the DOM, and manipulating tags is also possible in a Python, and or jQuery-similar syntax.
 
 ### Why?
-HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
+HTML is like SQL: we all use it, we know it works, we all recognize its importance, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
 Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow) ... so the idea of TemPy emerges.
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
+No parsing, and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
 See below for benchmarks against other templating engines.
 
 ### Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
@@ -23,7 +23,7 @@ See below for benchmarks against other templating engines.
 
 ### Build, manipulate, and navigate HTML documents, with no HTML involved.
 
-Overview: 
+Overview:
 
 * [Building the DOM, basic usage](#basic-usage)
 * [Building separate blocks, nesting and re-usability](#building-blocks)
@@ -37,7 +37,7 @@ Overview:
 ### Installation
 TemPy is avaiable on PyPi: `pip3 install tem-py`.
 
-Or clone/download this repository and run `python3 setup.py install`
+Or clone/download this repository, and run `python3 setup.py install`
 
 ### Building the DOM
 
@@ -94,7 +94,7 @@ page.render()
 ```
 
 #### Building Blocks
-You can also create blocks and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
+You can also create blocks, and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
 ```python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
@@ -127,7 +127,7 @@ def my_content_controller(url='/content'):
 ```
 
 #### OOT - Object Oriented Templating
-TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom HTML tree structures to use as blocks.
+TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes, and add custom HTML tree structures to use as blocks.
 
 ```python
 from tempy.widgets import TempyPage
@@ -162,7 +162,7 @@ class BasePage(TempyPage):
                 content=Div(id='content')(Hr())
             )
         )
-    
+
     # Your subclass can have its own methods like any other class
     def make_menu(self, typ):
         return Div(klass='menu')(
@@ -244,7 +244,7 @@ class MyClass:
         self.foo = 'foo'
         self.bar = 'bar'
         self.link = 'www.foobar.com'
-    
+
     # If an instance on MyClass is found inside a div
     class Div(TempyREPR):
         def repr(self):
@@ -252,7 +252,7 @@ class MyClass:
                 Div()(self.foo),
                 Div()(self.bar)
             )
-    
+
     # If an instance on MyClass is found inside a link
     class A(TempyREPR):
         def repr(self):
@@ -263,7 +263,7 @@ class MyClass:
     class Td(TempyREPR):
         def repr(self):
             self(self.bar.upper())
-    
+
     # If an instance on MyClass is found when rendering the a TempyPage called 'HomePage'
     class HomePage(TempyREPR):
         def repr(self):  # note: here self is the object's parent, not the root
@@ -333,7 +333,7 @@ div1.siblings(div2)
 div1.slice(div2)
 ```
 
-## Tag Attributes 
+## Tag Attributes
 Add attributes to every element at definition time or later:
 ```python
 div = Div(id='my_html_id', klass='someHtmlClass') # 'klass' because 'class' is a Python's buildin keyword
@@ -413,9 +413,9 @@ container_div.slice()
 ```
 
 # Performance
-Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the produced output, and many other factors.
+Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the output, and many other factors.
 
-TemPy does not parse strings, does not use regex, and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2 and Mako.
+TemPy does not parse strings, does not use regex, and does not load .html files, resulting in great speed compared to the traditional frameworks such as Jinja2, and Mako.
 
 Here are a few benchmarks of TemPy in action, used in a Flask app, rendering a template (see code [here](benchmarks)).
 
