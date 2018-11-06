@@ -39,7 +39,7 @@ div2.css({'background-color': 'blue'})
 page = Html()(  # add tags inside the one you created calling the parent
     Head()(  # add multiple tags in one call
         Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
-        Link(href="my.css", typ="text/css", rel="stylesheet"),
+        Link(href="my.css", type="text/css", rel="stylesheet"),
         new_css
     ),
     body=Body()(  # give them a name so you can navigate the DOM with those names

@@ -53,7 +53,7 @@ another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit
 page = Html()(  # add tags inside the one you created calling the parent
     Head()(  # add multiple tags in one call
         Meta(charset='utf-8'),  # add tag attributes using kwargs in tag initialization
-        Link(href="my.css", typ="text/css", rel="stylesheet")
+        Link(href="my.css", type="text/css", rel="stylesheet")
     ),
     body=Body()(  # give them a name so you can navigate the DOM with those names
         Div(klass='linkBox')(
@@ -142,7 +142,7 @@ class BasePage(TempyPage):
         return [
             Link(href=url_for('static', filename='style.css'),
                  rel="stylesheet",
-                 typ="text/css"),
+                 type="text/css"),
             Link(href='https://fonts.googleapis.com/css?family=Quicksand:300',
                  rel="stylesheet"),
             Link(href=url_for('static',
