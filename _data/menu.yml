@@ -27,6 +27,28 @@
     - text: TempyREPR
       url: /oot/tempyrepr/
       id: oot_tempyrepr
+- text: Let's Build with TemPy (Tutorial)
+  url: /make_an_app/
+  id: app
+  subitems:
+    - text: Base Files
+      url: /make_an_app/base_files/
+      id: app_base
+    - text: Database
+      url: /make_an_app/database/
+      id: database
+    - text: Models
+      url: /make_an_app/models/
+      id: models
+    - text: TempPy - Basics
+      url: /make_an_app/tempy_base/
+      id: tempy_base
+    - text: TempPy - Inheritance
+      url: /make_an_app/tempy_2/
+      id: tempy_2
+    - text: TempPy - Dynamic Content
+      url: /make_an_app/tempy_3/
+      id: tempy_3
 - text: Performance
   url: /performance/
   id: performance
