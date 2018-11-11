@@ -28,7 +28,7 @@ section {
   width: 100%;
   border: none;
   border-bottom: 1px #ffa816 solid;
-  padding-top: 14px;
+  padding-top: 5px;
   -webkit-transition: .5s;
   display: inline-block;
   float: initial;
@@ -38,14 +38,15 @@ section {
 .menuItem:hover > a {
   color: #ffa816;
   font-weight: bold; 
-  font-size: 14px;
+  font-size: 13px;
   -webkit-transition: 1s;
 }
 
 .menuItem > a {
   font-weight: bold;
-  font-size: 13px;
+  font-size: 12px;
   -webkit-transition: 1s;
+  height: 24px;
 }
 
 .submenu {
@@ -60,7 +61,7 @@ section {
 .submenu .menuItem:hover > a {
   color: #ffa816;
   font-weight: bold; 
-  font-size: 14px;
+  font-size: 13px;
   -webkit-transition: 1s;
 }
 
@@ -84,13 +85,13 @@ section {
 .current a, .superCurrent a {
   color: #ffa816;
   font-weight: bold; 
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .info, .success, .warning, .error, .validation {
   border: 1px solid;
   margin: 10px 0px;
-  padding:15px 10px 15px 50px;
+  padding: 15px 10px 15px 50px;
   background-repeat: no-repeat;
   background-position: 10px center;
 }
