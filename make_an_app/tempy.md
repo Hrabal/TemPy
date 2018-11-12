@@ -17,10 +17,10 @@ First, we have to make our `templates` folder a valid python module, so we can l
 (venv)$ touch templates/__init__.py
 ```
 
-Now it's time to build our home page structure! Create a file called `home.py` and add this code in it (we'll analyze each line later):
+Now it's time to build our home page structure! Create a file called `pages.py` and add this code in it (we'll analyze each line later):
 
 ```python
-# templates/home.py
+# templates/pages.py
 
 from tempy.tags import Link, Script, Meta, Main, Section, Div, H1, P
 from tempy.widgets import TempyPage
@@ -200,7 +200,7 @@ Now that we built a TemPy template, we ca use it in our app, go back to the `con
 ```python
 from app import app
 
-from templates.home import HomePage
+from templates.pages import HomePage
 
 
 @app.route('/')

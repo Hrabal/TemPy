@@ -102,12 +102,12 @@ The other difference is that we gave a couple of names to some tags and we repla
 ...
 ```
 
-Adding those child tags using named arguments will let us reach them much more easily later. In fact, now that we created a base template we can change our `HomePage` in `home.py` so it uses this base template and just add the page-specific content:
+Adding those child tags using named arguments will let us reach them much more easily later. In fact, now that we created a base template we can change our `HomePage` so it uses this base template and just add the page-specific content.
 
-Our `home.py` will look like this now:
+Our `pages.py` will look like this now:
 
 ```python
-# home.py
+# pages.py
 
 from tempy.tags import Div
 
