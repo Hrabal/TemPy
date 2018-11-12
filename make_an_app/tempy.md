@@ -9,7 +9,7 @@ permalink: /make_an_app/tempy_base/
 ### TemPy in Action, the basics
 
 In this section we'll start to use TemPy, we're going to build the home page of our site.
-To build our app we'll use Bootstrap 4.1, following the recipe in the [Bootstrap's Album Example](https://getbootstrap.com/docs/4.1/examples/album/). We'll recreate the html structure of this example with TemPy and in the next section we'll add our custom contents.
+To build our app we'll use Fontawesome for icons and Bootstrap 4.1 for the page structure and the basic style, following the recipe in the [Bootstrap's Album Example](https://getbootstrap.com/docs/4.1/examples/album/). We'll recreate the html structure of this example with TemPy and in the next section we'll add our custom contents.
 
 First, we have to make our `templates` folder a valid python module, so we can later import the templates and pages:
 
@@ -56,6 +56,7 @@ class HomePage(TempyPage):
             Script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js",
                    integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ",
                    crossorigin="anonymous"),
+            Script(defer=True, src="https://use.fontawesome.com/releases/v5.0.0/js/all.js")
         )
 
 ```

@@ -36,7 +36,8 @@ SCRIPTS = [
            crossorigin="anonymous"),
     Script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js",
            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ",
-           crossorigin="anonymous")
+           crossorigin="anonymous"),
+    Script(defer=True, src="https://use.fontawesome.com/releases/v5.0.0/js/all.js")
 ]
 ```
 
