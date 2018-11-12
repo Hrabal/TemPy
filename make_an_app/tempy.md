@@ -9,7 +9,7 @@ permalink: /make_an_app/tempy_base/
 ### TemPy in Action, the basics
 
 In this section we'll start to use TemPy, we're going to build the home page of our site.
-To build our app we'll use Bootstrap 4.1, following the recipe in the [Bottstrap's Album Example](https://getbootstrap.com/docs/4.1/examples/album/). We'll recreate the html structure of this example with TemPy and in the next section we'll add our custom contents.
+To build our app we'll use Bootstrap 4.1, following the recipe in the [Bootstrap's Album Example](https://getbootstrap.com/docs/4.1/examples/album/). We'll recreate the html structure of this example with TemPy and in the next section we'll add our custom contents.
 
 First, we have to make our `templates` folder a valid python module, so we can later import the templates and pages:
 
