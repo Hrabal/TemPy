@@ -49,6 +49,9 @@
     - text: TempPy - Dynamic Content
       url: /make_an_app/tempy_3/
       id: tempy_3
+    - text: TempPy - TempyREPR
+      url: /make_an_app/tempy_4/
+      id: tempy_4
 - text: Performance
   url: /performance/
   id: performance
