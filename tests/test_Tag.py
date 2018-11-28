@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy.tags import Div, P
+from tempy.tags import Div, P, Br
 from tempy.elements import Tag, Content, TagAttrs
 from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
@@ -81,6 +81,14 @@ class TestTag(unittest.TestCase):
         d = Div()
         p = P().append_to(d)
         self.assertEqual(p.parent, d)
+
+    def test_void_tag_insertion(self):
+        with self.assertRaises(TagError):
+            d = Br()(Div(id='test_void_tag_insertion'))
+
+        br = Br()
+        with self.assertRaises(TagError):
+            p = Div().append_to(br)
 
     def test_index(self):
         father = Div()(Div(), Div())
