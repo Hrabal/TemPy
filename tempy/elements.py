@@ -297,7 +297,8 @@ class VoidTag(Tag):
             raise TagError(self, 'Adding elements to a Void Tag is prohibited.')
         else:
             super()._insert(self, dom_group, idx, prepend, name)
-            
+
+
 class Css(Tag):
     """Special class for the style tag.
     Css attributes can be altered with the Css.update method. At render time the attr dict is transformed in valid css:
