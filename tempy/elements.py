@@ -292,6 +292,12 @@ class VoidTag(Tag):
     _void = True
     _template = '<{tag}{attrs}/>'
 
+    def _insert(self, dom_group, idx=None, prepend=False, name=None):
+        if dom_group is not None:
+            raise TagError(self, 'Adding elements to a Void Tag is prohibited.')
+        else:
+            super()._insert(self, dom_group, idx, prepend, name)
+
 
 class Css(Tag):
     """Special class for the style tag.
