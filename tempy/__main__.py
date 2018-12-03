@@ -5,6 +5,7 @@ import argparse
 
 from .t import T
 
+
 def translate(origin, destination, pretty=False):
     if not destination:
         destination = origin.split('.')[0] + '.py'
@@ -30,6 +31,7 @@ def main():
     else:
         if actions.translate:
             translate(args.origin, args.destination, pretty=args.pretty)
+
 
 if __name__ == '__main__':
     main()
