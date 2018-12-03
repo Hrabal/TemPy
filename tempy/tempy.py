@@ -479,11 +479,10 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self.content_data = {}
         self._stable = True
         self._data = kwargs
-        for cls in reversed(self.__class__.__mro__):
-            try:
-                cls.init(self)
-            except AttributeError:
-                pass
+        for cls in reversed(self.__class__.__mro__[:-6]):
+            init = getattr(cls, 'init', None)
+            if init:
+                init(self)
 
     def __repr__(self):
         return '<%s.%s %s.%s%s%s>' % (
