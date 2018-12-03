@@ -479,11 +479,9 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self.content_data = {}
         self._stable = True
         self._data = kwargs
-        self._applied_funcs = set()
         for cls in reversed(self.__class__.__mro__):
             try:
                 cls.init(self)
-                self._applied_funcs.add(cls.init)
             except AttributeError:
                 pass
 
