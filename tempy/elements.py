@@ -43,14 +43,10 @@ class TagAttrs(dict):
         super().__setitem__('klass', set())
         super().__setitem__('style', {})
         super().__init__(**kwargs)
-        if not args:
-            pass
-        else:
-            for arg in args:
-                if not isinstance(arg, str):
-                    raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-            for boolean_key in args:
-                super().__setitem__(boolean_key, bool)
+        for arg in args:
+            if not isinstance(arg, str):
+                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
+            super().__setitem__(arg, bool)
 
     def __setitem__(self, key, value):
         if key in self._SET_VALUES_ATTRS:
@@ -108,11 +104,7 @@ class Tag(DOMElement):
 
     def __init__(self, *args, **kwargs):
         data = kwargs.pop('data', {})
-        self.attrs = TagAttrs()
-        if args:
-            self.attr(*args)
-        if kwargs:
-            self.attr(**kwargs)
+        self.attrs = TagAttrs(*args, **kwargs)
         super().__init__(**data)
         self._tab_count = 0
         self._render = None
@@ -144,8 +136,8 @@ class Tag(DOMElement):
         for arg in args:
             if not isinstance(arg, str):
                 raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
+            kwargs[arg] = bool
         self._stable = False
-        kwargs.update({k: bool for k in args})
         self.attrs.update(kwargs)
         return self
 
