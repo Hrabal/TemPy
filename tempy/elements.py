@@ -43,14 +43,10 @@ class TagAttrs(dict):
         super().__setitem__('klass', set())
         super().__setitem__('style', {})
         super().__init__(**kwargs)
-        if not args:
-            pass
-        else:
-            for arg in args:
-                if not isinstance(arg, str):
-                    raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-            for boolean_key in args:
-                super().__setitem__(boolean_key, bool)
+        for arg in args:
+            if not isinstance(arg, str):
+                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
+            super().__setitem__(arg, bool)
 
     def __setitem__(self, key, value):
         if key in self._SET_VALUES_ATTRS:
