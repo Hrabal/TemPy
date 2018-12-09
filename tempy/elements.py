@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
-Elemnts used inside Tempy Classes
+Elements used inside Tempy Classes
 """
 import re
 from copy import copy
@@ -13,88 +13,6 @@ from .exceptions import WrongArgsError, WrongContentError, ContentError, TagErro
 import inspect
 
 
-class TagAttrs(dict):
-    """
-    Html tag attributes container, a subclass of dict with __setitiem__ and update overload.
-    Manages the manipulation and render of tag attributes, using the dict api, with few exceptions:
-    - space separated multiple value keys
-        i.e. the class atrribute, an update on this key will add the value to the list
-    - mapping type attributes
-        i.e. style attribute, an udpate will trigger the dict.update method
-
-    TagAttrs.render formats all the attributes in the proper html format.
-    """
-    _MAPPING_ATTRS = ('style',)
-    _SET_VALUES_ATTRS = ('klass',)
-    _SPECIALS = {
-        'klass': 'class',
-        'typ': 'type',
-        '_for': 'for',
-        '_async': 'async',
-    }
-    _TO_SPECIALS = {v: k for k, v in _SPECIALS.items()}
-    _FORMAT = {
-        'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
-        'klass': ' '.join,
-        'comment': lambda x: x
-    }
-
-    def __init__(self, *args, **kwargs):
-        super().__setitem__('klass', set())
-        super().__setitem__('style', {})
-        super().__init__(**kwargs)
-        for arg in args:
-            if not isinstance(arg, str):
-                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-            super().__setitem__(arg, bool)
-
-    def __setitem__(self, key, value):
-        if key in self._SET_VALUES_ATTRS:
-            for v in value.split():
-                self[key].add(v)
-        elif key in self._MAPPING_ATTRS:
-            if isinstance(value, str):
-                splitted = iter(re.split(';|:', value))
-                value = dict(zip(splitted, splitted))
-            self[key].update(value)
-        else:
-            super().__setitem__(key, value)
-
-    def __copy__(self):
-        return TagAttrs(**self)
-
-    def update(self, attrs=None, **kwargs):
-        if attrs is not None:
-            for k, v in attrs.items() if isinstance(attrs, Mapping) else attrs:
-                self[k] = v
-        for k, v in kwargs.items():
-            self[k] = v
-
-    def render(self):
-        """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        ret = []
-        for k, v in self.items():
-            if v:
-                f_string = (' {}="{}"', ' {}')[v is bool]
-                f_args = (self._SPECIALS.get(k, k), self._FORMAT.get(k, lambda x: x)(v))[:2 + (v is bool)]
-                ret.append(f_string.format(*f_args))
-        return ''.join(ret)
-
-    def to_code(self):
-        def formatter(k, v):
-            k_norm = twist_specials.get(k, k)
-            if k in self._SET_VALUES_ATTRS:
-                return '%s="%s"' % (k_norm, ', '.join(map(str, v)))
-            if isinstance(v, bool) or v is bool:
-                return '%s="%s"' % (k_norm, 'True')
-            if isinstance(v, str):
-                return '%s="""%s"""' % (k_norm, v)
-            return '%s=%s' % (k_norm, v)
-
-        twist_specials = {v: k for k, v in self._SPECIALS.items()}
-        return ', '.join(formatter(k, v) for k, v in self.items() if v)
-
-
 class Tag(DOMElement):
     """
     Provides an api for tag inner manipulation and for rendering.
@@ -102,13 +20,25 @@ class Tag(DOMElement):
     _template = '{pretty}<{tag}{attrs}>{inner}{pretty}</{tag}>'
     _void = False
 
+    _MAPPING_ATTRS = ('style',)
+    _SET_VALUES_ATTRS = ('klass',)
+    _SPECIAL_ATTRS = {
+        'klass': 'class',
+        'typ': 'type',
+        '_for': 'for',
+        '_async': 'async',
+    }
+    _TO_SPECIALS = {v: k for k, v in _SPECIAL_ATTRS.items()}
+    _FORMAT_ATTRS = {
+        'style': lambda x: ' '.join('%s: %s;' % (k, v) for k, v in x.items()),
+        'klass': ' '.join,
+        'comment': lambda x: x
+    }
+
     def __init__(self, *args, **kwargs):
         data = kwargs.pop('data', {})
-        self.attrs = TagAttrs()
-        if args:
-            self.attr(*args)
-        if kwargs:
-            self.attr(**kwargs)
+        self.attrs = {'style': {}, 'klass': set()}
+        self.attr(*args, **kwargs)
         super().__init__(**data)
         self._tab_count = 0
         self._render = None
@@ -137,12 +67,18 @@ class Tag(DOMElement):
 
     def attr(self, *args, **kwargs):
         """Add an attribute to the element"""
-        for arg in args:
-            if not isinstance(arg, str):
-                raise WrongArgsError(self, arg, 'Positional arguments should be strings.')
-        self._stable = False
         kwargs.update({k: bool for k in args})
-        self.attrs.update(kwargs)
+        for key, value in kwargs.items():
+            if key == 'klass':
+                self.attrs['klass'].update(value.split())
+            elif key == 'style':
+                if isinstance(value, str):
+                    splitted = iter(re.split(';|:', value))
+                    value = dict(zip(splitted, splitted))
+                self.attrs['style'].update(value)
+            else:
+                self.attrs[key] = value
+        self._stable = False
         return self
 
     def remove_attr(self, attr):
@@ -150,6 +86,30 @@ class Tag(DOMElement):
         self._stable = False
         self.attrs.pop(attr, None)
         return self
+
+    def render_attrs(self):
+        """Renders the tag's attributes using the formats and performing special attributes name substitution."""
+        ret = []
+        for k, v in self.attrs.items():
+            if v:
+                f_string = (' {}="{}"', ' {}')[v is bool]
+                f_args = (self._SPECIAL_ATTRS.get(k, k), self._FORMAT_ATTRS.get(k, lambda x: x)(v))[:2 + (v is bool)]
+                ret.append(f_string.format(*f_args))
+        return ''.join(ret)
+
+    def to_code_attrs(self):
+        def formatter(k, v):
+            k_norm = twist_specials.get(k, k)
+            if k in self._SET_VALUES_ATTRS:
+                return '%s="%s"' % (k_norm, ', '.join(map(str, v)))
+            if isinstance(v, bool) or v is bool:
+                return '%s="%s"' % (k_norm, 'True')
+            if isinstance(v, str):
+                return '%s="""%s"""' % (k_norm, v)
+            return '%s=%s' % (k_norm, v)
+
+        twist_specials = {v: k for k, v in self._SPECIAL_ATTRS.items()}
+        return ', '.join(formatter(k, v) for k, v in self.attrs.items() if v)
 
     def set_id(self, css_id):
         self.attrs['id'] = css_id
@@ -240,7 +200,7 @@ class Tag(DOMElement):
     def render(self, *args, **kwargs):
         """Renders the element and all his childrens."""
         # args kwargs API provided for last minute content injection
-        #self._reverse_mro_func('pre_render')
+        # self._reverse_mro_func('pre_render')
         pretty = kwargs.pop('pretty', False)
         if pretty and self._stable != 'pretty':
             self._stable = False
@@ -260,7 +220,7 @@ class Tag(DOMElement):
 
         tag_data = {
             'tag': self._get__tag(),
-            'attrs': self.attrs.render(),
+            'attrs': self.render_attrs(),
             'pretty': '\n' + ('\t' * self._depth) if pretty else '',
         }
         tag_data['inner'] = self.render_childs(pretty) if not self._void and self.childs else ''

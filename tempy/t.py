@@ -6,7 +6,7 @@ from mistune import Markdown
 
 # Internal imports
 from .markdown import TempyMarkdownRenderer
-from .elements import Tag, VoidTag, TagAttrs
+from .elements import Tag, VoidTag
 
 
 class TempyParser(HTMLParser):
@@ -37,7 +37,7 @@ class TempyParser(HTMLParser):
         if not tempy_tag_cls:
             unknow_maker = [self.unknown_tag_maker, self.unknown_tag_maker.Void][void]
             tempy_tag_cls = unknow_maker[tag]
-        attrs = {TagAttrs._TO_SPECIALS.get(k, k): v or True for k, v in attrs}
+        attrs = {Tag._TO_SPECIALS.get(k, k): v or True for k, v in attrs}
         tempy_tag = tempy_tag_cls(**attrs)
         if not self.current_tag:
             self.result.append(tempy_tag)

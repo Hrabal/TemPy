@@ -5,7 +5,7 @@
 import unittest
 
 from tempy.tags import Div, P, Br
-from tempy.elements import Tag, Content, TagAttrs
+from tempy.elements import Tag, Content
 from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 
@@ -23,20 +23,6 @@ class TestTag(unittest.TestCase):
         class TestTag(Tag): pass
         with self.assertRaises(TagError):
             TestTag()._get__tag()
-
-    def test_tagattrs(self):
-        a = TagAttrs(named1='test1')
-        self.assertTrue('named1' in a)
-        self.assertEqual(a['named1'], 'test1')
-
-    def test_tagattrs_bool(self):
-        a = TagAttrs('bool1', 'bool2')
-        self.assertTrue('bool1' in a)
-        self.assertTrue('bool2' in a)
-        self.assertEqual(a['bool1'], bool)
-
-        with self.assertRaises(WrongArgsError):
-            a = TagAttrs(1)
 
     def test_tag_set_attrs(self):
         d = Div(klass='test_css_class')
@@ -67,15 +53,6 @@ class TestTag(unittest.TestCase):
         self.assertTrue('test_boolean' in d.attrs)
         self.assertEqual(d.attrs['test_boolean'], bool)
         self.assertEqual(d.render(), '<div test_boolean></div>')
-
-    def test_bool_args(self):
-        d = Div('test_boolean')
-        self.assertTrue('test_boolean' in d.attrs)
-        self.assertEqual(d.attrs['test_boolean'], bool)
-        self.assertEqual(d.render(), '<div test_boolean></div>')
-
-        with self.assertRaises(WrongArgsError):
-            d = Div(1)
 
     def test_parent(self):
         d = Div()

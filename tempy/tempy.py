@@ -554,7 +554,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         class_code += self.__class__.__name__
         ret.append('%s(%s)%s' % (
             class_code,
-            self.attrs.to_code(),
+            self.to_code_attrs(),
             childs_code
         ))
         return ''.join(ret)

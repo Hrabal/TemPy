@@ -4,7 +4,7 @@
 """
 import unittest
 
-from tempy.elements import Tag, TagAttrs
+from tempy.elements import Tag
 from tempy.exceptions import WrongContentError, WrongArgsError, TagError, DOMModByKeyError, DOMModByIndexError
 from tempy.tags import Div, A, P, Html, Head, Body, Pre, Br
 from tempy.tempy import DOMElement, Escaped
@@ -18,7 +18,7 @@ class TestDOMelement(unittest.TestCase):
         """a tag should be instance of Tag and DOMElement, and should have a TagAttrs attribute)"""
         self.assertIsInstance(tag, Tag)
         self.assertIsInstance(tag, DOMElement)
-        self.assertIsInstance(tag.attrs, TagAttrs)
+        self.assertIsInstance(tag.attrs, dict)
 
     def check_head_body(self, head, body):
         self.is_tag(head)
@@ -436,20 +436,6 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(a.content_data['test4'], 'test')
         with self.assertRaises(WrongContentError):
             a.inject([1, 2, 3])
-
-    def test_attrs(self):
-        d = Div()
-        d.attrs['klass'] = 'test'
-        self.assertTrue(d.has_class('test'))
-
-        d.attrs['style'] = {'color': 'blue'}
-        self.assertEqual(d.attrs['style'], {'color': 'blue'})
-
-        d.attrs['style'] = {'test': 'yellow'}
-        self.assertEqual(d.attrs['style'], {'color': 'blue', 'test': 'yellow'})
-
-        d.attrs.update(style={'color': 'blue', 'test': '1'})
-        self.assertEqual(d.attrs['style'], {'color': 'blue', 'test': '1'})
 
     def test_next(self):
         c = Div()
