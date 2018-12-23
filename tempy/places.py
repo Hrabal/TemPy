@@ -19,11 +19,12 @@ class Inside(TempyPlace):
 
 class Sibling(TempyPlace):
     """Base class for TempyPlaces that depends on the TempyREPR object's container siblings"""
+
     @classmethod
     def _check_container_siblings(cls, container, start=-1, stop=2):
         container_index = container.parent.childs.index(container)
-        before = container.parent.childs[container_index + start:container_index]
-        after = container.parent.childs[container_index + 1:container_index + stop]
+        before = container.parent.childs[container_index + start : container_index]
+        after = container.parent.childs[container_index + 1 : container_index + stop]
         for sibling in before + after:
             if sibling.__class__ == cls._pointer_class:
                 return 1
@@ -52,13 +53,16 @@ class After(Sibling):
 
 
 # Creation of a TempyPlace class for every tag defined in the tags.py module
-all_tags = importlib.import_module('.tags', package='tempy')
+all_tags = importlib.import_module(".tags", package="tempy")
 for tag in dir(all_tags):
-    if not tag.startswith('__'):
+    if not tag.startswith("__"):
         for place_type in (Inside, Near, Before, After):
-            place_tag_name = '%s%s' % (place_type.__name__, tag)
+            place_tag_name = "%s%s" % (place_type.__name__, tag)
             # Dynamic class definition
-            place_cls = type(place_tag_name, (place_type, ),
-                             {'_pointer_class': getattr(all_tags, tag), '_base_place': False})
+            place_cls = type(
+                place_tag_name,
+                (place_type,),
+                {"_pointer_class": getattr(all_tags, tag), "_base_place": False},
+            )
             # We put the new dynamically created class inside locals to make it avaiable from the outside
             locals()[place_tag_name] = place_cls

@@ -22,7 +22,7 @@ class TempyParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.unknown_tag_maker = TempyFactory()
-        self.tempy_tags = importlib.import_module('.tags', package='tempy')
+        self.tempy_tags = importlib.import_module(".tags", package="tempy")
         self._reset()
 
     def _reset(self):
@@ -69,7 +69,6 @@ class TempyParser(HTMLParser):
 
 
 class TempyFactory:
-
     def __init__(self, void_maker=False):
         self._void = void_maker
         if not self._void:
@@ -77,7 +76,11 @@ class TempyFactory:
 
     def make_tempy(self, tage_name):
         base_class = [Tag, VoidTag][self._void]
-        return type(tage_name, (base_class, ), {'_%s__tag' % tage_name: tage_name.lower(), '_from_factory': True})
+        return type(
+            tage_name,
+            (base_class,),
+            {"_%s__tag" % tage_name: tage_name.lower(), "_from_factory": True},
+        )
 
     def __getattribute__(self, attr):
         try:
@@ -91,7 +94,6 @@ class TempyFactory:
 
 
 class TempyGod(TempyFactory):
-
     def __init__(self):
         super().__init__()
         self._html_parser = TempyParser()
@@ -110,12 +112,16 @@ class TempyGod(TempyFactory):
         """Dumps a Tempy object to a python file"""
         if not filename:
             raise ValueError('"filename" argument should not be none.')
-        if len(filename.split('.')) > 1 and not filename.endswith('.py'):
-            raise ValueError('"filename" argument should have a .py extension, if given.')
-        if not filename.endswith('.py'):
-            filename += '.py'
-        with open(filename, 'w') as f:
-            f.write('# -*- coding: utf-8 -*-\nfrom tempy import T\nfrom tempy.tags import *\n')
+        if len(filename.split(".")) > 1 and not filename.endswith(".py"):
+            raise ValueError(
+                '"filename" argument should have a .py extension, if given.'
+            )
+        if not filename.endswith(".py"):
+            filename += ".py"
+        with open(filename, "w") as f:
+            f.write(
+                "# -*- coding: utf-8 -*-\nfrom tempy import T\nfrom tempy.tags import *\n"
+            )
             for tempy_tree in tempy_tree_list:
                 f.write(tempy_tree.to_code(pretty=pretty))
         return filename

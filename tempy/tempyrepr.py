@@ -19,6 +19,7 @@ def _filter_classes(cls_list, cls_type):
 
 class REPRFinder:
     """Collection of methods used to manage TempyREPR classes."""
+
     def _evaluate_tempyREPR(self, child, repr_cls):
         """Assign a score ito a TempyRepr class.
         The scores depends on the current scope and position of the object in which the TempyREPR is found."""
@@ -32,8 +33,12 @@ class REPRFinder:
 
         # Add points defined in scorers methods of used TempyPlaces
         for parent_cls in _filter_classes(repr_cls.__mro__[1:], TempyPlace):
-            for scorer in (method for method in dir(parent_cls) if method.startswith('_reprscore')):
-                score += getattr(parent_cls, scorer, lambda *args: 0)(parent_cls, self, child)
+            for scorer in (
+                method for method in dir(parent_cls) if method.startswith("_reprscore")
+            ):
+                score += getattr(parent_cls, scorer, lambda *args: 0)(
+                    parent_cls, self, child
+                )
 
         return score
 
@@ -43,7 +48,11 @@ class REPRFinder:
         Otherwise the original object is returned.
         """
         evaluator = partial(self._evaluate_tempyREPR, obj)
-        sorted_reprs = sorted(_filter_classes(obj.__class__.__dict__.values(), TempyREPR), key=evaluator, reverse=True)
+        sorted_reprs = sorted(
+            _filter_classes(obj.__class__.__dict__.values(), TempyREPR),
+            key=evaluator,
+            reverse=True,
+        )
         if sorted_reprs:
             # If we find some TempyREPR, we return the one with the best score.
             return sorted_reprs[0]
@@ -54,17 +63,20 @@ class TempyREPR:
     """Helper Class to provide views for custom objects.
     Objects of classes with a nested TempyREPR subclass are rendered using the TempyREPR subclass as a template.
     """
+
     def __init__(self, obj):
         super().__init__()
         self.obj = obj
         try:
             self.repr()
         except AttributeError:
-            raise IncompleteREPRError(self.__class__, 'TempyREPR subclass should implement an "repr" method.')
+            raise IncompleteREPRError(
+                self.__class__, 'TempyREPR subclass should implement an "repr" method.'
+            )
 
     def __getattribute__(self, attr):
         try:
-            return super().__getattribute__('obj').__getattribute__(attr)
+            return super().__getattribute__("obj").__getattribute__(attr)
         except AttributeError:
             return super().__getattribute__(attr)
 
@@ -75,5 +87,6 @@ class TempyREPR:
 class TempyPlace(TempyREPR):
     """Used to identify places in the DOM.
     Everything defined here is a placeholder."""
+
     _pointer_class = None
     _base_place = True

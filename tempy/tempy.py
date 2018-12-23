@@ -7,14 +7,18 @@ from copy import copy
 from functools import wraps
 from numbers import Number
 
-from .exceptions import TagError, WrongContentError, WrongArgsError, DOMModByKeyError, \
-    DOMModByIndexError
+from .exceptions import (
+    TagError,
+    WrongContentError,
+    WrongArgsError,
+    DOMModByKeyError,
+    DOMModByIndexError,
+)
 from .tempyrepr import REPRFinder
 import inspect
 
 
 class DOMNavigator:
-
     @property
     def root(self):
         return self.parent.root if self.parent else self
@@ -29,11 +33,13 @@ class DOMNavigator:
                 return self.parent._find_content(cont_name)
             else:
                 # Fallback for no content (Raise NoContent?)
-                return ''
+                return ""
 
     def _get_non_tempy_contents(self):
         """Returns rendered Contents and non-DOMElement stuff inside this Tag."""
-        for thing in filter(lambda x: not issubclass(x.__class__, DOMElement), self.childs):
+        for thing in filter(
+            lambda x: not issubclass(x.__class__, DOMElement), self.childs
+        ):
             yield thing
 
     def find(self, selector=None, names=None):
@@ -60,7 +66,9 @@ class DOMNavigator:
 
         elif selector is not None and isinstance(selector, str):
             for child in self.childs:
-                if (inspect.isclass(child) and selector == child.__name__) or selector == child.__class__.__name__:
+                if (
+                    inspect.isclass(child) and selector == child.__name__
+                ) or selector == child.__class__.__name__:
                     found_elements_selector.append(child)
                 if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
                     found_elements_selector += child.find(selector, names)
@@ -68,7 +76,7 @@ class DOMNavigator:
         found_elements_names = []
         if names is not None:
             for child in self.childs:
-                if hasattr(child, '_name') and names == child._name:
+                if hasattr(child, "_name") and names == child._name:
                     found_elements_names.append(child)
                 if issubclass(child.__class__, DOMElement) and len(child.childs) > 0:
                     found_elements_names += child.find(selector, names)
@@ -78,7 +86,11 @@ class DOMNavigator:
             set_names = set(found_elements_names)
             found_elements = list(set_selector.intersection(set_names))
         else:
-            found_elements = found_elements_selector if selector is not None else found_elements_names
+            found_elements = (
+                found_elements_selector
+                if selector is not None
+                else found_elements_names
+            )
 
         return found_elements
 
@@ -104,7 +116,7 @@ class DOMNavigator:
 
     def next_all(self):
         """Returns all the next siblings as a list."""
-        return self.parent.childs[self._own_index + 1:]
+        return self.parent.childs[self._own_index + 1 :]
 
     def prev(self):
         """Returns the previous sibling."""
@@ -112,7 +124,7 @@ class DOMNavigator:
 
     def prev_all(self):
         """Returns all the previous siblings as a list."""
-        return self.parent.childs[:self._own_index]
+        return self.parent.childs[: self._own_index]
 
     def siblings(self):
         """Returns all the siblings of this element as a list."""
@@ -132,7 +144,7 @@ class DOMNavigator:
         while queue:
             node = queue.pop()
             yield node
-            if hasattr(node, 'childs'):
+            if hasattr(node, "childs"):
                 queue.extendleft(node.childs)
 
     def dfs_preorder(self, reverse=False):
@@ -144,7 +156,7 @@ class DOMNavigator:
         while stack:
             node = stack.pop()
             yield node
-            if hasattr(node, 'childs'):
+            if hasattr(node, "childs"):
                 if reverse:
                     stack.extend(node.childs)
                 else:
@@ -172,7 +184,7 @@ class DOMNavigator:
             else:
                 stack.append(node)
                 visited.add(node)
-                if hasattr(node, 'childs'):
+                if hasattr(node, "childs"):
                     if reverse:
                         stack.extend(node.childs)
                     else:
@@ -192,7 +204,7 @@ class DOMNavigator:
             else:
                 visited.add(node)
                 stack.append(node)
-                if hasattr(node, 'childs'):
+                if hasattr(node, "childs"):
                     if reverse:
                         stack.extend(node.childs)
                     else:
@@ -200,7 +212,6 @@ class DOMNavigator:
 
 
 class DOMModifier:
-
     def content_receiver(reverse=False):
         """Decorator for content adding methods.
         Takes args and kwargs and calls the decorated method one time for each argument provided.
@@ -244,8 +255,10 @@ class DOMModifier:
         else:
             idx = idx if idx is not None else len(self.childs)
         if dom_group is not None:
-            if not isinstance(dom_group, Iterable) or isinstance(dom_group, (DOMElement, str)):
-                dom_group = [dom_group, ]
+            if not isinstance(dom_group, Iterable) or isinstance(
+                dom_group, (DOMElement, str)
+            ):
+                dom_group = [dom_group]
             for i_group, elem in enumerate(dom_group):
                 if elem is not None:
                     # Element insertion in this DOMElement childs
@@ -272,7 +285,7 @@ class DOMModifier:
     def __sub__(self, other):
         """Subtraction produces a copy of the left operator, with the right operator removed from left.childs."""
         if other not in self:
-            raise ValueError('%s is not in %s' % (other, self))
+            raise ValueError("%s is not in %s" % (other, self))
         ret = self.clone()
         ret.pop(other._own_index)
         return ret
@@ -280,7 +293,7 @@ class DOMModifier:
     def __isub__(self, other):
         """removes the child."""
         if other not in self:
-            raise ValueError('%s is not in %s' % (other, self))
+            raise ValueError("%s is not in %s" % (other, self))
         return self.pop(other._own_index)
 
     def __mul__(self, n):
@@ -288,7 +301,7 @@ class DOMModifier:
         if not isinstance(n, int):
             raise TypeError
         if n < 0:
-            raise ValueError('Negative multiplication not permitted.')
+            raise ValueError("Negative multiplication not permitted.")
         return [self.clone() for i in range(n)]
 
     def __imul__(self, n):
@@ -337,7 +350,7 @@ class DOMModifier:
     def wrap(self, other):
         """Wraps this element inside another empty tag."""
         if other.childs:
-            raise TagError(self, 'Wrapping in a non empty Tag is forbidden.')
+            raise TagError(self, "Wrapping in a non empty Tag is forbidden.")
         if self.parent:
             self.before(other)
             self.parent.pop(self._own_index)
@@ -357,10 +370,19 @@ class DOMModifier:
 
         for arg in args:
             is_elem = arg and isinstance(arg, DOMElement)
-            is_elem_iter = (not is_elem and arg and isinstance(arg, Iterable) and
-                            isinstance(iter(arg).__next__(), DOMElement))
+            is_elem_iter = (
+                not is_elem
+                and arg
+                and isinstance(arg, Iterable)
+                and isinstance(iter(arg).__next__(), DOMElement)
+            )
             if not (is_elem or is_elem_iter):
-                raise WrongArgsError(self, 'Argument {} is not DOMElement nor iterable of DOMElements'.format(arg))
+                raise WrongArgsError(
+                    self,
+                    "Argument {} is not DOMElement nor iterable of DOMElements".format(
+                        arg
+                    ),
+                )
 
         wcopies = []
         failure = []
@@ -384,9 +406,20 @@ class DOMModifier:
                 wcopies.append(type(arg)(iter_wcopies))
 
         if failure and strict:
-            raise TagError(self, 'Wrapping in a non empty Tag is forbidden, failed on arguments ' +
-                           ', '.join(list(map(lambda idx: str(idx[0]) if idx[1] == -1 else '[{1}] of {0}'.format(*idx),
-                                              failure))))
+            raise TagError(
+                self,
+                "Wrapping in a non empty Tag is forbidden, failed on arguments "
+                + ", ".join(
+                    list(
+                        map(
+                            lambda idx: str(idx[0])
+                            if idx[1] == -1
+                            else "[{1}] of {0}".format(*idx),
+                            failure,
+                        )
+                    )
+                ),
+            )
         return wcopies
 
     def wrap_inner(self, other):
@@ -410,11 +443,11 @@ class DOMModifier:
         """Moves all the childs to a new father"""
         idx_from = idx_from or 0
         idx_to = idx_to or len(self.childs)
-        removed = self.childs[idx_from: idx_to]
+        removed = self.childs[idx_from:idx_to]
         for child in removed:
             if issubclass(child.__class__, DOMElement):
                 child.parent = None
-        self.childs[idx_from: idx_to] = []
+        self.childs[idx_from:idx_to] = []
         return removed
 
     def move_childs(self, new_father, idx_from=None, idx_to=None):
@@ -445,12 +478,14 @@ class DOMModifier:
         else:
             result = []
             if isinstance(arg, str):
-                arg = [arg, ]
+                arg = [arg]
             for x in arg:
                 try:
                     result.append(getattr(self, x))
                 except AttributeError:
-                    raise DOMModByKeyError(self, "Given search key invalid. No child found.")
+                    raise DOMModByKeyError(
+                        self, "Given search key invalid. No child found."
+                    )
             if result:
                 for x in result:
                     self.childs.remove(x)
@@ -469,6 +504,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
+
     _from_factory = False
 
     def __init__(self, **kwargs):
@@ -480,18 +516,19 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self._stable = True
         self._data = kwargs
         for cls in reversed(self.__class__.__mro__[:-6]):
-            init = getattr(cls, 'init', None)
+            init = getattr(cls, "init", None)
             if init:
                 init(self)
 
     def __repr__(self):
-        return '<%s.%s %s.%s%s%s>' % (
+        return "<%s.%s %s.%s%s%s>" % (
             self.__module__,
             type(self).__name__,
             id(self),
-            ' Son of %s.' % type(self.parent).__name__ if self.parent else '',
-            ' %d childs.' % len(self.childs) if self.childs else '',
-            ' Named %s' % self._name if self._name else '')
+            " Son of %s." % type(self.parent).__name__ if self.parent else "",
+            " %d childs." % len(self.childs) if self.childs else "",
+            " Named %s" % self._name if self._name else "",
+        )
 
     def __hash__(self):
         return id(self)
@@ -504,11 +541,14 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
     def __eq__(self, other):
         if self.__class__ != other.__class__:
             return False
-        comp_dicts = [{
-            'name': t._name,
-            'childs': [id(c) for c in t.childs if isinstance(c, DOMElement)],
-            'content_data': t.content_data,
-        } for t in (self, other)]
+        comp_dicts = [
+            {
+                "name": t._name,
+                "childs": [id(c) for c in t.childs if isinstance(c, DOMElement)],
+                "content_data": t.content_data,
+            }
+            for t in (self, other)
+        ]
         return comp_dicts[0] == comp_dicts[1]
 
     def __getitem__(self, i):
@@ -530,11 +570,13 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         return len(self.childs)
 
     def __copy__(self):
-        return self.__class__()(copy(c) if isinstance(c, DOMElement) else c for c in self.childs)
+        return self.__class__()(
+            copy(c) if isinstance(c, DOMElement) else c for c in self.childs
+        )
 
     def to_code(self, pretty=False):
         ret = []
-        prettying = '\n' + ('\t' * self._depth) if pretty else ''
+        prettying = "\n" + ("\t" * self._depth) if pretty else ""
         childs_to_code = []
         for child in self.childs:
             if issubclass(child.__class__, DOMElement):
@@ -543,21 +585,17 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
             else:
                 childs_to_code.append('"""%s"""' % child)
 
-        childs_code = ''
+        childs_code = ""
         if childs_to_code:
-            childs_code = '(%s%s%s)' % (prettying, ', '.join(childs_to_code), prettying)
-        class_code = ''
+            childs_code = "(%s%s%s)" % (prettying, ", ".join(childs_to_code), prettying)
+        class_code = ""
         if self._from_factory:
-            class_code += 'T.'
-            if getattr(self, '_void', False):
-                class_code += 'Void.'
+            class_code += "T."
+            if getattr(self, "_void", False):
+                class_code += "Void."
         class_code += self.__class__.__name__
-        ret.append('%s(%s)%s' % (
-            class_code,
-            self.to_code_attrs(),
-            childs_code
-        ))
-        return ''.join(ret)
+        ret.append("%s(%s)%s" % (class_code, self.to_code_attrs(), childs_code))
+        return "".join(ret)
 
     @property
     def _depth(self):
@@ -631,7 +669,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
 
     def render_childs(self, pretty=False):
         """Public api to render all the childs using Tempy rules"""
-        return ''.join(self._iter_child_renders(pretty=pretty))
+        return "".join(self._iter_child_renders(pretty=pretty))
 
     def data(self, key=None, **kwargs):
         """Adds or retrieve extra data to this element, this data will not be rendered.
@@ -650,7 +688,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         Multiple injections on the same key will override the content (dict.update behavior).
         """
         if contents and not isinstance(contents, dict):
-            raise WrongContentError(self, contents, 'contents should be a dict')
+            raise WrongContentError(self, contents, "contents should be a dict")
         self._stable = False
         if not contents:
             contents = {}
