@@ -5,5 +5,5 @@ playground/*.*
 build/
 dist/
 *.egg-info
-venv/
+venv*/
 .idea/
