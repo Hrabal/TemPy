@@ -266,7 +266,7 @@ class VoidTag(Tag):
         if dom_group is not None:
             raise TagError(self, "Adding elements to a Void Tag is prohibited.")
         else:
-            super()._insert(self, dom_group, idx, prepend, name)
+            super()._insert(self, dom_group, idx=idx, prepend=prepend, name=name)
 
 
 class Css(Tag):

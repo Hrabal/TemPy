@@ -221,7 +221,7 @@ class DOMModifier:
         def _receiver(func):
             @wraps(func)
             def wrapped(inst, *tags, **kwtags):
-                verse = (1, -1)[reverse]
+                verse = (1, -1)[int(reverse)]
                 kwtags = kwtags.items()
                 i = 0
                 for typ in (tags, kwtags)[::verse]:
