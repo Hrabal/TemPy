@@ -224,7 +224,7 @@ class DOMModifier:
                 verse = (1, -1)[reverse]
                 kwtags = kwtags.items()
                 i = 0
-                for typ in (kwtags, tags)[::verse]:
+                for typ in (tags, kwtags)[::verse]:
                     for item in typ:
                         if typ is kwtags:
                             name, item = item
