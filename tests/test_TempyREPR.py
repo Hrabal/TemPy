@@ -175,7 +175,7 @@ class TestSingleTags(unittest.TestCase):
         self.assertEqual(Pre()(Span(), A()(inst)).render(), '<pre><span></span><a>footest</a></pre>')
 
         inst = Obj()
-        self.assertEqual(Pre()(Div(), Div()(inst)).render(), '<pre><div></div><div>bar</div></pre>')
+        self.assertEqual(Pre()(Div(), A()(inst)).render(), '<pre><div></div><a>bar</a></pre>')
 
     def test_root(self):
         class Obj:
