@@ -22,9 +22,8 @@ class Sibling(TempyPlace):
 
     @classmethod
     def _check_container_siblings(cls, container, start=-1, stop=2):
-        container_index = container.parent.childs.index(container)
-        before = container.parent.childs[container_index + start : container_index]
-        after = container.parent.childs[container_index + 1 : container_index + stop]
+        before = container.parent.childs[container._own_index + start: container._own_index]
+        after = container.parent.childs[container._own_index + 1: container._own_index + stop]
         for sibling in before + after:
             if sibling.__class__ == cls._pointer_class:
                 return 1

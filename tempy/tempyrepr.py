@@ -39,7 +39,6 @@ class REPRFinder:
                 score += getattr(parent_cls, scorer, lambda *args: 0)(
                     parent_cls, self, child
                 )
-
         return score
 
     def _search_for_view(self, obj):
