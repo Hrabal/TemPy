@@ -24,7 +24,7 @@ class Tag(DOMElement):
     Provides an api for tag inner manipulation and for rendering.
     """
 
-    _template = "{pretty}<{tag}{attrs}>{inner}{pretty}</{tag}>"
+    _template = "{pretty_pre}<{tag}{attrs}>{inner}{pretty_inner}</{tag}>"
     _void = False
 
     _MAPPING_ATTRS = ("style",)
@@ -228,8 +228,12 @@ class Tag(DOMElement):
         tag_data = {
             "tag": self._get__tag(),
             "attrs": self.render_attrs(),
-            "pretty": "\n" + ("\t" * self._depth) if pretty else "",
+            "pretty_pre": "",
+            "pretty_inner": "",
         }
+        if pretty:
+            tag_data["pretty_pre"] = "\n" + ("\t" * self._depth) if pretty else ""
+            tag_data["pretty_inner"] = "\n" + ("\t" * self._depth) if len(self.childs) > 1 else ""
         tag_data["inner"] = (
             self.render_childs(pretty) if not self._void and self.childs else ""
         )
@@ -260,7 +264,7 @@ class VoidTag(Tag):
     """
 
     _void = True
-    _template = "<{tag}{attrs}/>"
+    _template = "{pretty_pre}<{tag}{attrs}/>"
 
     def _insert(self, dom_group, idx=None, prepend=False, name=None):
         if dom_group is not None:
