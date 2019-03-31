@@ -96,12 +96,12 @@ class Tag(DOMElement):
         ret = []
         for k, v in self.attrs.items():
             if v:
-                f_string = (' %s="%s"', " %s")[v is bool]
-                f_args = (
-                    self._SPECIAL_ATTRS.get(k, k),
-                    self._FORMAT_ATTRS.get(k, lambda x: x)(v),
-                )[: 2 - (v is bool)]
-                ret.append(f_string % f_args)
+                if v is bool:
+                    ret.append(" %s" % self._SPECIAL_ATTRS.get(k, k))
+                else:
+                    fnc = self._FORMAT_ATTRS.get(k, None)
+                    val = fnc(v) if fnc else v
+                    ret.append(' %s="%s"' % (self._SPECIAL_ATTRS.get(k, k), val))
         return "".join(ret)
 
     def to_code_attrs(self):
