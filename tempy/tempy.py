@@ -116,7 +116,7 @@ class DOMNavigator:
 
     def next_all(self):
         """Returns all the next siblings as a list."""
-        return self.parent.childs[self._own_index + 1 :]
+        return self.parent.childs[self._own_index + 1:]
 
     def prev(self):
         """Returns the previous sibling."""
@@ -371,10 +371,7 @@ class DOMModifier:
         for arg in args:
             is_elem = arg and isinstance(arg, DOMElement)
             is_elem_iter = (
-                not is_elem
-                and arg
-                and isinstance(arg, Iterable)
-                and isinstance(iter(arg).__next__(), DOMElement)
+                not is_elem and arg and isinstance(arg, Iterable) and isinstance(iter(arg).__next__(), DOMElement)
             )
             if not (is_elem or is_elem_iter):
                 raise WrongArgsError(
@@ -408,8 +405,8 @@ class DOMModifier:
         if failure and strict:
             raise TagError(
                 self,
-                "Wrapping in a non empty Tag is forbidden, failed on arguments "
-                + ", ".join(
+                "Wrapping in a non empty Tag is forbidden, failed on arguments " +
+                ", ".join(
                     list(
                         map(
                             lambda idx: str(idx[0])

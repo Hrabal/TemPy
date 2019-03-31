@@ -267,10 +267,7 @@ class VoidTag(Tag):
     _template = "{pretty_pre}<{tag}{attrs}/>"
 
     def _insert(self, dom_group, idx=None, prepend=False, name=None):
-        if dom_group is not None:
-            raise TagError(self, "Adding elements to a Void Tag is prohibited.")
-        else:
-            super()._insert(self, dom_group, idx=idx, prepend=prepend, name=name)
+        raise TagError(self, "Adding elements to a Void Tag is prohibited.")
 
 
 class Css(Tag):

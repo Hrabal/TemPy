@@ -12,13 +12,13 @@ TABLE_DATA = [
          g='g',
          h='h',
          i='i',
-         j='k') for x in range(1000)
+         j='k') for x in range(100)
 ]
 
 tables = []
 pr = cProfile.Profile()
 pr.enable()
-for _ in range(1000):
+for _ in range(100):
     tables.append(
         Div()(
             table=Table()(
@@ -30,18 +30,18 @@ for _ in range(1000):
     )
 pr.disable()
 s = StringIO()
-sortby = 'cumulative'
+sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 print(s.getvalue())
-
+"""
 pr = cProfile.Profile()
 pr.enable()
 for t in tables:
     t.render()
 pr.disable()
 s = StringIO()
-sortby = 'cumulative'
+sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 print(s.getvalue())
@@ -49,11 +49,12 @@ print(s.getvalue())
 pr = cProfile.Profile()
 pr.enable()
 cont = Div()
-for _ in range(100000):
+for _ in range(10000):
     cont(Div())
 pr.disable()
 s = StringIO()
-sortby = 'cumulative'
+sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 print(s.getvalue())
+"""
