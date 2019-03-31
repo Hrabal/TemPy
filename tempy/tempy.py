@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Main Tempy classes"""
-import html
+from html import escape
 from collections import deque, Iterable
 from copy import copy
 from functools import wraps
@@ -639,8 +639,15 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
 
     def _iter_child_renders(self, pretty=False):
         for child in self.childs:
-            if isinstance(child, (str, Number)):
-                pass
+            if isinstance(child, str):
+                yield escape(child)
+            elif isinstance(child, Number):
+                yield str(child)
+            elif issubclass(child.__class__, DOMElement):
+                if isinstance(child, Escaped):
+                    yield child._render
+                else:
+                    yield child.render(pretty=pretty)
             elif not issubclass(child.__class__, DOMElement):
                 tempyREPR_cls = self._search_for_view(child)
                 if tempyREPR_cls:
@@ -650,15 +657,9 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
                         pass
 
                     child = Patched(child)
-            try:
-                yield child.render(pretty=pretty)
-            except (AttributeError, NotImplementedError):
-                if isinstance(child, Escaped):
-                    yield child._render
+                    yield child.render(pretty=pretty)
                 else:
-                    yield html.escape(str(child))
-            except Exception as ex:
-                raise ex
+                    yield escape(str(child))
 
     def render(self, *args, **kwargs):
         """Placeholder for subclass implementation"""
