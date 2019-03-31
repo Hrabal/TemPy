@@ -40,7 +40,7 @@ print(s.getvalue())
 
 pr = cProfile.Profile()
 pr.enable()
-render = page.render()
+_ = page.render()
 pr.disable()
 s = StringIO()
 sortby = 'tottime'
@@ -49,4 +49,3 @@ print('*' * 200)
 print('RENDERING')
 ps.print_stats()
 print(s.getvalue())
-print(render)
