@@ -24,7 +24,7 @@ class Tag(DOMElement):
     Provides an api for tag inner manipulation and for rendering.
     """
 
-    _template = "{pretty_pre}<{tag}{attrs}>{inner}{pretty_inner}</{tag}>"
+    _template = "%s<%s%s>%s%s</%s>"
     _void = False
 
     _MAPPING_ATTRS = ("style",)
@@ -96,12 +96,12 @@ class Tag(DOMElement):
         ret = []
         for k, v in self.attrs.items():
             if v:
-                f_string = (' {}="{}"', " {}")[v is bool]
+                f_string = (' %s="%s"', " %s")[v is bool]
                 f_args = (
                     self._SPECIAL_ATTRS.get(k, k),
                     self._FORMAT_ATTRS.get(k, lambda x: x)(v),
-                )[: 2 + (v is bool)]
-                ret.append(f_string.format(*f_args))
+                )[: 2 - (v is bool)]
+                ret.append(f_string % f_args)
         return "".join(ret)
 
     def to_code_attrs(self):
@@ -225,21 +225,22 @@ class Tag(DOMElement):
         if self._stable and self._render:
             return self._render
 
-        tag_data = {
-            "tag": self._get__tag(),
-            "attrs": self.render_attrs(),
-            "pretty_pre": "",
-            "pretty_inner": "",
-        }
+        pretty_pre = pretty_inner = ""
         if pretty:
-            tag_data["pretty_pre"] = "\n" + ("\t" * self._depth) if pretty else ""
-            tag_data["pretty_inner"] = "\n" + ("\t" * self._depth) if len(self.childs) > 1 else ""
-        tag_data["inner"] = (
-            self.render_childs(pretty) if not self._void and self.childs else ""
-        )
+            pretty_pre = "\n" + ("\t" * self._depth) if pretty else ""
+            pretty_inner = "\n" + ("\t" * self._depth) if len(self.childs) > 1 else ""
+        inner = self.render_childs(pretty) if not self._void else ""
 
         # We declare the tag is stable and have an official render:
-        self._render = self._template.format(**tag_data)
+        tag_data = (
+            pretty_pre,
+            self._get__tag(),
+            self.render_attrs(),
+            inner,
+            pretty_inner,
+            self._get__tag()
+        )[: 6 - [0, 3][self._void]]
+        self._render = self._template % tag_data
         self._stable = "pretty" if pretty else True
         return self._render
 
@@ -264,7 +265,7 @@ class VoidTag(Tag):
     """
 
     _void = True
-    _template = "{pretty_pre}<{tag}{attrs}/>"
+    _template = "%s<%s%s/>"
 
     def _insert(self, dom_group, idx=None, prepend=False, name=None):
         raise TagError(self, "Adding elements to a Void Tag is prohibited.")
@@ -300,7 +301,7 @@ class Css(Tag):
     </style>
     """
 
-    _template = "<style>{css}</style>"
+    _template = "<style>%s</style>"
 
     def __init__(self, *args, **kwargs):
         css_styles = self._parse__args(*args, **kwargs)
@@ -367,13 +368,13 @@ class Css(Tag):
                     nodes_to_parse.append(([p for p in parents] + [key], value))
             if result:
                 result.append("} " + ("\n\n" if pretty else ""))
-        return self._template.format(css="".join(result))
+        return self._template % "".join(result)
 
     def dump(self, filename, **kwargs):
         with open(filename, "w") as file_to_write:
-            self._template = "{css}"
+            self._template = "%s"
             file_to_write.write(self.render(**kwargs))
-            self._template = "<style>{css}</style>"
+            self._template = "<style>%s</style>"
 
     def replace_element(self, selector_list, new_style, ignore_error=True):
         if new_style is None or not isinstance(new_style, (str, dict)) or not new_style:

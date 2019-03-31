@@ -78,7 +78,7 @@ class TempyFactory:
         base_class = [Tag, VoidTag][self._void]
         return type(
             tage_name,
-            (base_class,),
+            (base_class, ),
             {"_%s__tag" % tage_name: tage_name.lower(), "_from_factory": True},
         )
 

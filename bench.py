@@ -2,6 +2,7 @@ import cProfile
 import pstats
 from io import StringIO
 from tempy.tags import Table, Tr, Td, Div
+from tempy.widgets import TempyPage
 TABLE_DATA = [
     dict(a='a',
          b='b',
@@ -15,11 +16,11 @@ TABLE_DATA = [
          j='k') for x in range(100)
 ]
 
-tables = []
+page = TempyPage()
 pr = cProfile.Profile()
 pr.enable()
 for _ in range(100):
-    tables.append(
+    page.body(
         Div()(
             table=Table()(
                 Tr(id='%s' % i)(
@@ -32,29 +33,19 @@ pr.disable()
 s = StringIO()
 sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-ps.print_stats()
-print(s.getvalue())
-"""
-pr = cProfile.Profile()
-pr.enable()
-for t in tables:
-    t.render()
-pr.disable()
-s = StringIO()
-sortby = 'tottime'
-ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+print('*' * 200)
+print('CREATION')
 ps.print_stats()
 print(s.getvalue())
 
 pr = cProfile.Profile()
 pr.enable()
-cont = Div()
-for _ in range(10000):
-    cont(Div())
+_ = page.render()
 pr.disable()
 s = StringIO()
 sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+print('*' * 200)
+print('RENDERING')
 ps.print_stats()
 print(s.getvalue())
-"""
