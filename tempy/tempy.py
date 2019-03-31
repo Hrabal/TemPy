@@ -655,9 +655,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
                     # this trick is used to avoid circular imports
                     class Patched(tempyREPR_cls, DOMElement):
                         pass
-
-                    child = Patched(child)
-                    yield child.render(pretty=pretty)
+                    yield Patched(child).render(pretty=pretty)
                 else:
                     yield escape(str(child))
 
