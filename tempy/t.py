@@ -60,6 +60,8 @@ class TempyParser(HTMLParser):
     def handle_data(self, data):
         if self.current_tag and data.strip():
             self.current_tag(data)
+        else:
+            self.result.append(data)
 
     def handle_comment(self, data):
         pass
