@@ -510,9 +510,8 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self.childs = []
         if not getattr(self, 'parent', None):
             self.parent = None
-        self.content_data = {}
+        self.content_data = kwargs
         self._stable = True
-        self._data = kwargs
         for cls in reversed(self.__class__.__mro__[:-6]):
             init = getattr(cls, "init", None)
             if init:
@@ -677,11 +676,11 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         """Adds or retrieve extra data to this element, this data will not be rendered.
         Every tag have a _data attribute (dict), if key is given _data[key] is returned.
         Kwargs are used to udpate this Tag's _data."""
-        self._data.update(kwargs)
+        self.content_data.update(kwargs)
         if key:
-            return self._data[key]
+            return self.content_data[key]
         if not kwargs:
-            return self._data
+            return self.content_data
         return self
 
     def inject(self, contents=None, **kwargs):

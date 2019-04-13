@@ -147,7 +147,7 @@ class TestTag(unittest.TestCase):
     def test_data(self):
         d = Div()
         d.data(test_key='test_value')
-        self.assertTrue('test_key' in d._data)
+        self.assertTrue('test_key' in d.content_data)
         self.assertEqual(d.data('test_key'), 'test_value')
         self.assertEqual(d.data(), {'test_key': 'test_value'})
 
