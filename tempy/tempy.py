@@ -508,7 +508,8 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         super().__init__()
         self._name = None
         self.childs = []
-        self.parent = None
+        if not getattr(self, 'parent', None):
+            self.parent = None
         self.content_data = {}
         self._stable = True
         self._data = kwargs
@@ -652,9 +653,14 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
                 tempyREPR_cls = self._search_for_view(child)
                 if tempyREPR_cls:
                     # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
-                    # this trick is used to avoid circular imports
+                    # this abomination is used to avoid circular imports
                     class Patched(tempyREPR_cls, DOMElement):
-                        pass
+                        def __init__(s, obj, *args, **kwargs):
+                            # Forced adoption of the patched element as son of us
+                            s.parent = self
+                            # MRO would init only the tempyREPR_cls, we force DOMElement init too
+                            DOMElement.__init__(s, **kwargs)
+                            super().__init__(obj)
                     yield Patched(child).render(pretty=pretty)
                 else:
                     yield escape(str(child))
