@@ -16,7 +16,6 @@ Templating systems are cool (Python syntax in HTML code) but not cool enough (yo
 
 ### Weeeeeeee!
 No parsing, and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
-See below for benchmarks against other templating engines.
 
 ### Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 *****
@@ -411,11 +410,6 @@ container_div.prev_all()
 container_div.parent()
 container_div.slice()
 ```
-
-# Performance
-Performance varies considerably based on the complexity of the rendered content, the amount of dynamic content on the page, the size of the output, and many other factors.
-TemPy does not parse strings, does not use regex, and does not load .html files.
-
 
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
 ### Contribute.
