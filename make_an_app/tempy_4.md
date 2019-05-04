@@ -44,7 +44,7 @@ class PersonPage(BasePage):
             self.body.main.container(
                 Div(klass='row')(
                     Div(klass='col')(
-                        self._data['person']
+                        self.content_data['person']
                     )
                 )
             )
@@ -153,13 +153,13 @@ class PersonPage(BasePage):
             self.body.main.container(
                 Div(klass='row')(
                     Div(klass='col')(
-                        self._data['person']
+                        self.content_data['person']
                     )
                 ),
                 Div(klass='row')(
                     Div(klass='col')(
                         Table(klass='table')(
-                            Tr()(c) for c in self._data['person'].contacts
+                            Tr()(c) for c in self.content_data['person'].contacts
                         )
                     )
                 )

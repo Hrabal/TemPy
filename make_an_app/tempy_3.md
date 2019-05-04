@@ -34,7 +34,7 @@ We added two new imports:
 We use the `db.session.query` method to start a query to the db, and then we apply a sorting to our records with `order_by` and a maximum number of records with `limit`. `all()` will run our query and so `people` will contain all the extracted records.
 
 The we pass this data (those are `models.Person` instances) to our template, so we can use them as we please, when instantiating the template with the argument `data={'people': people}`.
-This will populate the `_data` attribute inside our template with the dict we pass to it, so we can retrieve the data while building the DOM.
+This will populate the `content_data` attribute inside our template with the dict we pass to it, so we can retrieve the data while building the DOM.
 
 Now in the `HomePage` template we are going to use this data, this will be the final code of our `HomePage` template:
 
@@ -67,7 +67,7 @@ class HomePage(BasePage):
                                     )
                                 )
                             )
-                        ) for person in self._data['people']
+                        ) for person in self.content_data['people']
                     ]
                 )
             )
@@ -94,7 +94,7 @@ This code will place a div with the Bootstrap's css class "container" the `body.
 We build the basic Boostrap Grid System scheleton, we now have to add a variable number of cols inside id. To do so we add inside the `row` a named argument called `persons` which is a list comprehension:
 
 ```python
-[<some tags> for person in self._data['people']]
+[<some tags> for person in self.content_data['people']]
 ```
 
 `<some tags>` are the basic card structure (from the Bootstrap example) of the list we are building with a link we add so we can click on the card to go tho a single person profile and a couple FontAwesome icons to indicate which kind of contacts we have for this person.
@@ -134,11 +134,11 @@ This repeated for each person, with each contact structure repeated for each per
                 )
             )
         )
-    ) for person in self._data['people']
+    ) for person in self.content_data['people']
 ]
 ```
 
-As you can see we are looping over the list inside `self._data['people']` which is the results of the query we performed in the controller. For each person in our list we are addin the basic structure with a custom link `href` taken from the `person.person_id` attribute we defined in the `Person` model.
+As you can see we are looping over the list inside `self.content_data['people']` which is the results of the query we performed in the controller. For each person in our list we are addin the basic structure with a custom link `href` taken from the `person.person_id` attribute we defined in the `Person` model.
 
 Inside this basic structure for each person we are adding another nested list comprehension for the person's contact:
 
