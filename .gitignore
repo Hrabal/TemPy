@@ -7,3 +7,6 @@ dist/
 *.egg-info
 _site/
 Gemfile.lock
+.python-version
+.idea
+venv*
