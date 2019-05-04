@@ -11,6 +11,9 @@ This tutorial is based on the great Miguel Grinberg's [Flask Mega Tutorial](http
 
 We'll cover all the steps from zero to a working Contact Book app, focusing more in the TemPy parts, If you are confident using Flask and SQLAlchemy you can skip to the [TemPy in action](tempy/) part of this tutorial.
 
+You can find the complete code on [https://github.com/Hrabal/TempyExample](https://github.com/Hrabal/TempyExample)
+
+
 ### Check we have what we need
 
 First we'll check everything we need to build our app, in this tutorial we'll use Python >= 3.6 and sqllite3.
