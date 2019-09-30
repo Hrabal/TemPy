@@ -514,7 +514,7 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         self._stable = True
         for cls in reversed(self.__class__.__mro__[:-6]):
             init = getattr(cls, "init", None)
-            if init:
+            if init and init.__name__ in cls.__dict__:
                 init(self)
 
     def __repr__(self):
