@@ -8,14 +8,14 @@
 
 ### What?
 Build HTML without writing a single tag.
-TemPy dynamically generates HTML, and accesses it in a pure Python, or jQuery fashion. Navigating the DOM, and manipulating tags is also possible in a Python, and or jQuery-similar syntax.
+TemPy dynamically generates HTML and accesses it in a pure Python, or jQuery fashion. Navigating the DOM, and manipulating tags are also possible in a Python, and or jQuery-similar syntax.
 
 ### Why?
 HTML is like SQL: we all use it, we know it works, we all recognize its importance, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
 Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow) ... so the idea of TemPy emerges.
 
 ### Weeeeeeee!
-No parsing, and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
+No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
 
 ### Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 *****
@@ -93,7 +93,7 @@ page.render()
 ```
 
 #### Building Blocks
-You can also create blocks, and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
+You can also create blocks, and put them together using the manipulation API, each TemPy object can be used later inside another TemPy object:
 ```python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
@@ -126,7 +126,7 @@ def my_content_controller(url='/content'):
 ```
 
 #### OOT - Object Oriented Templating
-TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes, and add custom HTML tree structures to use as blocks.
+TemPy is designed to provide Object-Oriented Templating. You can subclass TemPy classes, and add custom HTML tree structures to use as blocks.
 
 ```python
 from tempy.widgets import TempyPage
@@ -208,7 +208,7 @@ class HomePage(BasePage):
                      Div()(comment for comment in current_content.comments))
 ```
 
-TemPy executes each base class `init` method in reverse mro, so your subclass can access all the elements defined in its parent classes.
+TemPy executes each base class `init` method in reverse MRO, so your subclass can access all the elements defined in its parent classes.
 
 #### TemPy Reprs
 
