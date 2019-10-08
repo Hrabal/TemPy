@@ -6,15 +6,15 @@ python3 tempy_examples.py
 
 Links to each template code:
 - Simple examples
-  - [**Hello World**](templates/hello_world.py) - It is what it seems, a complete html hello world page, whoa!
+  - [**Hello World**](templates/hello_world.py) - It is what it seems, a complete HTML hello world page. Whoa!
   - **Passing content** - Variables are good, let's use them!
-  - **Rendering lists** - aka looping
-  - **Content injection** - it's a bird, it's a context!
+  - **Rendering lists** - AKA looping
+  - **Content injection** - It's a bird, it's a context!
   - **Simple conditional generation** - We do what the code say
   - **Static files** - Pics or it didn't happen!
 
 - More complex examples
-  - [**Star Wars character list**](templates/star_wars.py) - Load and show few Mb of data
+  - [**Star Wars character list**](templates/star_wars.py) - Load and show few MB of data
   - **A blog** - A simple blog structure
   - **Bootstrap** - Can we? Yes we can!
   

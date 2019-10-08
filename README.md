@@ -3,21 +3,20 @@
 
 [![Release](https://img.shields.io/github/release/Hrabal/TemPy.svg)](https://img.shields.io/github/release/Hrabal/TemPy.svg)
 [![PyPI version](https://badge.fury.io/py/tem-py.svg)](https://badge.fury.io/py/tem-py) [![PyPI version](https://img.shields.io/badge/python-%3E%3D%203.3-blue.svg)](https://pypi.org/project/tem-py/) [![Build Status](https://travis-ci.org/Hrabal/TemPy.svg?branch=master)](https://travis-ci.org/Hrabal/TemPy) [![Coverage Status](https://coveralls.io/repos/github/Hrabal/TemPy/badge.svg?branch=master)](https://coveralls.io/github/Hrabal/TemPy?branch=master) [![codebeat badge](https://codebeat.co/badges/d8820f91-3b3e-422b-b5cf-062cb7c8d805)](https://codebeat.co/projects/github-com-hrabal-tempy-master) [![Code Climate](https://codeclimate.com/github/Hrabal/TemPy.png)](https://codeclimate.com/github/Hrabal/TemPy) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b35654867b91423e98511db6c22b6317)](https://www.codacy.com/app/federicocerchiari/TemPy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Hrabal/TemPy&amp;utm_campaign=Badge_Grade) [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/Hrabal/TemPy/master/LICENSE)
-### Fast Object-Oriented HTML templating With Python!
+### Fast Object Oriented HTML Templating With Python!
 
 ### What?
 Build HTML without writing a single tag.
-TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery style sintax.
+TemPy dynamically generates HTML and accesses it in a pure Python or jQuery fashion. Navigating the DOM and manipulating tags is also possible in a Python or jQuery style syntax.
 
 ### Why?
 HTML is like SQL: we all use it, we know it works, we all recognize it's importance. However our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
-Templating systems are cool, Python syntax in html code, but not cool enough, you still have to write html somehow.
+Templating systems are cool, but Python syntax in HTML code is not cool enough. You still have to write HTML.
 
-#### ...so the idea of TemPy.
+#### Introducing TemPy
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
-See below for benchmarks against other templating engines.
+No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time. See below for benchmarks against other templating engines.
 
 ## Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 
@@ -95,7 +94,7 @@ page.render()
 ```
 
 #### Building blocks
-You can also create blocks and put them together using the manipulation api, each TemPy object can be used later inside other TemPy object:
+You can also create blocks and put them together using the manipulation API, each TemPy object can be used later inside other TemPy object:
 ```python
 # --- file: base_elements.py
 from somewhere import links, foot_imgs
@@ -128,7 +127,7 @@ def my_content_controller(url='/content'):
 ```
 
 #### OOT - Object Oriented Templating
-TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom html tree structures to use as blocks.
+TemPy is designed to provide Object Oriented Templating. You can subclass TemPy classes and add custom HTML tree structures to use as blocks.
 
 ```python
 from tempy.widgets import TempyPage
@@ -271,19 +270,20 @@ class MyClass:
             self('Hello World, this is bar: ', self.bar)
 ```
 
-### Elements api
+### Elements API
 Create DOM elements by instantiating tags:
 ```python
 page = Html()
 >>> <html></html>
 ```
 
-Add elements or content by calling them like a function...
+Add elements or content by calling them like a function:
 ```python
 page(Head())
 >>> <html><head></head></html>
 ```
-or use one of the jQuery-like apis:
+
+Use one of the jQuery-like APIs:
 ```python
 body = Body()
 page.append(body)
@@ -294,7 +294,8 @@ div = Div().append_to(body)
 div.append('This is some content', Br(), 'And some Other')
 >>> <html><head></head><body><div>This is some content<br>And some Other</div></body></html>
 ```
-same for removing:
+
+Removing content:
 ```python
 head.remove()
 >>> <html><body><div></div></body></html>
@@ -304,7 +305,7 @@ page.pop()
 >>> <html></html>
 ```
 
-Several api's are provided to modify you're existing DOM elements:
+Several APIs are provided to modify your existing DOM elements:
 ```python
 div1 = Div()
 div2 = Div()
@@ -346,7 +347,7 @@ a.attr({'href': 'www.thisisalink.com'})
 >>> <a id="another_dom_id" class="someHtmlClass" href="www.thisisalink.com">text of this link</a>
 ```
 
-Styles are editable in the jQuery fashion:
+Edit styles in the jQuery fashion:
 ```python
 div2.css(width='100px', float='left')
 div2.css({'height': '100em'})
@@ -391,7 +392,7 @@ container_div[0][4].attr(id='pId')
 >>> </div>
 ```
 
-or access elements inside a container as if it they were attributes:
+Access elements inside a container as if it they were attributes:
 ```python
 container_div = Div()
 container_div(content_div=Div())
@@ -401,7 +402,7 @@ container_div.content_div('Some content')
 ```
 
 
-..or if you feel jQuery-ish you can use:
+Edit in the jQuery fashion:
 ```python
 container_div.children()
 container_div.first()
@@ -450,7 +451,7 @@ Performance difference is even higher in Jinja2 plain (no Flask) rendering:
 ![TemPy No-Web Rednering](bench_plain.jpg)
 
 ## Credits: made and mantained by Federico Cerchiari / Hrabal
-### Contribute.
+### Contribute
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
 ## Python versions compatibility
