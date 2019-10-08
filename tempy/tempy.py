@@ -14,6 +14,7 @@ from .exceptions import (
     DOMModByKeyError,
     DOMModByIndexError,
 )
+from .tempyrepr import REPRFinder
 import inspect
 
 
