@@ -715,7 +715,6 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         return mapped_list
 
 
-
 class Escaped(DOMElement):
     def __init__(self, content, **kwargs):
         super().__init__(**kwargs)
