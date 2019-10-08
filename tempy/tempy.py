@@ -702,6 +702,13 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         """Returns a deepcopy of this element."""
         return copy(self)
 
+    @classmethod
+    def join(cls, list):
+        n = len(list)
+        for index in range(1, 2*n-2, 2):
+            list.insert(index, cls())
+        return list
+
 
 class Escaped(DOMElement):
     def __init__(self, content, **kwargs):
