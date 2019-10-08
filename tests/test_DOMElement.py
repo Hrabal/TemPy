@@ -6,7 +6,7 @@ import unittest
 
 from tempy.elements import Tag
 from tempy.exceptions import WrongContentError, WrongArgsError, TagError, DOMModByKeyError, DOMModByIndexError
-from tempy.tags import Div, A, P, Html, Head, Body, Pre, Br
+from tempy.tags import Div, A, P, Html, Head, Body, Pre, Br, Td
 from tempy.tempy import DOMElement, Escaped
 
 
@@ -578,7 +578,14 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(len(result), 1)
 
     def test_join(self):
-        tag= Div()
-        list=['foo', 'Br', 'Div', 'Pre']
-        result= tag.join(list)
+        tag = Div()
+        list_ele = ['foo', 'Br', 'Div', 'Pre']
+        result = tag.join(list_ele)
         self.assertEqual(len(result), 7)
+
+    def test_map(self):
+        tag = Td()
+        list_ele = ['foo', 'Br', 'Div', 'Pre']
+        result = tag.map(list_ele)
+        self.assertEqual(len(result), 4)
+
