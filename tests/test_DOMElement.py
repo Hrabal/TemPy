@@ -576,3 +576,9 @@ class TestDOMelement(unittest.TestCase):
 
         result = tag.find('Br', names='foo')  # will return foo -> (Br())
         self.assertEqual(len(result), 1)
+
+    def test_join(self):
+        tag= Div()
+        list=['foo', 'Br', 'Div', 'Pre']
+        result= tag.join(list)
+        self.assertEqual(len(result), 7)
