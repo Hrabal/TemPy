@@ -2,7 +2,7 @@
 layout: default
 ---
 
-TemPy documentation.
+TemPy documentation
 ======
 
 
@@ -30,17 +30,15 @@ Build HTML without writing a single tag.
 
 HTML is like SQL: we all use it, we know it works, we all recognize it's important, but our biggest dream is to never write a single line of it again. For SQL we have ORM's, but we're not there yet for HTML.
 
-Templating systems are cool (Python syntax in html code) but not cool enough (you still have to write html somehow)...
+Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow)... That's where the idea of TemPy comes in.
 
-...that's where the idea of TemPy comes in.
+TemPy lets the developer build the DOM using only Python objects and classes. It provides a simple but complete API to dynamically create, navigate, modify and manage HTML templates and objects in pure Python.
 
-TemPy lets the developer build the DOM using only Python objects and classes. It provides a simple but complete API to dynamically create, navigate, modify and manage "HTML" templates and objects in pure Python.
+TemPy is designed to offer Object Oriented Templating, giving the developer the ability to use and manage HTML templates following the OOP paradigms. Subclassing, overriding and all the other OOP techniques will make HTML templating more flexible and maintainable.
 
-TemPy is designed to offer Object-Oriented Templating, giving the developer the ability to use and manage html templates following the OOP paradigms. Subclassing, overriding and all the other OOP techniques will make HTML templating more flexible and maintainable.
+Navigating the DOM and manipulating tags is possible in a Python or jQuery-style syntax. TemPy makes it easier to use different HTML structures for different contents, add dynamic contents and manage every content exception, add dynamic formatting in the template code.
 
-Navigating the DOM and manipulating tags is possible in a Python or jQuery-style syntax. TemPy makes it easier to use different html structures for different contents, add dynamic contents and manage every content exception, add dynamic formatting in the template code.
-
-Later, your controllers can serve the page by just calling the `render()` method on the root element, so this code...
+Later, your controllers can serve the page by just calling the `render()` method on the root element, so this code:
 
 ```python
 Html()(
@@ -63,7 +61,7 @@ Html()(
 ).render()
 ```
 
-..will generate this html output:
+Will generate this HTML output:
 
 ```html
 <html>
@@ -94,4 +92,4 @@ TemPy's philosophy is to provide a different approach to HTML generation, with p
 
 One of the main factors that leads to slow speeds when developing webapps is the template engine. TemPy has a different approach to HTML generation, resulting in a significant speed boost in many occasions.
 
-No parsing and a simple structure make TemPy fast. TemPy simply adds html tags around your data, and the actual html string exists only at render time.
+No parsing and a simple structure make TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.

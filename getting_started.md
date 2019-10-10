@@ -10,7 +10,7 @@ permalink: /getting_started/
 pip3 install tem-py
 ```
 
-..or, if you want the latest unreleased version, clone TemPy from GitHub:
+If you want the latest unreleased version, clone TemPy from GitHub:
 
 ```shell
 git clone https://github.com/Hrabal/TemPy.git
