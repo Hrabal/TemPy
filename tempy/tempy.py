@@ -703,11 +703,16 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder):
         return copy(self)
 
     @classmethod
-    def join(cls, list):
-        n = len(list)
+    def join(cls, list_ele):
+        n = len(list_ele)
         for index in range(1, 2*n-2, 2):
-            list.insert(index, cls())
-        return list
+            list_ele.insert(index, cls())
+        return list_ele
+
+    @classmethod
+    def map(cls, list_ele):
+        mapped_list = [cls()(ele) for ele in list_ele]
+        return mapped_list
 
 
 class Escaped(DOMElement):
