@@ -8,7 +8,7 @@ permalink: /make_an_app/base_files/
 
 ### Base files
 
-Now we'll make the base code to make our Flask app working. We start by making an `app.py` file that will contain the Flask initialization:
+Now we'll make the base code to get our Flask app working. We start by making an `app.py` file that will contain the Flask initialization:
 
 ```python
 # app.py
@@ -30,16 +30,16 @@ def index():
 ```
 
 In this file we setup the basic logging utilities and we set some locale config for datetime.
-The important part here is the declaration of the `app` variable which is an instance of Flask, this will manage all our web requests. With the `app.config.from_object('config')` instruction we tell Flask to load oll the configurations of our app from a config file, so now we need to make the `config.py` file:
+The important part here is the declaration of the `app` variable which is an instance of Flask. This will manage all our web requests. With the `app.config.from_object('config')` instruction we tell Flask to load all the configurations of our app from a config file, so now we need to make the `config.py` file:
 
 ```python
 # config.py
 
 SECRET_KEY = 'very secret string!'
 ```
-This file is small right now, we'll add some more lines as we'll add a database access to our app.
+This file is small right now, we'll add some more lines as we add database access to our app.
 
-The only missing thing in order to run our raw webapp is way to start it, so we make a `run.py` file with the only those two lines of code:
+The only thing missing that is needed in order to run our raw webapp is way to start it, so we make a `run.py` file with only these two lines of code:
 
 ```python
 # run.py
@@ -48,14 +48,14 @@ from app import app
 app.run(debug=True)
 ```
 
-Now we are ready to test if everything is working, go to the shell and run our last created file:
+Now we are ready to test if everything is working. Go to the shell and run our last created file:
 
 ```shell
 (venv)$ python run.py
 WARNING:werkzeug: * Debugger is active!
 ```
 
-Now our app is up and running, and we should be able to get the Hello World message in the browser hitting the [`http://127.0.0.1:5000/`](http://127.0.0.1:5000/){:target="_blank"} address.
+Now our app is up and running, and we should be able to get the Hello World message in the browser by hitting the [`http://127.0.0.1:5000/`](http://127.0.0.1:5000/){:target="_blank"} address.
 
 
 get back to the terminal and hit `control + c` to stop the wesberver.
@@ -63,8 +63,8 @@ get back to the terminal and hit `control + c` to stop the wesberver.
 
 ### Project structure
 
-Now that we made our Flask app running, let's make it a little more organized so we'll have organiside code.
-At this point our folder structure should be this:
+Now that we have our Flask app running, let's make it a little more organized.
+At this point our folder structure should look like this:
 
 ```
 tempy_app\
@@ -77,7 +77,7 @@ tempy_app\
     config.py     
 ```
 
-We'll add one empty file that will contain or database models:
+We'll add one empty file that will contain our database models:
 ```shell
 (venv)$ touch models.py
 ```
@@ -93,7 +93,7 @@ def index():
     return "Hello World"
 ```
 
-..and replace the controller code in `app.py` with an import of this new files, `app.py` will now look like this:
+..and replace the controller code in `app.py` with an import of this new file. `app.py` will now look like this:
 
 ```python
 # app.py
