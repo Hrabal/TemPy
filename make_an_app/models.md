@@ -8,14 +8,14 @@ permalink: /make_an_app/models/
 
 ### Models for our App
 
-Our database is empty for no tables have been added, to do so we'll add to our app some models. SQLAlchemy will take care of all the needed db instructions to create the tables for our models.
+Our database is currently empty because we haven't added any tables. To do so we'll add some models to our app. SQLAlchemy will take care of all the needed db instructions to create the tables for our models.
 
-Those models describe the entities we are going to use in our app. For a basic Contact Book the models are:
+These models describe the entities we are going to use in our app. For a basic Contact Book, the models are:
 
  * Person
  * Contact
 
-Let's open the `models.py` file and add those models:
+Let's open the `models.py` file and add these models:
 
 ```python
 # models.py
@@ -57,14 +57,14 @@ class Contact(db.Model):
 
 ```
 
-With those models we are able to represent a person and n contacts linked to that person, to see if this models are working we have to upgrade our db so the two tables are created:
+With these models we are able to represent a person and n contacts linked to that person. To see if the models are working we have to upgrade our db so the two tables are created:
 
 ```shell
 (venv)$ python db_update.py
 (venv)$ python db_migrate.py
 ```
 
-Now, to test the model, we'll add a couple of records. Open a python interpreter and add a few persons with their contacts (I'm using my favourite Czech writers but feel free to use other people):
+Now, to test the model, we'll add a couple of records. Open a python interpreter and add a few people with their contacts (I'm using my favourite Czech writers but feel free to use other people):
 ```python
 (venv)$ python
 Python 3.7.0 (v3.7.0:1bf9cc5093, Jun 26 2018, 23:26:24)
