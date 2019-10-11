@@ -9,9 +9,9 @@ permalink: /make_an_app/tempy_4/
 
 ### TemPy in Action, TempyREPR
 
-Another way to use TemPy is to define how objects will be rendered in the DOM by defining `TempyREPR` classes inside the object classes. To show how to user `TempyREPR` we'll build the single person's pages using this tecnique.
+Another way to use TemPy is to define how objects will be rendered in the DOM by defining `TempyREPR` classes inside the object classes. To show how to use `TempyREPR` we'll build the single person's pages using this technique.
 
-First, add the controller for the single person page, we already added links to this page in the homepage of our app with link in the form `person/<person_id>`, so we write a controller for those links:
+First, add the controller for the single person page. We already added links to this page in the homepage of our app with link in the form `person/<person_id>`, so we write a controller for those links:
 
 ```python
 # controllers.py
@@ -33,9 +33,9 @@ def person(person_id):
     return PersonPage(data={'person': person}).render()
 ```
 
-We are using the `PersonPage` template to show the page, so we need to add this import from `templates/pages.py` in which we'll build the new template.
+We are using the `PersonPage` template to show the page, so we need to add the import from `templates/pages.py` in which we'll build the new template.
 
-In the `templates/pages.py`file we add the new template with the minimun code to place our person data, leaving the actual person data formatting to a `TempyREPR` placed inside the `Person` model:
+In the `templates/pages.py`file we add the new template with the minimum code to place our person data, leaving the actual person data formatting to a `TempyREPR` placed inside the `Person` model:
 
 ```python
 class PersonPage(BasePage):
@@ -105,9 +105,9 @@ class Contact(db.Model):
 
 With the nested class `PersonREPR` that inherits from `TempyREPR` we define a way every instance of `Person` will be treated when found inside a TemPy tag.
 
-In this class we just wrote we need to define a `repr` method, in which `self` is both the `Person` instance container (`Div(klass='col')`) and the instance of `Person` itself. We can call `self` to add content where we are placing the `Person` instance and we can access `self` attributes as we would do with a normal `Person` instance.
+In the class we just wrote we need to define a `repr` method, in which `self` is both the `Person` instance container (`Div(klass='col')`) and the instance of `Person` itself. We can call `self` to add content where we are placing the `Person` instance and we can access `self` attributes as we would do with a normal `Person` instance.
 
-That's it, now if we restart our webserver, navigate to the home and click on some person's card we'll se that TemPy have rendered the `Person` as serie of `<span>` with strings and the `Person` data inside.
+That's it. Now if we restart our webserver, navigate to the home and click on some person's card we'll see that TemPy has rendered the `Person` as series of `<span>` with strings and the `Person` data inside.
 
 --- 
 
