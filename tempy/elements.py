@@ -347,6 +347,16 @@ class Css(Tag):
             for parent in gen:
                 if isinstance(parent, tuple):
                     result.append(", ".join(parent))
+                elif isinstance(parent, Tag):
+                    if parent.id() != None:
+                        result.append("#"+str(parent.id()))
+                    elif len(parent.attrs["klass"]) > 0:
+                        out = ""
+                        for klass in parent.attrs["klass"]:
+                            out += "." + klass
+                        result.append(out)
+                    else:
+                        result.append(parent._get__tag() + " ")
                 elif inspect.isclass(parent):
                     result.append(
                         getattr(parent, "_" + parent.__name__ + "__tag") + " "
