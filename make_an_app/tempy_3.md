@@ -9,7 +9,7 @@ permalink: /make_an_app/tempy_3/
 
 ### TemPy in Action, dynamic contents: cycles and conditions
 
-Now it's time to add some dynamic contents in our page. We'll get those contents from the databse and we'll use python and TemPy to put those in our template.
+Now it's time to add some dynamic content to our page. We'll get this content from the databse and we'll use python and TemPy to put them in our template.
 
 First we have to retrieve the data, so we use SQLAlchemy query method to get the first 10 people in our database, sorted by name. We'll do this in our controller:
 
@@ -33,10 +33,10 @@ We added two new imports:
 
 We use the `db.session.query` method to start a query to the db, and then we apply a sorting to our records with `order_by` and a maximum number of records with `limit`. `all()` will run our query and so `people` will contain all the extracted records.
 
-The we pass this data (those are `models.Person` instances) to our template, so we can use them as we please, when instantiating the template with the argument `data={'people': people}`.
+Then we pass this data (the `models.Person` instances) to our template. We can now use them as we please, when instantiating the template with the argument `data={'people': people}`.
 This will populate the `content_data` attribute inside our template with the dict we pass to it, so we can retrieve the data while building the DOM.
 
-Now in the `HomePage` template we are going to use this data, this will be the final code of our `HomePage` template:
+Now in the `HomePage` template we are going to use this data. This will be the final code of our `HomePage` template:
 
 ```python
 # templates/home.py
@@ -80,7 +80,7 @@ The basic Bootstrap structure consists of three nested divs with the classes `co
 self.body.main.container.attr(klass="album py-5 bg-light")
 ```
 
-We access the already created div by names, and we call the TemPy method `attr` on this TemPy tag, that will translate this call arguments to attributes of the TemPy tag.
+We access the already created div by name, and we call the TemPy method `attr` on this TemPy tag. This will translate the call arguments to attributes of the TemPy tag.
 
 Then we add content inside this div by calling this function:
 
@@ -91,13 +91,13 @@ self.body.main.container(
 ```
 This code will place a div with the Bootstrap's css class "container" the `body.main.container` div, and another div with the css class "row" inside it.
 
-We build the basic Boostrap Grid System scheleton, we now have to add a variable number of cols inside id. To do so we add inside the `row` a named argument called `persons` which is a list comprehension:
+We've built the basic Boostrap Grid System skeleton, and we now have to add a variable number of cols inside it. To do so we add inside the `row` a named argument called `persons` which is a list comprehension:
 
 ```python
 [<some tags> for person in self.content_data['people']]
 ```
 
-`<some tags>` are the basic card structure (from the Bootstrap example) of the list we are building with a link we add so we can click on the card to go tho a single person profile and a couple FontAwesome icons to indicate which kind of contacts we have for this person.
+`<some tags>` are the basic card structure (from the Bootstrap example) of the list we are building with a link we add so we can click on the card to go to a single person profile and a couple FontAwesome icons to indicate which kind of contacts we have for this person.
 
 This structure would look like this in plain html:
 
@@ -138,7 +138,7 @@ This repeated for each person, with each contact structure repeated for each per
 ]
 ```
 
-As you can see we are looping over the list inside `self.content_data['people']` which is the results of the query we performed in the controller. For each person in our list we are addin the basic structure with a custom link `href` taken from the `person.person_id` attribute we defined in the `Person` model.
+As you can see we are looping over the list inside `self.content_data['people']` which is the results of the query we performed in the controller. For each person in our list we are adding the basic structure with a custom link `href` taken from the `person.person_id` attribute we defined in the `Person` model.
 
 Inside this basic structure for each person we are adding another nested list comprehension for the person's contact:
 
@@ -208,9 +208,9 @@ class BasePage(TempyPage):
         )
 ```
 
-Notice that we added the mapping, but also we added a `Link` inside the `HEAD_TAGS`. This new link is the import of our custom css file, that we retrieve using Falsk's `url_for` method. We call `url_for` inside the `with app.test_request_context()` for Flask needs it to generate a valid url for our static files.
+Notice that we added the mapping, but also we added a `Link` inside the `HEAD_TAGS`. This new link is the import of our custom css file, that we retrieve using Falsk's `url_for` method. We call `url_for` inside the `with app.test_request_context()` because Flask needs it to generate a valid url for our static files.
 
-So, add this in a new file called `style.css` inside the `static` folder:
+So, add this in a new file called `style.css`, inside the `static` folder:
 
 ```css
 .contactIcon {
@@ -219,6 +219,6 @@ So, add this in a new file called `style.css` inside the `static` folder:
 }
 ```
 
-Now if we start again our app with `python run.py` in the terminal and hit the `http://localhost:5000/` we can see that the page now have a colum for each person, with variable icons depending on the person's contacts.
+Now if we restart with `python run.py` in the terminal and hit the `http://localhost:5000/` we can see that the page now has a column for each person, with variable icons depending on the person's contacts.
 
 In the [next section](../tempy_4/) we'll use another TemPy feature, `TempyREPR`, that will let us define a TemPy structure directly in the models.

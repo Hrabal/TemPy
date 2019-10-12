@@ -8,7 +8,7 @@ permalink: /make_an_app/database/
 
 ### Database
 
-Now it's time to add a database to project that will store contacts. First we need to add some db configurations in our `config.py` file, change the file with this content:
+Now it's time to add a database to our project that will store contacts. First, we need to add some db configurations in our `config.py` file. Change the file with this content:
 
 ```python
 # config.py
@@ -26,7 +26,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 ```
 
 
-We have added some constats that SQLAlchemy will use to manage our db, but we have no db yet so we add it to our `app.py`. We need to change the app.py file like this:
+We have added some constants that SQLAlchemy will use to manage our db, but we have no db yet. So let's add it to our `app.py`. We need to change the app.py file like this:
 
 ```python
 # app.py
@@ -48,9 +48,9 @@ import models
 import controllers
 ```
 
-We added the SQLAlchemy import and the db variable instantiation. Now SQLAlchemy can do a lot of work for us and so we don't have to write SQL queries, and it will also do the database creation an update for us.
+We added the SQLAlchemy import and the db variable instantiation. Now SQLAlchemy can do a lot of the work for us. We don't have to write SQL queries, and it will also do the database creation and update for us.
 Now, following the [database part](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database) of the Miguel Grinberg's Flask Mega-Tutorial we'll make some utility scripts that will manage the db for us.
-Make the files `db_create.py`, `db_update.py`, `db_migrate.py` and  `db_downgrade.py` with those contents:
+Make the files `db_create.py`, `db_update.py`, `db_migrate.py` and  `db_downgrade.py` with the following contents:
 
 ```python
 # db_create.py
@@ -114,7 +114,7 @@ v = api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
 print('Current database version: ' + str(v))
 ```
 
-If you want to understand what's happening in those files please refer to [Miguel Grinberg's Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database). Those are scripts that we'll use to create and update the database everytime we change our databse models or structure, let's try the db creation script:
+If you want to understand what's happening in those files please refer to [Miguel Grinberg's Flask Mega-Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database). TWe'll use these scripts to create and update the database everytime we change our databse models or structure. Let's try the db creation script:
 
 ```shell
 (venv)$ python db_create.py

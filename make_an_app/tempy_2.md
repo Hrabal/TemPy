@@ -12,7 +12,7 @@ If we have to build another page, say the "contact" page to diplay the details o
 
 To avoid all this boilerplate code, and to optimize our app's performance, we're going to move our fixed tags outside of the templates so they will be created once and used multiple times, and we are going to make a base template class that will be used in every page.
 
-First, we're going to move all scripts and the link outside the template class, make a new file in the `templates` folder so we can store the common parts of our templates in it:
+First, we're going to move all scripts and the link outside the template class, and make a new file in the `templates` folder so we can store the common parts of our templates in it:
 
 ```python
 # base.py
@@ -43,7 +43,7 @@ SCRIPTS = [
 
 In this file we build the `Script`, `Meta` and `Link` tags once, so they are instantiated when our webserver starts and not during each web request. We can then use our `head_tags` and `scripts_tags` in any template just by inserting them in a TemPy tag.
 
-Here's how we do it, again in the `templates/base.py` file we move the basic structure of our site in a base template that we are going to use as a base class for all our templates:
+Here's how we do it, again in the `templates/base.py` file we move the basic structure of our site into a base template that we are going to use as a base class for all our templates:
 
 ```python
 # base.py
@@ -89,7 +89,7 @@ class BasePage(TempyPage):
         )
 ```
 
-We defined a `BasePage` class with almost identical struture to `HomePage` defined before. The only differencies are that instead of defining the `Script`, `Meta` and `Link` tags inside our temlate, we define them early and we inseet them in our template. this way when `base.py` is imported (most surely when our app starts) those tags are created and the the same objects are shared between each request.
+We defined a `BasePage` class with almost identical struture to `HomePage` defined before. The only differencies are that instead of defining the `Script`, `Meta` and `Link` tags inside our template, we define them early and we insert them in our template. This way when `base.py` is imported (most surely when our app starts) those tags are created and the same objects are shared between each request.
 
 The other difference is that we gave a couple of names to some tags and we replaced the main page's main content with an empty div:
 
@@ -125,4 +125,4 @@ class HomePage(BasePage):
         )
 ```
 
-In the [next section](../tempy_3/) we'll make add to our templates the code needed to display our dynamic contents.
+In the [next section](../tempy_3/) we'll add to our templates the code needed to display our dynamic content.
