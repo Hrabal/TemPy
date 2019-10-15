@@ -34,7 +34,7 @@ Overview:
 
 # Usage
 ### Installation
-TemPy is avaiable on PyPi: `pip3 install tem-py`.
+TemPy is available on PyPi: `pip3 install tem-py`.
 
 Or clone/download this repository, and run `python3 setup.py install`
 
@@ -233,7 +233,7 @@ You can define several `TempyREPR` nested classes, and when dealing with a non-T
 * a `TempyREPR` subclass with the same name of his TemPy container's root.
 * a `TempyREPR` subclass named `HtmlREPR`.
 * the first `TempyREPR` found.
-* if none of the previous if found, the object will be rendered calling his `__str__` method.
+* if none of the previous ones are found, the object will be rendered calling its `__str__` method.
 
 You can use this order to set different renderings for different situations/pages:
 
@@ -302,7 +302,7 @@ page.pop()
 >>> <html></html>
 ```
 
-Several APIs are provided to modify you're existing DOM elements:
+Several APIs are provided to modify your existing DOM elements:
 ```python
 div1 = Div()
 div2 = Div()
@@ -411,7 +411,7 @@ container_div.parent()
 container_div.slice()
 ```
 
-## Credits: made and mantained by Federico Cerchiari / Hrabal
+## Credits: made and maintained by Federico Cerchiari / Hrabal
 ### Contribute.
 Any contribution is welcome. Please refer to the [contributing page](CONTRIBUTING.md).
 
