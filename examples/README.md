@@ -17,4 +17,5 @@ Links to each template code:
   - [**Star Wars character list**](templates/star_wars.py) - Load and show few Mb of data
   - **A blog** - A simple blog structure
   - **Bootstrap** - Can we? Yes we can!
+    - [**Bootstrap Starter**](templates/bootstrap_example.py) - The bootstrap starter template
   
