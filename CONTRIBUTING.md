@@ -8,26 +8,26 @@ If you want to propose (or ask for) a new feature, if you want to propose a refa
 
 Every contribution *should* have its tests and will have to pass already written tests.
 Tests are important, and no merge will be made without some test coverage. If you don't know how to write/run tests just AMA on our  [Slack](https://tempy-dev.slack.com) channel. 
-Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html), every PR you make will be analysed by [Travis CI](https://travis-ci.org/Hrabal/TemPy).
+Tempy tests are written with [Unittest](https://docs.python.org/3/library/unittest.html), every PR you make will be analyzed by [Travis CI](https://travis-ci.org/Hrabal/TemPy).
 
-Contact me if you want to help maintaining this project or if you are willing to suggest ideas.
+Contact me if you want to help to maintain this project or if you are willing to suggest ideas.
 We have a [Slack](https://tempy-dev.slack.com) for TemPy dev discussions (ask for an invitation to federicocerchiari @ gmail . com).
 
 ### Code Style
 This project does not have a coding style guideline (except [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP20](https://www.python.org/dev/peps/pep-0020/) of course) , just code as you like to code!
 
 ## Workflow
-Every development is tracked using Issues. If you want to work on a specific issue, ask for assignement. And if you don't find an issue for what you want to work on, open a new issue with your proposed development.
+Every development is tracked using Issues. If you want to work on a specific issue, ask for assignment. And if you don't find an issue for what you want to work on, open a new issue with your proposed development.
 
 Small (2/3 commits, 1 contributor) contributions should follow this simple workflow:
 - Ask to be assigned to the issue
 - Fork this repo: [GitHub guide on forking](https://help.github.com/articles/fork-a-repo/)
 - Do the coding on the forked repo in the master branch
 - Make a Pull Request: [GitHub guide on making a PR](https://help.github.com/articles/about-pull-requests/)
-Some CI and code quality services will be triggered and 5/10 mins after your PR you'll see in the PR page if your contribution is breaking some tests, if it contain some code that can be made better and if it have a good test coverage.
+Some CI and code quality services will be triggered and 5/10 mins after your PR you'll see in the PR page if your contribution is breaking some tests, if it contain some code that can be made better and if it have good test coverage.
 I'll check the PR and merge, or review your code if I have suggestions on something you wrote.
 
-Bigger developments (i.e: a new widget, a new complex feature, a deep refactor, more than one person working on the feature) etc..) will follow a different workflow:
+Bigger developments (i.e: a new widget, a new complex feature, a deep refactor, more than one person working on the feature), etc..) will follow a different workflow:
 - Discuss the development strategy on the Issue
 - Discuss particular problems in the Slack channel
 - I'll make a new branch dedicated to this feature with no CI
