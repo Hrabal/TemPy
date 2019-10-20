@@ -15,7 +15,7 @@ HTML is like SQL. We all use it, know how it works and we all recognize its impo
 Templating systems are cool (Python syntax in HTML code) but not cool enough (you still have to write HTML somehow) ... so the idea of TemPy emerges.
 
 ### Weeeeeeee!
-No parsing and a simple structure makes TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
+No parsing and a simple structure make TemPy fast. TemPy simply adds HTML tags around your data, and the actual HTML string exists only at render time.
 
 ### Read the full documentation here: [https://hrabal.github.io/TemPy/](https://hrabal.github.io/TemPy/)
 *****
@@ -125,7 +125,7 @@ def my_content_controller(url='/content'):
     return content_page.body.container.append(content).render()
 ```
 
-#### OOT - Object Oriented Templating
+#### OOT - Object-Oriented Templating
 TemPy is designed to provide Object-Oriented Templating. You can subclass TemPy classes, and add custom HTML tree structures to use as blocks.
 
 ```python
