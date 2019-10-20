@@ -94,6 +94,11 @@ def user_page_handler():
     return page.render()
 
 
+@app.route('/video_tag')
+def video_tag_handler():
+    from templates.video_tag import page
+    return page.render()
+
 
 @app.route('/homepage')
 def homepage_handler():
