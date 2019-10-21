@@ -99,6 +99,10 @@ def video_tag_handler():
     from templates.video_tag import page
     return page.render()
 
+@app.route('/form')
+def form_handler():
+    from templates.form_components import page
+    return page.render()
 
 @app.route('/homepage')
 def homepage_handler():
