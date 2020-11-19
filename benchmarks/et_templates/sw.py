@@ -5,9 +5,11 @@ A = E.a
 I = E.i
 B = E.b
 
+
 def CLASS(v):
     # helper function, 'class' is a reserved word
     return {'class': v}
+
 
 page = (
     E.html(

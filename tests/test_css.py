@@ -99,7 +99,8 @@ class TestTag(unittest.TestCase):
     def test_render(self):
         css = Css(self.css_dict)
         rendered_css = css.render()
-        expected_counter = Counter('<style> {} html { background-color: lightblue; } h1 { color: white; text-align: center; } </style>')
+        expected_counter = Counter('<style> {} html { background-color: lightblue; }'
+                                   'h1 { color: white; text-align: center; } </style>')
         # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
         self.assertEqual(Counter(rendered_css), expected_counter)
 
@@ -172,17 +173,17 @@ class TestTag(unittest.TestCase):
         css.replace_element(['#myid'], {'color': 'purple'})
         self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
 
-        #nested example
+        # nested example
         css.replace_element(['html', 'body', link], {'color': 'grey'})
         self.assertEqual({'color': 'grey'}, css.attrs['css_attrs']['html']['body'][link])
 
-        #failed to find
+        # failed to find
         css.replace_element(['myid'], {'color': 'purple'})
         self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
         with self.assertRaises(AttrNotFoundError):
             css.replace_element(['myid'], {'color': 'purple'}, ignore_error=False)
 
-        #wrong args type
+        # wrong args type
         css.replace_element('', None)
         self.assertEqual(css_values, css.attrs['css_attrs'])
         with self.assertRaises(WrongArgsError):

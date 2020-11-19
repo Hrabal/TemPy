@@ -11,7 +11,7 @@ from .tempyrepr import TempyPlace
 class Inside(TempyPlace):
     """Check if a TempyREPR object's container is inside a certain Tempy Tag"""
 
-    def _reprscore_container_parent(self, container, child):
+    def _reprscore_container_parent(self, container):
         if container.parent.__class__ == self._pointer_class:
             return 1
         return 0
@@ -33,21 +33,21 @@ class Sibling(TempyPlace):
 class Near(Sibling):
     """Check if a TempyREPR object's container if near a certain Tempy Tag"""
 
-    def _reprscore_container_siblings(self, container, child):
+    def _reprscore_container_siblings(self, container):
         return self._check_container_siblings(container)
 
 
 class Before(Sibling):
     """Check if a TempyREPR object's container if before a certain Tempy Tag"""
 
-    def _reprscore_container_following(self, container, child):
+    def _reprscore_container_following(self, container):
         return self._check_container_siblings(container, start=0)
 
 
 class After(Sibling):
     """Check if a TempyREPR object's container if after a certain Tempy Tag"""
 
-    def _reprscore_container_previous(self, container, child):
+    def _reprscore_container_previous(self, container):
         return self._check_container_siblings(container, stop=0)
 
 

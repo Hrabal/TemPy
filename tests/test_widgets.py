@@ -134,7 +134,7 @@ class TestTempyTable(unittest.TestCase):
         table.col_class('class_example')
         self.assertEqual({'class_example'}, table.childs[0].childs[0].childs[0].attrs['klass'])
 
-        #first column of each row
+        # first column of each row
         table.col_class('class_example_new', 0)
         self.assertEqual({'class_example_new', 'class_example'}, table.childs[0].childs[0].childs[0].attrs['klass'])
 
@@ -218,7 +218,7 @@ class TestTempyList(unittest.TestCase):
         with self.assertRaises(WidgetDataError):
             li.populate('wrong type')
         li = TempyList(typ=Dl)
-        li.populate({1: 'one', 2:'two', 34:['three', 'four']})
+        li.populate({1: 'one', 2: 'two', 34: ['three', 'four']})
         self.assertIsInstance(li, Dl)
         self.assertEqual(len(li), 7)
         self.assertIsInstance(li[0], Dt)

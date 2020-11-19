@@ -76,7 +76,8 @@ other text"""
    * bar
    * baz"""
         r = T.from_markdown(t)
-        self.assertEqual(''.join(t.render() for t in r), '<p>Important list:</p><ul><li>foo</li><li>bar</li><li>baz</li></ul>')
+        self.assertEqual(''.join(t.render() for t in r),
+                         '<p>Important list:</p><ul><li>foo</li><li>bar</li><li>baz</li></ul>')
 
     def test_list_numbered(self):
         t = """Important Numbered list:
@@ -85,7 +86,8 @@ other text"""
    2. bar
    3. baz"""
         r = T.from_markdown(t)
-        self.assertEqual(''.join(t.render() for t in r), '<p>Important Numbered list:</p><ol><li>foo</li><li>bar</li><li>baz</li></ol>')
+        self.assertEqual(''.join(t.render() for t in r),
+                         '<p>Important Numbered list:</p><ol><li>foo</li><li>bar</li><li>baz</li></ol>')
 
     def test_markdown_escape(self):
         t = """&"""
@@ -127,7 +129,14 @@ some code here
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |"""
         r = T.from_markdown(t)
-        self.assertEqual(''.join(t.render() for t in r), '<p>Test markdown table</p><table><thead><tr><th>Tables</th><th style="text-align: center;">Are</th><th style="text-align: right;">Cool</th></tr></thead><tbody><tr><td>col 3 is</td><td style="text-align: center;">right-aligned</td><td style="text-align: right;">$1600</td></tr><tr><td>col 2 is</td><td style="text-align: center;">centered</td><td style="text-align: right;">$12</td></tr><tr><td>zebra stripes</td><td style="text-align: center;">are neat</td><td style="text-align: right;">$1</td></tr></tbody></table>')
+        self.assertEqual(''.join(t.render() for t in r),
+                         '<p>Test markdown table</p><table><thead><tr><th>Tables</th><th style="text-align: center;"'
+                         '>Are</th><th style="text-align: right;">Cool</th></tr></thead><tbody><tr><td>col 3 is</td>'
+                         '<td style="text-align: center;">right-aligned</td><td style="text-align: right;">'
+                         '$1600</td></tr><tr><td>col 2 is</td><td style="text-align: center;">centered</td>'
+                         '<td style="text-align: right;">$12</td></tr><tr><td>zebra stripes</td>'
+                         '<td style="text-align: center;">are neat</td><td style="text-align: right;">'
+                         '$1</td></tr></tbody></table>')
 
     def test_table_non_styled(self):
         t = """Test markdown table
@@ -138,7 +147,11 @@ some code here
 | col 2 is      | bar.          |   $12 |
 | zebra stripes | baz.          |    $1 |"""
         r = T.from_markdown(t)
-        self.assertEqual(''.join(t.render() for t in r), '<p>Test markdown table</p><table><thead><tr><th>Tables</th><th>Are</th><th>Cool</th></tr></thead><tbody><tr><td>col 3 is</td><td>foo</td><td>$1600</td></tr><tr><td>col 2 is</td><td>bar.</td><td>$12</td></tr><tr><td>zebra stripes</td><td>baz.</td><td>$1</td></tr></tbody></table>')
+        self.assertEqual(''.join(t.render() for t in r),
+                         '<p>Test markdown table</p><table><thead><tr><th>Tables</th><th>Are</th><th>Cool</th></tr>'
+                         '</thead><tbody><tr><td>col 3 is</td><td>foo</td><td>$1600</td></tr><tr><td>col 2 is</td>'
+                         '<td>bar.</td><td>$12</td></tr><tr><td>zebra stripes</td><td>baz.</td><td>$1</td></tr></tbody>'
+                         '</table>')
 
     def test_table_non_styled_non_pretty(self):
         t = """Test markdown table non pretty
@@ -148,12 +161,16 @@ Markdown | Less | Pretty
 *Still* | `renders` | **nicely**
 1 | 2 | 3"""
         r = T.from_markdown(t)
-        self.assertEqual(''.join(t.render() for t in r), '<p>Test markdown table non pretty</p><table><thead><tr><th>Markdown</th><th>Less</th><th>Pretty</th></tr></thead><tbody><tr><td><em>Still</em></td><td><code>renders</code></td><td><strong>nicely</strong></td></tr><tr><td>1</td><td>2</td><td>3</td></tr></tbody></table>')
+        self.assertEqual(''.join(t.render() for t in r),
+                         '<p>Test markdown table non pretty</p><table><thead><tr><th>Markdown</th><th>Less</th><th>'
+                         'Pretty</th></tr></thead><tbody><tr><td><em>Still</em></td><td><code>renders</code></td><td>'
+                         '<strong>nicely</strong></td></tr><tr><td>1</td><td>2</td><td>3</td></tr></tbody></table>')
 
     def test_autolink(self):
         t = "https://hrabal.github.io/TemPy"
         r = T.from_markdown(t)
-        self.assertEqual(r[0].render(), '<p><a href="https://hrabal.github.io/TemPy">https://hrabal.github.io/TemPy</a></p>')
+        self.assertEqual(r[0].render(),
+                         '<p><a href="https://hrabal.github.io/TemPy">https://hrabal.github.io/TemPy</a></p>')
 
     def test_email_link(self):
         t = "<hey@you.com>"
@@ -163,4 +180,5 @@ Markdown | Less | Pretty
     def test_img(self):
         t = '![alt text](foo.png "Title text")'
         r = T.from_markdown(t)
-        self.assertEqual(Counter(r[0].render()), Counter('<p><img src="foo.png" alt="alt text" title="Title text"/></p>'))
+        self.assertEqual(Counter(r[0].render()),
+                         Counter('<p><img src="foo.png" alt="alt text" title="Title text"/></p>'))

@@ -27,10 +27,10 @@ class TestTag(unittest.TestCase):
     def test_tag_set_attrs(self):
         d = Div(klass='test_css_class')
         self.assertTrue('klass' in d.attrs)
-        self.assertEqual(d.attrs['klass'], set(['test_css_class', ]))
+        self.assertEqual(d.attrs['klass'], {'test_css_class'})
 
         d.attr(klass='test_2')
-        self.assertEqual(d.attrs['klass'], set(['test_css_class', 'test_2']))
+        self.assertEqual(d.attrs['klass'], {'test_css_class', 'test_2'})
 
     def test_tag_attrs(self):
         d = Div(id='test_css_id')

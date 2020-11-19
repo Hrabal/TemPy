@@ -37,16 +37,16 @@ class TempyMarkdownRenderer(Renderer):
         return [self._tempy_tags.Blockquote()(text)]
 
     def header(self, text, level, raw=None):
-        HeaderTag = getattr(self._tempy_tags, "H%s" % level, None)
-        return [HeaderTag()(text)]
+        header_tag = getattr(self._tempy_tags, "H%s" % level, None)
+        return [header_tag()(text)]
 
     def hrule(self):
         return [self._tempy_tags.Hr()]
 
     def list(self, body, ordered=True):
         tag = "Ul" if not ordered else "Ol"
-        ListTag = getattr(self._tempy_tags, tag, None)
-        return [ListTag()(body)]
+        list_tag = getattr(self._tempy_tags, tag, None)
+        return [list_tag()(body)]
 
     def list_item(self, text):
         return [self._tempy_tags.Li()(text)]
@@ -67,8 +67,8 @@ class TempyMarkdownRenderer(Renderer):
         align = flags["align"]
         if align:
             kwattrs["style"] = "text-align:%s" % align
-        CellTag = getattr(self._tempy_tags, tag, None)
-        return [CellTag(**kwattrs)(content)]
+        cell_tag = getattr(self._tempy_tags, tag, None)
+        return [cell_tag(**kwattrs)(content)]
 
     def codespan(self, text):
         return [self._tempy_tags.Code()(text)]

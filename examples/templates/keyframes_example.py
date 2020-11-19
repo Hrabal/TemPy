@@ -3,9 +3,9 @@ from tempy.elements import Css
 
 animationCSS = Css(
     {
-        "@keyframes bounce" : {
-            "0%":{
-                "background-color" : "blue;"
+        "@keyframes bounce": {
+            "0%": {
+                "background-color": "blue;"
             },
             "25%": {
                 "background-color": "red;",
@@ -14,20 +14,20 @@ animationCSS = Css(
                 
             },
             "50%": {
-                "background-color" : "red;",
+                "background-color": "red;",
                 "transform": "translate(600px, 600px);",
                 "border-radius": "0%;"
             },
-            "75%" : {
+            "75%": {
                 "background-color": "red;",
                 "transform": "translateY(600px);",
                 "border-radius": "100%;"
             },
-            "100%" : {
+            "100%": {
                 "background-color": "green;"
             }
         },
-        ".animation" : {
+        ".animation": {
          "width": "100px;",
          "height": "100px;",   
          "animation": "bounce;",
@@ -89,5 +89,4 @@ page = Html()(
 )
 
 
-
-#page.render()
+# page.render()

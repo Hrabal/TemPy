@@ -10,7 +10,7 @@ if sys.version_info < (3, 3):
     raise RuntimeError("TemPy requires Python >= 3.3.")
 
 
-_shorcuts = {
+_shortcuts = {
     "render_template": "tools",
     "Tag": "elements",
     "VoidTag": "elements",
@@ -23,11 +23,11 @@ _shorcuts = {
 }
 
 
-class module(ModuleType):
+class Module(ModuleType):
     def __getattr__(self, name):
-        if name in _shorcuts.keys():
+        if name in _shortcuts.keys():
             submodule = __import__(
-                "tempy." + _shorcuts[name], globals(), locals(), [name]
+                "tempy." + _shortcuts[name], globals(), locals(), [name]
             )
             return getattr(submodule, name)
         r = ModuleType.__getattribute__(self, name)
@@ -50,7 +50,7 @@ class module(ModuleType):
         return result
 
 
-old_module, sys.modules["tempy"] = sys.modules["tempy"], module("tempy")
+old_module, sys.modules["tempy"] = sys.modules["tempy"], Module("tempy")
 sys.modules["tempy"].__dict__.update(
     {
         "__file__": __file__,
@@ -58,7 +58,7 @@ sys.modules["tempy"].__dict__.update(
         "__path__": __path__,
         "__doc__": __doc__,
         "__version__": __version__,
-        "__all__": tuple(_shorcuts.keys()),
+        "__all__": tuple(_shortcuts.keys()),
         "__docformat__": "restructuredtext en",
     }
 )
