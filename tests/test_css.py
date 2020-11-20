@@ -99,8 +99,7 @@ class TestTag(unittest.TestCase):
     def test_render(self):
         css = Css(self.css_dict)
         rendered_css = css.render()
-        expected_counter = Counter('<style> {} html { background-color: lightblue; }'
-                                   'h1 { color: white; text-align: center; } </style>')
+        expected_counter = Counter('<style> {} html { background-color: lightblue; } h1 { color: white; text-align: center; } </style>')
         # We count chars occurrence 'cause in python < 3.6 kwargs is not an OrderedDict'
         self.assertEqual(Counter(rendered_css), expected_counter)
 

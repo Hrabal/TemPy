@@ -135,8 +135,7 @@ class TestTag(unittest.TestCase):
         result = """# -*- coding: utf-8 -*-
 from tempy import T
 from tempy.tags import *
-Div(klass="cssClass", bool_attr="True")(A(href=\"\"\"www.foo.bar\"\"\")(\"\"\"non-tempy content\"\"\"), 
-T.CustomTag(numb_attr=9), Br(), Doctype("html"), Comment("test comment"), T.Void.TestVoid())"""
+Div(klass="cssClass", bool_attr="True")(A(href=\"\"\"www.foo.bar\"\"\")(\"\"\"non-tempy content\"\"\"), T.CustomTag(numb_attr=9), Br(), Doctype("html"), Comment("test comment"), T.Void.TestVoid())"""
         filename = 'test.py'
         tempy_tree = [Div(klass='cssClass', bool_attr=bool)(A(href='www.foo.bar')('non-tempy content'),
                                                             T.CustomTag(numb_attr=9), Br(), Doctype('html'),
