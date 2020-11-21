@@ -25,7 +25,6 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
         if not getattr(self, 'parent', None):
             self.parent = None
         self.content_data = kwargs
-        self._stable = True
         for cls in reversed(self.__class__.__mro__[:-6]):
             init = getattr(cls, "init", None)
             if init and init.__name__ in cls.__dict__:
@@ -100,15 +99,6 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
         return self._own_index
 
     @property
-    def stable(self):
-        if all(c.stable for c in self.childs) and self._stable:
-            self._stable = True
-            return self._stable
-        else:
-            self._stable = False
-            return self._stable
-
-    @property
     def length(self):
         """Returns the number of childs."""
         return len(self.childs)
@@ -136,7 +126,6 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
         """
         if contents and not isinstance(contents, dict):
             raise WrongContentError(self, contents, "contents should be a dict")
-        self._stable = False
         if not contents:
             contents = {}
         if kwargs:

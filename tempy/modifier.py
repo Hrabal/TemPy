@@ -210,13 +210,11 @@ class DOMNihil(DOMWrapper):
         """Moves this element from his father to the given one."""
         self.parent.pop(self._own_index)
         new_father._insert(self, idx=idx, prepend=prepend, name=name)
-        new_father._stable = False
         return self
 
     def pop(self, arg=None):
         """Removes the child at given position or by name (or name iterator).
             if no argument is given removes the last."""
-        self._stable = False
         if arg is None:
             arg = len(self.childs) - 1
         if isinstance(arg, int):
@@ -243,7 +241,6 @@ class DOMNihil(DOMWrapper):
 
     def empty(self):
         """Remove all this tag's childs."""
-        self._stable = False
         self._detach_childs()
         return self
 

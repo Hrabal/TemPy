@@ -71,12 +71,10 @@ class Tag(DOMElement):
                 self.attrs["style"].update(value)
             else:
                 self.attrs[key] = value
-        self._stable = False
         return self
 
     def remove_attr(self, attr):
         """Removes an attribute."""
-        self._stable = False
         self.attrs.pop(attr, None)
         return self
 
@@ -124,7 +122,6 @@ class Tag(DOMElement):
 
     def toggle_class(self, csscl):
         """Same as jQuery's toggleClass function. It toggles the css class on this element."""
-        self._stable = False
         action = ("add", "remove")[self.has_class(csscl)]
         return getattr(self.attrs["klass"], action)(csscl)
 
@@ -156,13 +153,12 @@ class Tag(DOMElement):
 
     def hide(self):
         """Adds the "display: none" style attribute."""
-        self._stable, self.attrs["style"]["display"] = False, "none"
+        self.attrs["style"]["display"] = "none"
         return self
 
     def show(self, display=None):
         """Removes the display style attribute.
         If a display type is provided """
-        self._stable = False
         if not display:
             self.attrs["style"].pop("display")
         else:
@@ -195,27 +191,18 @@ class Tag(DOMElement):
         # args kwargs API provided for last minute content injection
         # self._reverse_mro_func('pre_render')
         pretty = kwargs.pop("pretty", False)
-        if pretty and self._stable != "pretty":
-            self._stable = False
         for arg in args:
-            self._stable = False
             if isinstance(arg, dict):
                 self.inject(arg)
         if kwargs:
-            self._stable = False
             self.inject(kwargs)
 
-        # If the tag or his contents are not changed and we already have rendered it
-        # with the same attrs we skip all the work
-        if self._stable and self._render:
-            return self._render
         pretty_pre = pretty_inner = ""
         if pretty:
             pretty_pre = "\n" + ("\t" * self._depth) if pretty else ""
             pretty_inner = "\n" + ("\t" * self._depth) if len(self.childs) > 1 else ""
         inner = self.render_childs(pretty) if not self._void else ""
 
-        # We declare the tag is stable and have an official render:
         tag_data = (
             pretty_pre,
             self._get__tag(),
@@ -225,7 +212,6 @@ class Tag(DOMElement):
             self._get__tag()
         )[: 6 - [0, 3][self._void]]
         self._render = self._template % tag_data
-        self._stable = "pretty" if pretty else True
         return self._render
 
     def apply_function(self, format_function):

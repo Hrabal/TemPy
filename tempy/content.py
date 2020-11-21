@@ -26,7 +26,6 @@ class Content(DOMElement):
         self._t_repr = t_repr
         if self._t_repr and not isinstance(self._t_repr, DOMElement):
             raise ContentError(self, "template argument should be a DOMElement")
-        self._stable = False
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:

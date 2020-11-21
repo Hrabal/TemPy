@@ -73,14 +73,6 @@ class TestTag(unittest.TestCase):
         d = Div().append_to(father)
         self.assertEqual(d.index, 2)
 
-    def test_stable(self):
-        f = Div()
-        self.assertTrue(f.stable)
-        f(Div())
-        self.assertFalse(f.stable)
-        f.render()
-        self.assertTrue(f.stable)
-
     def test_rem_attr(self):
         d = Div(test_attr='test')
         d.remove_attr('test_attr')

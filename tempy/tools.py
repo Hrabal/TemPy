@@ -44,7 +44,6 @@ def content_receiver(reverse=False):
                     if isinstance(item, TempyClass) and name:
                         # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
                         item._name = name
-                    inst._stable = False
                     func(inst, i, item, name)
                     i += 1
             return inst
