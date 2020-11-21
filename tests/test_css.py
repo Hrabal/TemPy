@@ -123,10 +123,7 @@ class TestTag(unittest.TestCase):
             'td, tr': {'color': 'pink'}
         })
         rendered_css = css_complex.render()
-        expected_css = '<style>{ } html { } #myid { color: purple; } #ex_a { color: grey; }' \
-                       ' td, tr { color: pink; } html body { color: red; } ' \
-                       'html body div { color: green; border: 1px; } html body #89602992 { color: grey; }' \
-                       ' html body .cl_a { color: grey; } html body a { color: yellow; } </style>'
+        expected_css = '<style>{ } html { } #myid { color: purple; } #ex_a{ color: grey; } td, tr { color: pink; } html body { color: red; } html body div { color: green; border: 1px; } html body a { color: grey; } html body .cl_a{ color: grey; } html body a { color: blue; } </style>'
         expected_counter = Counter(x for x in expected_css if not x.isdigit())
         self.assertEqual(Counter(x for x in rendered_css if not x.isdigit()), expected_counter)
 
