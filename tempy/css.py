@@ -139,37 +139,37 @@ class Css(Tag):
                     "Second argument should be a non-empty string or dictionary.",
                 )
 
-        try:
-            element_node = self.find_attr(selector_list)
-        except (AttrNotFoundError, WrongArgsError) as wrong_args_error:
-            if ignore_error:
-                return
-            else:
-                print(wrong_args_error.__repr__())
-                raise
-
-        if element_node:
+        element_node = self.find_attr(selector_list, ignore_error=ignore_error)
+        if element_node is None:
+            return
+        elif element_node:
             element_node[selector_list[-1]] = new_style
         elif not element_node and selector_list[0] in self.attrs["css_attrs"]:
             (self.attrs["css_attrs"])[selector_list[0]] = new_style
 
-    def find_attr(self, selector_list):
-        if not isinstance(selector_list, list) or len(selector_list) < 1:
-            raise WrongArgsError(
-                self, selector_list, "The provided argument should be a non-empty list."
-            )
-
-        found_node = self.attrs["css_attrs"]
-        parent_node = None
-
-        for child in selector_list:
-            if child in found_node:
-                parent_node = found_node
-                found_node = found_node[child]
-            else:
-                raise AttrNotFoundError(
-                    self, selector_list, "Provided element does not exist."
+    def find_attr(self, selector_list, ignore_error=True):
+        try:
+            if not isinstance(selector_list, list) or len(selector_list) < 1:
+                raise WrongArgsError(
+                    self, selector_list, "The provided argument should be a non-empty list."
                 )
+
+            found_node = self.attrs["css_attrs"]
+            parent_node = None
+
+            for child in selector_list:
+                if child in found_node:
+                    parent_node = found_node
+                    found_node = found_node[child]
+                else:
+                    raise AttrNotFoundError(
+                        self, selector_list, "Provided element does not exist."
+                    )
+        except (AttrNotFoundError, WrongArgsError):
+            if ignore_error:
+                return None
+            else:
+                raise
         return parent_node
 
     def clear(self, selector_list=None, ignore_error=True):
@@ -177,16 +177,10 @@ class Css(Tag):
             self.attrs["css_attrs"] = {}
             return
 
-        try:
-            element_node = self.find_attr(selector_list)
-        except (AttrNotFoundError, WrongArgsError) as wrong_args_error:
-            if ignore_error:
-                return
-            else:
-                print(wrong_args_error.__repr__())
-                raise
-
-        if element_node:
+        element_node = self.find_attr(selector_list, ignore_error=ignore_error)
+        if element_node is None:
+            return
+        elif element_node:
             element_node.pop(selector_list[-1], None)
         elif not element_node and selector_list[0] in self.attrs["css_attrs"]:
             (self.attrs["css_attrs"]).pop([selector_list[0]], None)
