@@ -133,11 +133,7 @@ class DOMNavigator:
         while stack:
             node = stack.pop()
             yield node
-            if hasattr(node, "childs"):
-                if reverse:
-                    stack.extend(node.childs)
-                else:
-                    stack.extend(node.childs[::-1])
+            _, stack = self.__visit_node(node, stack, reverse)
 
     def dfs_inorder(self, reverse=False):
         """Generator that returns each element of the tree in Inorder order.
@@ -159,7 +155,7 @@ class DOMNavigator:
             if node in visited or not node.childs:
                 yield node
             else:
-                visited, stack = self.__visit_node(node, visited, stack, reverse)
+                visited, stack = self.__visit_node(node, stack, reverse, visited)
 
     def dfs_postorder(self, reverse=False):
         """Generator that returns each element of the tree in Postorder order.
@@ -173,11 +169,13 @@ class DOMNavigator:
             if node in visited:
                 yield node
             else:
-                visited, stack = self.__visit_node(node, visited, stack, reverse)
+                visited, stack = self.__visit_node(node, stack, reverse, visited)
 
-    def __visit_node(self, node, visited, stack, reverse):
-        visited.add(node)
-        stack.append(node)
+    @staticmethod
+    def __visit_node(node, stack, reverse, visited=None):
+        if visited is not None:
+            visited.add(node)
+            stack.append(node)
         if hasattr(node, "childs"):
             if reverse:
                 stack.extend(node.childs)
