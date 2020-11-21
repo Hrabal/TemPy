@@ -32,7 +32,7 @@ def main():
             "origin", help="original .html file", action="store"
         )
         translate_group.add_argument(
-            "destination", nargs="?", help="detination .py file", action="store"
+            "destination", nargs="?", help="destination .py file", action="store"
         )
         translate_group.add_argument(
             "-p",

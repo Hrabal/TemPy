@@ -33,7 +33,7 @@ class TestTag(unittest.TestCase):
         cont = Content(content=['test'])
         self.assertEqual(list(cont.content), ['test', ])
 
-        cont = Content(content=('test'))
+        cont = Content(content='test')
         self.assertEqual(list(cont.content), ['test', ])
 
         c = (i for i in (1, 2, 3))

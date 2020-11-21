@@ -172,17 +172,17 @@ class TestTag(unittest.TestCase):
         css.replace_element(['#myid'], {'color': 'purple'})
         self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
 
-        #nested example
+        # nested example
         css.replace_element(['html', 'body', link], {'color': 'grey'})
         self.assertEqual({'color': 'grey'}, css.attrs['css_attrs']['html']['body'][link])
 
-        #failed to find
+        # failed to find
         css.replace_element(['myid'], {'color': 'purple'})
         self.assertEqual({'color': 'purple'}, css.attrs['css_attrs']['#myid'])
         with self.assertRaises(AttrNotFoundError):
             css.replace_element(['myid'], {'color': 'purple'}, ignore_error=False)
 
-        #wrong args type
+        # wrong args type
         css.replace_element('', None)
         self.assertEqual(css_values, css.attrs['css_attrs'])
         with self.assertRaises(WrongArgsError):

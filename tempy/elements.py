@@ -77,7 +77,7 @@ class Tag(DOMElement):
                 self.attrs["klass"].update(value.split())
             elif key == "style":
                 if isinstance(value, str):
-                    splitted = iter(re.split(";|:", value))
+                    splitted = iter(re.split("[;:]", value))
                     value = dict(zip(splitted, splitted))
                 self.attrs["style"].update(value)
             else:
@@ -348,7 +348,7 @@ class Css(Tag):
                 if isinstance(parent, tuple):
                     result.append(", ".join(parent))
                 elif isinstance(parent, Tag):
-                    if parent.id() != None:
+                    if parent.id() is not None:
                         result.append("#"+str(parent.id()))
                     elif len(parent.attrs["klass"]) > 0:
                         out = ""

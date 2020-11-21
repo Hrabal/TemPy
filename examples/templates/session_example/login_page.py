@@ -2,7 +2,8 @@
 
 from tempy.tags import *
 
-def get_page(messages = []):
+
+def get_page(messages=[]):
     divs = [
         Div()(
             'User login'

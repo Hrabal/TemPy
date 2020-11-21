@@ -22,39 +22,39 @@ css_tag = Css({
                 '.class_example_1': {'color': 'blue'},
                 '.class_example_2': {'color': 'pink'},
                 '.class_example_3': {'background-color': 'grey'},
-          });
+          })
 
 # set class for every cell
 table1.col_class('class_example_2')
 
-#applies function to upper string for every cell
+# applies function to upper string for every cell
 table1.map_col(lambda x: x.upper())
 
 # set class for first column of each row
 table2.col_class('class_example_1', 0)
 
-#applies function to lower string for second column
+# applies function to lower string for second column
 table2.map_col(lambda x: x.lower(), 1)
 
-#applies function to upper string for last column
+# applies function to upper string for last column
 table2.map_col(lambda x: x.upper(), 4)
 
 # set class for every row
 table3.row_class('class_example_3')
 
-#applies function to upper string for every row
+# applies function to upper string for every row
 table3.map_row(lambda x: x.upper())
 
 # set class for second row
 table4.row_class('class_example_3', 1)
 
-#applies function to lower string for second row
+# applies function to lower string for second row
 table4.map_row(lambda x: x.lower(), 1)
 
-#applies col scope to first cell
+# applies col scope to first cell
 table1.make_scope(col_scope_list=[(0, 0)])
 
-#applies col scope to last two cells in last row
+# applies col scope to last two cells in last row
 table4.make_scope(row_scope_list=[(2, 3), (2, 4)])
 
 page = Html()(

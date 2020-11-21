@@ -9,27 +9,26 @@ another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit
 div1 = Div(id='myid', klass='someHtmlClass')('dsfsd', Br())
 link = A()
 new_css = Css({'html': {
-        'body': {
-            'color': 'red',
-            Div: {
-                'color': 'green',
-                'border': '1px'
-            },
-           A: {'color': 'orange'}
-        }
-    },
+    'body': {
+        'color': 'red',
+        Div: {
+            'color': 'green',
+            'border': '1px'
+        },
+        A: {'color': 'orange'}
+    }
+},
     '#myid': {'color': 'blue'}
 })
 
 new_css.replace_element(['#myid'], {'color': 'purple'})
 
 new_css.replace_element(['html', 'body', Div], {
-            'color': 'pink',
-            'a': {
-                'color': 'red'
-            }
-        })
-
+    'color': 'pink',
+    'a': {
+        'color': 'red'
+    }
+})
 
 div2 = Div()
 div2.css(width='100px', float='left')
@@ -53,6 +52,8 @@ page[1][0](A(href='www.bar.com'))  # calling the tag
 page[1][0].append(Br())  # using the API
 page[1][0].append(A(href='www.baz.com'))  # using the API
 page[1][0].append(Br())  # using the API
-link = A().append_to(page.body[0]) # access the body as if it's a page attribute
-page.body(testDiv=Div()) # WARNING! Correct ordering with named Tag insertion is ensured with Python >= 3.5 (because kwargs are ordered)
-link.attr(href='www.python.org')('This is a link to Python.') # Add attributes and content to already placed tags
+link = A().append_to(page.body[0])  # access the body as if it's a page attribute
+page.body(
+    # WARNING! Correct ordering with named Tag insertion is ensured with Python >= 3.5 (because kwargs are ordered)
+    testDiv=Div())
+link.attr(href='www.python.org')('This is a link to Python.')  # Add attributes and content to already placed tags

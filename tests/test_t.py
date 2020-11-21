@@ -137,7 +137,9 @@ from tempy import T
 from tempy.tags import *
 Div(klass="cssClass", bool_attr="True")(A(href=\"\"\"www.foo.bar\"\"\")(\"\"\"non-tempy content\"\"\"), T.CustomTag(numb_attr=9), Br(), Doctype("html"), Comment("test comment"), T.Void.TestVoid())"""
         filename = 'test.py'
-        tempy_tree = [Div(klass='cssClass', bool_attr=bool)(A(href='www.foo.bar')('non-tempy content'), T.CustomTag(numb_attr=9), Br(), Doctype('html'), Comment('test comment'), T.Void.TestVoid()), ]
+        tempy_tree = [Div(klass='cssClass', bool_attr=bool)(A(href='www.foo.bar')('non-tempy content'),
+                                                            T.CustomTag(numb_attr=9), Br(), Doctype('html'),
+                                                            Comment('test comment'), T.Void.TestVoid()), ]
         T.dump(tempy_tree, filename)
         with open(filename, 'r') as f:
             self.assertEqual(Counter(f.read()), Counter(result))

@@ -20,7 +20,7 @@ def _filter_classes(cls_list, cls_type):
 class REPRFinder:
     """Collection of methods used to manage TempyREPR classes."""
 
-    def _evaluate_tempyREPR(self, child, repr_cls):
+    def _evaluate_tempy_repr(self, child, repr_cls):
         """Assign a score ito a TempyRepr class.
         The scores depends on the current scope and position of the object in which the TempyREPR is found."""
         score = 0
@@ -46,7 +46,7 @@ class REPRFinder:
         If at least one TempyREPR is found, it uses the best one to make a Tempy object.
         Otherwise the original object is returned.
         """
-        evaluator = partial(self._evaluate_tempyREPR, obj)
+        evaluator = partial(self._evaluate_tempy_repr, obj)
         sorted_reprs = sorted(
             _filter_classes(obj.__class__.__dict__.values(), TempyREPR),
             key=evaluator,

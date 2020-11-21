@@ -60,9 +60,9 @@ class TestDOMelement(unittest.TestCase):
         self.check_head_body(head, body)
 
     def test_create_call_list(self):
-        l = [Head(), Body()]
-        self.page(l)
-        self.check_head_body(*l)
+        li = [Head(), Body()]
+        self.page(li)
+        self.check_head_body(*li)
 
     def test_create_call_tuple(self):
         t = (Head(), Body())
@@ -532,28 +532,28 @@ class TestDOMelement(unittest.TestCase):
     def test_bft(self):
         a, b, c, d, e, f = Div(), Div(), Div(), Div(), Div(), Div()
         a(b(d), c(e(f)))
-        l = list(a.bft())
-        self.assertTrue(l == [a, b, c, d, e, f])
+        li = list(a.bft())
+        self.assertTrue(li == [a, b, c, d, e, f])
 
     def test_dft(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
-        l = list(a.dfs_preorder())
-        self.assertTrue(l == [a, b, d, c])
-        l = list(a.dfs_inorder())
-        self.assertTrue(l == [d, b, a, c])
-        l = list(a.dfs_postorder())
-        self.assertTrue(l == [d, b, c, a])
+        li = list(a.dfs_preorder())
+        self.assertTrue(li == [a, b, d, c])
+        li = list(a.dfs_inorder())
+        self.assertTrue(li == [d, b, a, c])
+        li = list(a.dfs_postorder())
+        self.assertTrue(li == [d, b, c, a])
 
     def test_dft_reverse(self):
         a, b, c, d = Div(), Div(), Div(), Div()
         a(b(d), c)
-        l = list(a.dfs_preorder(reverse=True))
-        self.assertTrue(l == [a, c, b, d])
-        l = list(a.dfs_inorder(reverse=True))
-        self.assertTrue(l == [c, a, d, b])
-        l = list(a.dfs_postorder(reverse=True))
-        self.assertTrue(l == [c, d, b, a])
+        li = list(a.dfs_preorder(reverse=True))
+        self.assertTrue(li == [a, c, b, d])
+        li = list(a.dfs_inorder(reverse=True))
+        self.assertTrue(li == [c, a, d, b])
+        li = list(a.dfs_postorder(reverse=True))
+        self.assertTrue(li == [c, d, b, a])
 
     def test_escaped(self):
         html_escapable_content = '"&<>£¢ì'
@@ -588,4 +588,3 @@ class TestDOMelement(unittest.TestCase):
         list_ele = ['foo', 'Br', 'Div', 'Pre']
         result = tag.map(list_ele)
         self.assertEqual(len(result), 4)
-
