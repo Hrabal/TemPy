@@ -144,7 +144,7 @@ class DOMWrapper(DOMFather):
                 not is_elem and arg and isinstance(arg, Iterable) and isinstance(iter(arg).__next__(), TempyClass)
             )
             if not (is_elem or is_elem_iter):
-                raise WrongArgsError(self, f"Argument {arg} is not DOMElement nor iterable of DOMElements")
+                raise WrongArgsError(self, "%s is not DOMElement nor iterable of DOMElements" % arg)
         wcopies = []
         failures = []
 
@@ -168,7 +168,7 @@ class DOMWrapper(DOMFather):
 
         if failures and strict:
             fail_repr = ', '.join(map(lambda i: str(i[0]) if i[1] == -1 else f"[{i[1]}] of {i[0]}", failures))
-            raise TagError(self, f"Wrapping in a non empty Tag is forbidden, failed on arguments {fail_repr}")
+            raise TagError(self, "Wrapping in a non empty Tag is forbidden, failed on arguments %s" % fail_repr)
         return wcopies
 
     def wrap_inner(self, other):
