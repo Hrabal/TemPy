@@ -575,6 +575,9 @@ class TestDOMelement(unittest.TestCase):
         self.assertEqual(len(result), 1)
 
         result = tag.find('Br', names='foo')  # will return foo -> (Br())
+        print('?'*22)
+        print(result)
+        print('?'*22)
         self.assertEqual(len(result), 1)
 
     def test_join(self):

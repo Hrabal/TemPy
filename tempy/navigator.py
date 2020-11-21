@@ -37,48 +37,37 @@ class DOMNavigator:
                         or TempyClass name (returns instances of this class)
             names => returns attributes of elements with given name
         """
-        if selector is None and names is None:
-            found_elements = self.childs[:]
-            for child in self.childs:
-                if issubclass(child.__class__, TempyClass) and len(child.childs) > 0:
-                    found_elements += child.find(selector, names)
-            return found_elements
+        found_elements = set()
+        for child in self.childs:
+            match_name, match_selector, match_all = False, False, False
+            if selector is None and names is None:
+                match_all = True
 
-        found_elements_selector = []
-        if selector is not None and inspect.isclass(selector):
-            for child in self.childs:
+            if inspect.isclass(selector):
                 if isinstance(child, selector):
-                    found_elements_selector.append(child)
-                if issubclass(child.__class__, TempyClass) and len(child.childs) > 0:
-                    found_elements_selector += child.find(selector, names)
-
-        elif selector is not None and isinstance(selector, str):
-            for child in self.childs:
+                    match_selector = True
+            elif isinstance(selector, str):
                 if (
                     inspect.isclass(child) and selector == child.__name__
                 ) or selector == child.__class__.__name__:
-                    found_elements_selector.append(child)
-                if issubclass(child.__class__, TempyClass) and len(child.childs) > 0:
-                    found_elements_selector += child.find(selector, names)
+                    match_selector = True
 
-        found_elements_names = []
-        if names is not None:
-            for child in self.childs:
-                if hasattr(child, "_name") and names == child._name:
-                    found_elements_names.append(child)
-                if issubclass(child.__class__, TempyClass) and len(child.childs) > 0:
-                    found_elements_names += child.find(selector, names)
+            if names is not None and hasattr(child, "_name") and names == child._name:
+                match_name = True
 
-        if selector is not None and names is not None:
-            set_selector = set(found_elements_selector)
-            set_names = set(found_elements_names)
-            found_elements = list(set_selector.intersection(set_names))
-        else:
-            found_elements = (
-                found_elements_selector
-                if selector is not None
-                else found_elements_names
-            )
+            if (
+                match_all
+            ) or (
+                match_selector and not names
+            ) or (
+                match_name and not selector
+            ) or (
+                match_name and match_selector
+            ):
+                found_elements.add(child)
+
+            if issubclass(child.__class__, TempyClass) and child.childs:
+                found_elements |= child.find(selector, names)
 
         return found_elements
 
