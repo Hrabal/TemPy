@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Main Tempy classes"""
-from html import escape
 from copy import copy
-from numbers import Number
 
 from .bases import TempyClass
 from .tempyrepr import REPRFinder
 from .modifier import DOMModifier
+from .renderer import DOMRenderer, CodeRenderer
 from .navigator import DOMNavigator
 from .exceptions import WrongContentError
 
 
-class DOMElement(DOMNavigator, DOMModifier, REPRFinder, TempyClass):
+class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinder, TempyClass):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
@@ -31,16 +30,6 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder, TempyClass):
             init = getattr(cls, "init", None)
             if init and init.__name__ in cls.__dict__:
                 init(self)
-
-    def __repr__(self):
-        return "<%s.%s %s.%s%s%s>" % (
-            self.__module__,
-            type(self).__name__,
-            id(self),
-            " Son of %s." % type(self.parent).__name__ if self.parent else "",
-            " %d childs." % len(self.childs) if self.childs else "",
-            " Named %s" % self._name if self._name else "",
-        )
 
     def __hash__(self):
         return id(self)
@@ -86,29 +75,6 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder, TempyClass):
             copy(c) if isinstance(c, DOMElement) else c for c in self.childs
         )
 
-    def to_code(self, pretty=False):
-        ret = []
-        prettying = "\n" + ("\t" * self._depth) if pretty else ""
-        childs_to_code = []
-        for child in self.childs:
-            if issubclass(child.__class__, DOMElement):
-                child_code = child.to_code(pretty=pretty)
-                childs_to_code.append(child_code)
-            else:
-                childs_to_code.append('"""%s"""' % child)
-
-        childs_code = ""
-        if childs_to_code:
-            childs_code = "(%s%s%s)" % (prettying, ", ".join(childs_to_code), prettying)
-        class_code = ""
-        if self._from_factory:
-            class_code += "T."
-            if getattr(self, "_void", False):
-                class_code += "Void."
-        class_code += self.__class__.__name__
-        ret.append("%s(%s)%s" % (class_code, self.to_code_attrs(), childs_code))
-        return "".join(ret)
-
     @property
     def _depth(self):
         return 0 if self.is_root else self.parent._depth + 1
@@ -152,41 +118,6 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder, TempyClass):
         """True if no childs"""
         return self.length == 0
 
-    def _iter_child_renders(self, pretty=False):
-        for child in self.childs:
-            if isinstance(child, str):
-                yield escape(child)
-            elif isinstance(child, Number):
-                yield str(child)
-            elif issubclass(child.__class__, DOMElement):
-                if isinstance(child, Escaped):
-                    yield child._render
-                else:
-                    yield child.render(pretty=pretty)
-            elif not issubclass(child.__class__, DOMElement):
-                tempyREPR_cls = self._search_for_view(child)
-                if tempyREPR_cls:
-                    # If there is a TempyREPR class defined in the child class we make a DOMElement out of it
-                    # this abomination is used to avoid circular imports
-                    class Patched(tempyREPR_cls, DOMElement):
-                        def __init__(s, obj, *args, **kwargs):
-                            # Forced adoption of the patched element as son of us
-                            s.parent = self
-                            # MRO would init only the tempyREPR_cls, we force DOMElement init too
-                            DOMElement.__init__(s, **kwargs)
-                            super().__init__(obj)
-                    yield Patched(child).render(pretty=pretty)
-                else:
-                    yield escape(str(child))
-
-    def render(self, *args, **kwargs):
-        """Placeholder for subclass implementation"""
-        raise NotImplementedError
-
-    def render_childs(self, pretty=False):
-        """Public api to render all the childs using Tempy rules"""
-        return "".join(self._iter_child_renders(pretty=pretty))
-
     def data(self, key=None, **kwargs):
         """Adds or retrieve extra data to this element, this data will not be rendered.
         Every tag have a _data attribute (dict), if key is given _data[key] is returned.
@@ -228,7 +159,6 @@ class DOMElement(DOMNavigator, DOMModifier, REPRFinder, TempyClass):
     def map(cls, list_ele):
         mapped_list = [cls()(ele) for ele in list_ele]
         return mapped_list
-
 
 class Escaped(DOMElement):
     def __init__(self, content, **kwargs):
