@@ -199,6 +199,11 @@ class TempyTable(Table):
             self(caption=Caption())
         return self.caption.empty()(caption)
 
+    def _iter_rows(self, col_index):
+        for row in self.body.childs:
+            if self.is_col_within_bounds(col_index, row) and row.childs[col_index].childs:
+                yield row
+
     def col_class(self, css_class, col_index=None):
         # adds css_class to every cell
         if col_index is None:
@@ -207,12 +212,8 @@ class TempyTable(Table):
                 cell.attr(klass=css_class)
             return
 
-        for row in self.body.childs:
-            if (
-                self.is_col_within_bounds(col_index, row)
-                and len(row.childs[col_index].childs) > 0
-            ):
-                row.childs[col_index].attr(klass=css_class)
+        for row in self._iter_rows(col_index):
+            row.childs[col_index].attr(klass=css_class)
 
     def row_class(self, css_class, row_index=None):
         # adds css_class to every row
@@ -228,14 +229,8 @@ class TempyTable(Table):
             self.map_table(col_function)
             return self
 
-        gen = (
-            row
-            for row in self.body.childs
-            if self.is_col_within_bounds(col_index, row)
-            and len(row.childs[col_index].childs) > 0
-        )
         try:
-            for row in gen:
+            for row in self._iter_rows(col_index):
                 row.childs[col_index].apply_function(col_function)
         except Exception as ex:
             if ignore_errors:
@@ -276,11 +271,9 @@ class TempyTable(Table):
     def make_scope(self, col_scope_list=None, row_scope_list=None):
         """Makes scopes and converts Td to Th for given arguments
         which represent lists of tuples (row_index, col_index)"""
-        if col_scope_list is not None and len(col_scope_list) > 0:
-            self.apply_scope(col_scope_list, "col")
-
-        if row_scope_list is not None and len(row_scope_list) > 0:
-            self.apply_scope(row_scope_list, "row")
+        for scope, itm in ((col_scope_list, "col"), (row_scope_list, "row")):
+            if scope is not None and len(scope) > 0:
+                self.apply_scope(scope, itm)
 
     def apply_scope(self, scope_list, scope_tag):
         gen = (
