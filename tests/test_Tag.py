@@ -5,7 +5,8 @@
 import unittest
 
 from tempy.tags import Div, P, Br
-from tempy.elements import Tag, Content
+from tempy.elements import Tag
+from tempy.content import Content
 from tempy.exceptions import TagError, WrongContentError, WrongArgsError
 
 

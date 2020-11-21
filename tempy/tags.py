@@ -3,7 +3,7 @@
 @author: Federico Cerchiari <federicocerchiari@gmail.com>
 All the HTML tags as defined in the W3C reference, in alphabetical order.
 """
-from .elements import Tag, VoidTag, Content
+from .elements import Tag, VoidTag
 
 DOCTYPES = {
     "html": "HTML",
@@ -91,18 +91,7 @@ class A(Tag):
             if "href" in self.attrs:
                 self.attrs["href"] = format_function(self.attrs["href"])
         else:
-            gen = (
-                (index, child)
-                for index, child in enumerate(self.childs)
-                if child is not None
-            )
-            for (index, child) in gen:
-                if isinstance(child, Tag):
-                    child.apply_function(format_function)
-                elif isinstance(child, Content):
-                    child.apply_function(format_function)
-                else:
-                    self.childs[index] = format_function(self.childs[index])
+            super().apply_function(format_function)
 
 
 class Title(Tag):

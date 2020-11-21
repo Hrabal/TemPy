@@ -421,9 +421,9 @@ class TestDOMelement(unittest.TestCase):
         a.inject(test='test')
         b = Div()
         a(b)
-        b._find_content('test')
+        b.find_content('test')
         c = P()
-        c._find_content('test')
+        c.find_content('test')
 
     def test_inject(self):
         a = Div()

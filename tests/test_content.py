@@ -18,7 +18,7 @@ class TestTag(unittest.TestCase):
     def test_repr(self):
         c = Content(name='test')
         id_of_c = id(c)
-        self.assertEqual(len(str(c)), len('<tempy.elements.Content %s. Named test>' % id_of_c))
+        self.assertEqual(len(str(c)), len('<tempy.content.Content %s. Named test>' % id_of_c))
 
     def test_init(self):
         with self.assertRaises(ContentError):
