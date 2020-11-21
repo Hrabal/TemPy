@@ -74,40 +74,33 @@ class Content(DOMElement):
                         ret.append(self._t_repr.inject(content).render(pretty=pretty))
                     elif isinstance(content, dict):
                         for v in content.values():
-                            if v is not None:
-                                if isinstance(v, list):
-                                    ret = ret + [str(i) for i in v if i is not None]
-                                else:
-                                    ret.append(str(v))
+                            if isinstance(v, list):
+                                ret = ret + [str(i) for i in v if i is not None]
+                            elif v is not None:
+                                ret.append(str(v))
                     else:
                         ret.append(str(content))
         return " ".join(ret)
 
-    def     apply_function(self, format_function):
-        gen = (
-            (index, content)
-            for index, content in enumerate(self.content)
-            if content is not None
-        )
-        for (index, content) in gen:
+    def apply_function(self, format_function):
+        for index, content in enumerate(filter(lambda c: c is not None, self.content)):
             if isinstance(content, DOMElement):
                 content.apply_function(format_function)
-            else:
-                if self._t_repr:
-                    if isinstance(self._t_repr, DOMElement):
-                        self._t_repr.apply_function(format_function)
-                    else:
-                        self._t_repr = format_function(self._t_repr)
-                elif isinstance(content, dict):
-                    dict_gen = (key for key in content if content[key] is not None)
-                    for key in dict_gen:
-                        if isinstance(content[key], list):
-                            content[key] = [
-                                format_function(elem)
-                                for elem in content[key]
-                                if elem is not None
-                            ]
-                        else:
-                            content[key] = format_function(content[key])
+            elif self._t_repr:
+                if isinstance(self._t_repr, DOMElement):
+                    self._t_repr.apply_function(format_function)
                 else:
-                    self.content[index] = format_function(self.content[index])
+                    self._t_repr = format_function(self._t_repr)
+            elif isinstance(content, dict):
+                dict_gen = (key for key in content if content[key] is not None)
+                for key in dict_gen:
+                    if isinstance(content[key], list):
+                        content[key] = [
+                            format_function(elem)
+                            for elem in content[key]
+                            if elem is not None
+                        ]
+                    else:
+                        content[key] = format_function(content[key])
+            else:
+                self.content[index] = format_function(self.content[index])

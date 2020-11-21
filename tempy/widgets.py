@@ -25,18 +25,9 @@ class TempyPage(Html):
     >>> TempyPage.head.title
     Provides an API to manage common meta tags directly.
     """
-
     __tag = Html._Html__tag
 
-    def __init__(
-        self,
-        title=None,
-        content=None,
-        charset="UTF-8",
-        keywords=None,
-        doctype=None,
-        **kwargs
-    ):
+    def __init__(self, title=None,content=None, charset="UTF-8", keywords=None, doctype=None, **kwargs):
         super().__init__(**kwargs)
         self.set_title(title or "")
         if content:
@@ -93,7 +84,6 @@ class TempyTable(Table):
     foot: if True add a table footer using the last data row
     caption: adds the caption to the table
     """
-
     __tag = Table._Table__tag
 
     def __init__(
@@ -125,9 +115,7 @@ class TempyTable(Table):
         except TypeError:
             row_length = row
         if self.body.childs and max(map(len, self.body)) < row_length:
-            raise WidgetDataError(
-                self, "The given data has more columns than the table column size."
-            )
+            raise WidgetDataError(self, "The given data has more columns than the table column size.")
 
     def populate(self, data, resize_x=True, normalize=True):
         """Adds/Replace data in the table.
@@ -144,7 +132,6 @@ class TempyTable(Table):
             )
         data = copy(data)
         if not self.body:
-            # Table is empty
             self(body=Tbody())
         self.clear()
 
