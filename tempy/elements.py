@@ -78,32 +78,6 @@ class Tag(DOMElement):
         self.attrs.pop(attr, None)
         return self
 
-    def render_attrs(self):
-        """Renders the tag's attributes using the formats and performing special attributes name substitution."""
-        ret = []
-        for k, v in self.attrs.items():
-            if v:
-                if v is bool:
-                    ret.append(" %s" % self._SPECIAL_ATTRS.get(k, k))
-                else:
-                    fnc = self._FORMAT_ATTRS.get(k, None)
-                    ret.append(' %s="%s"' % (self._SPECIAL_ATTRS.get(k, k), fnc(v) if fnc else v))
-        return "".join(ret)
-
-    def to_code_attrs(self):
-        def formatter(k, v):
-            k_norm = twist_specials.get(k, k)
-            if k in self._SET_VALUES_ATTRS:
-                return '%s="%s"' % (k_norm, ", ".join(map(str, v)))
-            if isinstance(v, bool) or v is bool:
-                return '%s="%s"' % (k_norm, "True")
-            if isinstance(v, str):
-                return '%s="""%s"""' % (k_norm, v)
-            return "%s=%s" % (k_norm, v)
-
-        twist_specials = {v: k for k, v in self._SPECIAL_ATTRS.items()}
-        return ", ".join(formatter(k, v) for k, v in self.attrs.items() if v)
-
     def set_id(self, css_id):
         self.attrs["id"] = css_id
         return self
