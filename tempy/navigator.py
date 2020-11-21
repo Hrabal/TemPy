@@ -159,13 +159,7 @@ class DOMNavigator:
             if node in visited or not node.childs:
                 yield node
             else:
-                stack.append(node)
-                visited.add(node)
-                if hasattr(node, "childs"):
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
+                visited, stack = self.__visit_node(node, visited, stack, reverse)
 
     def dfs_postorder(self, reverse=False):
         """Generator that returns each element of the tree in Postorder order.
@@ -179,10 +173,14 @@ class DOMNavigator:
             if node in visited:
                 yield node
             else:
-                visited.add(node)
-                stack.append(node)
-                if hasattr(node, "childs"):
-                    if reverse:
-                        stack.extend(node.childs)
-                    else:
-                        stack.extend(node.childs[::-1])
+                visited, stack = self.__visit_node(node, visited, stack, reverse)
+
+    def __visit_node(self, node, visited, stack, reverse):
+        visited.add(node)
+        stack.append(node)
+        if hasattr(node, "childs"):
+            if reverse:
+                stack.extend(node.childs)
+            else:
+                stack.extend(node.childs[::-1])
+        return visited, stack
