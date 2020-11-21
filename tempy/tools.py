@@ -5,6 +5,9 @@ Tools for Tempy
 """
 import sys
 import importlib
+from functools import wraps
+
+from .bases import TempyClass
 
 
 def render_template(template_name, start_directory=None, **kwargs):
@@ -18,3 +21,34 @@ def render_template(template_name, start_directory=None, **kwargs):
 class AdjustableList(list):
     def ljust(self, n, fillvalue=""):
         return self + [fillvalue] * (n - len(self))
+
+
+def content_receiver(reverse=False):
+    """Decorator for content adding methods.
+    Takes args and kwargs and calls the decorated method one time for each argument provided.
+    The reverse parameter should be used for prepending (relative to self) methods.
+    """
+
+    def _receiver(func):
+        @wraps(func)
+        def wrapped(inst, *tags, **kwtags):
+            verse = (1, -1)[int(reverse)]
+            kwtags = kwtags.items()
+            i = 0
+            for typ in (tags, kwtags)[::verse]:
+                for item in typ:
+                    if typ is kwtags:
+                        name, item = item
+                    else:
+                        name, item = None, item
+                    if isinstance(item, TempyClass) and name:
+                        # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
+                        item._name = name
+                    inst._stable = False
+                    func(inst, i, item, name)
+                    i += 1
+            return inst
+
+        return wrapped
+
+    return _receiver

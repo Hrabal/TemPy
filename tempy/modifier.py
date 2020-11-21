@@ -1,49 +1,14 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Classes for DOM building"""
-from functools import wraps
 from collections import Iterable
 
 from .bases import TempyClass
-from .exceptions import (
-    TagError,
-    WrongArgsError,
-    DOMModByKeyError,
-    DOMModByIndexError,
-)
+from .tools import content_receiver
+from .exceptions import TagError, WrongArgsError, DOMModByKeyError, DOMModByIndexError
 
 
-class DOMModifier:
-    def content_receiver(reverse=False):
-        """Decorator for content adding methods.
-        Takes args and kwargs and calls the decorated method one time for each argument provided.
-        The reverse parameter should be used for prepending (relative to self) methods.
-        """
-
-        def _receiver(func):
-            @wraps(func)
-            def wrapped(inst, *tags, **kwtags):
-                verse = (1, -1)[int(reverse)]
-                kwtags = kwtags.items()
-                i = 0
-                for typ in (tags, kwtags)[::verse]:
-                    for item in typ:
-                        if typ is kwtags:
-                            name, item = item
-                        else:
-                            name, item = None, item
-                        if isinstance(item, TempyClass) and name:
-                            # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
-                            item._name = name
-                        inst._stable = False
-                        func(inst, i, item, name)
-                        i += 1
-                return inst
-
-            return wrapped
-
-        return _receiver
-
+class BaseDOMModifier:
     def _insert(self, dom_group, idx=None, prepend=False, name=None):
         """Inserts a DOMGroup inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
@@ -57,9 +22,7 @@ class DOMModifier:
         else:
             idx = idx if idx is not None else len(self.childs)
         if dom_group is not None:
-            if not isinstance(dom_group, Iterable) or isinstance(
-                dom_group, (TempyClass, str)
-            ):
+            if not isinstance(dom_group, Iterable) or isinstance(dom_group, (TempyClass, str)):
                 dom_group = [dom_group]
             for i_group, elem in enumerate(dom_group):
                 if elem is not None:
@@ -76,6 +39,8 @@ class DOMModifier:
         """Calling the object will add the given parameters as childs"""
         self._insert(child, name=name)
 
+
+class OperatorsModifier(BaseDOMModifier):
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
         return self.clone()(other)
@@ -115,6 +80,8 @@ class DOMModifier:
             return self
         return self.after(self * (n - 1))
 
+
+class SiblingsManager(OperatorsModifier):
     @content_receiver()
     def after(self, i, sibling, name=None):
         """Adds siblings after the current tag."""
@@ -127,6 +94,8 @@ class DOMModifier:
         self.parent._insert(sibling, idx=self._own_index - i, name=name)
         return self
 
+
+class DOMFather(SiblingsManager):
     @content_receiver(reverse=True)
     def prepend(self, _, child, name=None):
         """Adds childs to this tag, starting from the first position."""
@@ -149,6 +118,8 @@ class DOMModifier:
         father.append(self)
         return self
 
+
+class DOMWrapper(DOMFather):
     def wrap(self, other):
         """Wraps this element inside another empty tag."""
         if other.childs:
@@ -162,37 +133,28 @@ class DOMModifier:
     def wrap_many(self, *args, strict=False):
         """Wraps different copies of this element inside all empty tags
         listed in params or param's (non-empty) iterators.
-
         Returns list of copies of this element wrapped inside args
         or None if not succeeded, in the same order and same structure,
         i.e. args = (Div(), (Div())) -> value = (A(...), (A(...)))
-
         If on some args it must raise TagError, it will only if strict is True,
         otherwise it will do nothing with them and return Nones on their positions"""
-
         for arg in args:
             is_elem = arg and isinstance(arg, TempyClass)
             is_elem_iter = (
                 not is_elem and arg and isinstance(arg, Iterable) and isinstance(iter(arg).__next__(), TempyClass)
             )
             if not (is_elem or is_elem_iter):
-                raise WrongArgsError(
-                    self,
-                    "Argument {} is not DOMElement nor iterable of DOMElements".format(
-                        arg
-                    ),
-                )
-
+                raise WrongArgsError(self, f"Argument {arg} is not DOMElement nor iterable of DOMElements")
         wcopies = []
-        failure = []
+        failures = []
 
         def wrap_next(tag, idx):
-            nonlocal wcopies, failure
+            nonlocal wcopies, failures
             next_copy = self.__copy__()
             try:
                 return next_copy.wrap(tag)
             except TagError:
-                failure.append(idx)
+                failures.append(idx)
                 return next_copy
 
         for arg_idx, arg in enumerate(args):
@@ -204,21 +166,9 @@ class DOMModifier:
                     iter_wcopies.append(wrap_next(t, (arg_idx, iter_idx)))
                 wcopies.append(type(arg)(iter_wcopies))
 
-        if failure and strict:
-            raise TagError(
-                self,
-                "Wrapping in a non empty Tag is forbidden, failed on arguments " +
-                ", ".join(
-                    list(
-                        map(
-                            lambda idx: str(idx[0])
-                            if idx[1] == -1
-                            else "[{1}] of {0}".format(*idx),
-                            failure,
-                        )
-                    )
-                ),
-            )
+        if failures and strict:
+            fail_repr = ', '.join(map(lambda i: str(i[0]) if i[1] == -1 else f"[{i[1]}] of {i[0]}", failures))
+            raise TagError(self, f"Wrapping in a non empty Tag is forbidden, failed on arguments {fail_repr}")
         return wcopies
 
     def wrap_inner(self, other):
@@ -226,6 +176,8 @@ class DOMModifier:
         self(other)
         return self
 
+
+class DOMNihil(DOMWrapper):
     def replace_with(self, other):
         """Replace this element with the given DOMElement."""
         self.after(other)
@@ -282,14 +234,11 @@ class DOMModifier:
                 try:
                     result.append(getattr(self, x))
                 except AttributeError:
-                    raise DOMModByKeyError(
-                        self, "Given search key invalid. No child found."
-                    )
-            if result:
-                for x in result:
-                    self.childs.remove(x)
-                    if isinstance(x, TempyClass):
-                        x.parent = False
+                    raise DOMModByKeyError(self, "Given search key invalid. No child found.")
+            for x in result:
+                self.childs.remove(x)
+                if isinstance(x, TempyClass):
+                    x.parent = False
         return result
 
     def empty(self):
@@ -298,3 +247,6 @@ class DOMModifier:
         self._detach_childs()
         return self
 
+
+class DOMModifier(DOMNihil):
+    pass
