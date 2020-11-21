@@ -167,7 +167,7 @@ class DOMWrapper(DOMFather):
                 wcopies.append(type(arg)(iter_wcopies))
 
         if failures and strict:
-            fail_repr = ', '.join(map(lambda i: str(i[0]) if i[1] == -1 else "[%s - %s}" % i, failures))
+            fail_repr = ', '.join(map(lambda i: str(i[0]) if i[1] == -1 else "[%s - %s]" % i, failures))
             raise TagError(self, "Wrapping in a non empty Tag is forbidden, failed on arguments %s" % fail_repr)
         return wcopies
 

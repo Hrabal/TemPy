@@ -169,7 +169,7 @@ class TestDOMelement(unittest.TestCase):
         self.assertIs(new[0].get_parent(), None)
 
         args = (Div()(A()), (Div(), Div()(A())))
-        with self.assertRaisesRegex(TagError, r'^.+arguments 0, \[1\] of 1'):
+        with self.assertRaisesRegex(TagError, r'^.+arguments 0, \[1\ - 1]'):
             A().wrap_many(*args, strict=True)
         new = A().wrap_many(*args)
         self.assertIs(new[0].get_parent(), None)
