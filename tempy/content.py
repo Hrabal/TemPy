@@ -62,24 +62,30 @@ class Content(DOMElement):
     def length(self):
         return len(list(self.content))
 
+    @staticmethod
+    def _render_dict(dct):
+        ret = []
+        for v in dct.values():
+            if isinstance(v, list):
+                ret = ret + [str(i) for i in v if i is not None]
+            elif v is not None:
+                ret.append(str(v))
+        return ret
+
     def render(self, *args, **kwargs):
         pretty = kwargs.pop("pretty", False)
         ret = []
         for content in self.content:
-            if content is not None:
-                if isinstance(content, DOMElement):
-                    ret.append(content.render(pretty=pretty))
-                else:
-                    if self._t_repr:
-                        ret.append(self._t_repr.inject(content).render(pretty=pretty))
-                    elif isinstance(content, dict):
-                        for v in content.values():
-                            if isinstance(v, list):
-                                ret = ret + [str(i) for i in v if i is not None]
-                            elif v is not None:
-                                ret.append(str(v))
-                    else:
-                        ret.append(str(content))
+            if content is None:
+                continue
+            if isinstance(content, DOMElement):
+                ret.append(content.render(pretty=pretty))
+            elif self._t_repr:
+                ret.append(self._t_repr.inject(content).render(pretty=pretty))
+            elif isinstance(content, dict):
+                ret.extend(self._render_dict(content))
+            else:
+                ret.append(str(content))
         return " ".join(ret)
 
     def apply_function(self, format_function):
