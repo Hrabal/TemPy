@@ -23,9 +23,10 @@ class TempyTable(tags.Table):
     """
     __tag = tags.Table._Table__tag
 
-    def __init__(
-        self, rows=0, cols=0, data=None, caption=None, head=False, foot=False, **kwargs
-    ):
+    def __init__(self, rows=0, cols=0, data=None, **kwargs):
+        caption = kwargs.pop("caption", None)
+        head = kwargs.pop("head", False)
+        foot = kwargs.pop("foot", False)
         super().__init__(**kwargs)
         self(body=tags.Tbody())
         # Initialize empty data structure if data is not given
