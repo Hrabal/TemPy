@@ -77,6 +77,46 @@ class Css(Tag):
         element.attrs["id"] = id(element)
         return "#" + str(id(element))
 
+    @staticmethod
+    def _render_tag_to_css(el):
+        if el.id() is not None:
+            return "#" + str(el.id())
+        elif len(el.attrs["klass"]) > 0:
+            out = ""
+            for klass in el.attrs["klass"]:
+                out += "." + klass
+            return out
+        else:
+            return el._get__tag() + " "
+
+    @staticmethod
+    def _render_node(node, parents, result, nodes_to_parse, pretty=False):
+        for key, value in node.items():
+            if isinstance(value, str):
+                result.append("%s: %s; %s" % (key, value, "\n" if pretty else ""))
+            elif hasattr(value, "__call__"):
+                result.append("%s: %s; %s" % (key, value(), "\n" if pretty else ""))
+            elif isinstance(value, dict):
+                nodes_to_parse.append(([p for p in parents] + [key], value))
+
+    def _render_parents(self, parents, result):
+        gen = [parent for parent in parents] if parents else []
+        for parent in gen:
+            if isinstance(parent, tuple):
+                result.append(", ".join(parent))
+            elif isinstance(parent, Tag):
+                result.append(self._render_tag_to_css(parent))
+            elif inspect.isclass(parent):
+                result.append(
+                    getattr(parent, "_" + parent.__name__ + "__tag") + " "
+                )
+            elif isinstance(parent, DOMElement):
+                result.append(
+                    self.__class__.render_dom_element_to_css(parent) + " "
+                )
+            else:
+                result.append("%s " % parent)
+
     def render(self, *args, **kwargs):
         pretty = kwargs.pop("pretty", False)
         result = []
@@ -84,39 +124,9 @@ class Css(Tag):
 
         while nodes_to_parse:
             parents, node = nodes_to_parse.pop(0)
-            gen = [parent for parent in parents] if parents else []
-            for parent in gen:
-                if isinstance(parent, tuple):
-                    result.append(", ".join(parent))
-                elif isinstance(parent, Tag):
-                    if parent.id() is not None:
-                        result.append("#"+str(parent.id()))
-                    elif len(parent.attrs["klass"]) > 0:
-                        out = ""
-                        for klass in parent.attrs["klass"]:
-                            out += "." + klass
-                        result.append(out)
-                    else:
-                        result.append(parent._get__tag() + " ")
-                elif inspect.isclass(parent):
-                    result.append(
-                        getattr(parent, "_" + parent.__name__ + "__tag") + " "
-                    )
-                elif isinstance(parent, DOMElement):
-                    result.append(
-                        self.__class__.render_dom_element_to_css(parent) + " "
-                    )
-                else:
-                    result.append("%s " % parent)
+            self._render_parents(parents, result)
             result.append("{ ")
-
-            for key, value in node.items():
-                if isinstance(value, str):
-                    result.append("%s: %s; %s" % (key, value, "\n" if pretty else ""))
-                elif hasattr(value, "__call__"):
-                    result.append("%s: %s; %s" % (key, value(), "\n" if pretty else ""))
-                elif isinstance(value, dict):
-                    nodes_to_parse.append(([p for p in parents] + [key], value))
+            self._render_node(node, parents, result, nodes_to_parse, pretty=pretty)
             if result:
                 result.append("} " + ("\n\n" if pretty else ""))
         return self._template % "".join(result)
