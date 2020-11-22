@@ -51,17 +51,16 @@ class Css(Tag):
 
     def _parse__args(self, *args, **kwargs):
         css_styles = {}
-        if args:
-            if len(args) > 1:
-                raise WrongContentError(
-                    self, args, "Css accepts max one positional argument."
-                )
-            if isinstance(args[0], dict):
-                css_styles.update(args[0])
-            elif isinstance(args[0], Iterable):
-                if any(map(lambda x: not isinstance(x, dict), args[0])):
-                    raise WrongContentError(self, args, "Unexpected arguments.")
-                css_styles = dict(ChainMap(*args[0]))
+
+        if len(args) > 1:
+            raise WrongContentError(self, args, "Css accepts max one positional argument.")
+        if args and isinstance(args[0], dict):
+            css_styles.update(args[0])
+        elif args and isinstance(args[0], Iterable):
+            if any(map(lambda x: not isinstance(x, dict), args[0])):
+                raise WrongContentError(self, args, "Unexpected arguments.")
+            css_styles = dict(ChainMap(*args[0]))
+
         css_styles.update(kwargs)
         return css_styles
 
