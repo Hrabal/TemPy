@@ -30,6 +30,26 @@ class DOMNavigator(TempyClass):
         ):
             yield thing
 
+    @staticmethod
+    def _match_selector(el, selector):
+        if not selector:
+            return True
+        if inspect.isclass(selector) and isinstance(el, selector):
+            return True
+        elif isinstance(selector, str) and (
+            (
+                inspect.isclass(el) and selector == el.__name__
+            ) or selector == el.__class__.__name__
+        ):
+            return True
+        return False
+
+    @staticmethod
+    def _match_name(el, name):
+        if not name:
+            return True
+        return name is not None and hasattr(el, "_name") and name == el._name
+
     def find(self, selector=None, names=None):
         """
         @param:
@@ -39,31 +59,10 @@ class DOMNavigator(TempyClass):
         """
         found_elements = set()
         for child in self.childs:
-            match_name, match_selector, match_all = False, False, False
-            if selector is None and names is None:
-                match_all = True
+            match_selector = self._match_selector(child, selector)
+            match_name = self._match_name(child, names)
 
-            if inspect.isclass(selector):
-                if isinstance(child, selector):
-                    match_selector = True
-            elif isinstance(selector, str):
-                if (
-                    inspect.isclass(child) and selector == child.__name__
-                ) or selector == child.__class__.__name__:
-                    match_selector = True
-
-            if names is not None and hasattr(child, "_name") and names == child._name:
-                match_name = True
-
-            if (
-                match_all
-            ) or (
-                match_selector and not names
-            ) or (
-                match_name and not selector
-            ) or (
-                match_name and match_selector
-            ):
+            if match_name and match_selector:
                 found_elements.add(child)
 
             if issubclass(child.__class__, TempyClass) and child.childs:
