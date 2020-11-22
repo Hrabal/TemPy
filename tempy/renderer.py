@@ -3,11 +3,14 @@
 """Base class for rendering"""
 from html import escape
 from numbers import Number
+from functools import partial
 
 from .bases import TempyClass
+from .tempyrepr import TempyPlace, TempyREPR
 
 
-class DOMRenderer:
+class DOMRenderer(TempyClass):
+
 	def __repr__(self):
 		return "<%s.%s %s.%s%s%s>" % (
 			self.__module__,
@@ -30,11 +33,11 @@ class DOMRenderer:
 				else:
 					yield child.render(pretty=pretty)
 			elif not issubclass(child.__class__, TempyClass):
-				tempyREPR_cls = self._search_for_view(child)
-				if tempyREPR_cls:
+				tempy_repr_cls = self._search_for_view(child)
+				if tempy_repr_cls:
 					# If there is a TempyREPR class defined in the child class we make a DOMElement out of it
 					# this abomination is used to avoid circular imports
-					class Patched(tempyREPR_cls, self.__class__):
+					class Patched(tempy_repr_cls, self.__class__):
 						def __init__(s, obj, *args, **kwargs):
 							# Forced adoption of the patched element as son of us
 							s.parent = self
@@ -45,6 +48,53 @@ class DOMRenderer:
 					yield Patched(child).render(pretty=pretty)
 				else:
 					yield escape(str(child))
+
+	@staticmethod
+	def _filter_classes(cls_list, cls_type):
+		"""Filters a list of classes and yields TempyREPR subclasses"""
+		for cls in cls_list:
+			if isinstance(cls, type) and issubclass(cls, cls_type):
+				if cls_type == TempyPlace and cls._base_place:
+					pass
+				else:
+					yield cls
+
+	def _evaluate_tempy_repr(self, child, repr_cls):
+		"""Assign a score ito a TempyRepr class.
+		The scores depends on the current scope and position of the object in which the TempyREPR is found."""
+		score = 0
+		if repr_cls.__name__ == self.__class__.__name__:
+			# One point if the REPR have the same name of the container
+			score += 1
+		elif repr_cls.__name__ == self.root.__class__.__name__:
+			# One point if the REPR have the same name of the Tempy tree root
+			score += 1
+
+		# Add points defined in scorers methods of used TempyPlaces
+		for parent_cls in self._filter_classes(repr_cls.__mro__[1:], TempyPlace):
+			for scorer in (
+					method for method in dir(parent_cls) if method.startswith("_reprscore")
+			):
+				score += getattr(parent_cls, scorer, lambda *args: 0)(
+					parent_cls, self, child
+				)
+		return score
+
+	def _search_for_view(self, obj):
+		"""Searches for TempyREPR class declarations in the child's class.
+		If at least one TempyREPR is found, it uses the best one to make a Tempy object.
+		Otherwise the original object is returned.
+		"""
+		evaluator = partial(self._evaluate_tempy_repr, obj)
+		sorted_reprs = sorted(
+			self._filter_classes(obj.__class__.__dict__.values(), TempyREPR),
+			key=evaluator,
+			reverse=True,
+		)
+		if sorted_reprs:
+			# If we find some TempyREPR, we return the one with the best score.
+			return sorted_reprs[0]
+		return None
 
 	def render(self, *args, **kwargs):
 		"""Placeholder for subclass implementation"""
@@ -67,7 +117,7 @@ class DOMRenderer:
 		return "".join(ret)
 
 
-class CodeRenderer:
+class CodeRenderer(TempyClass):
 	def to_code(self, pretty=False):
 		ret = []
 		prettying = "\n" + ("\t" * self._depth) if pretty else ""
@@ -104,3 +154,7 @@ class CodeRenderer:
 
 		twist_specials = {v: k for k, v in self._SPECIAL_ATTRS.items()}
 		return ", ".join(formatter(k, v) for k, v in self.attrs.items() if v)
+
+
+class TempyRenderer(CodeRenderer, DOMRenderer):
+	pass

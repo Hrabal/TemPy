@@ -16,15 +16,6 @@ class Tag(DOMElement):
     """
     _template = "%s<%s%s>%s%s</%s>"
     _void = False
-    _MAPPING_ATTRS = ("style",)
-    _SET_VALUES_ATTRS = ("klass",)
-    _SPECIAL_ATTRS = {"klass": "class", "typ": "type", "_for": "for", "_async": "async"}
-    _TO_SPECIALS = {v: k for k, v in _SPECIAL_ATTRS.items()}
-    _FORMAT_ATTRS = {
-        "style": lambda x: " ".join("%s: %s;" % (k, v) for k, v in x.items()),
-        "klass": " ".join,
-        "comment": lambda x: x,
-    }
 
     def __init__(self, *args, **kwargs):
         data = kwargs.pop("data", {})
@@ -113,7 +104,6 @@ class Tag(DOMElement):
 
     def css(self, *props, **kwprops):
         """Adds css properties to this element."""
-        self._stable = False
         if props:
             if len(props) == 1 and isinstance(props[0], Mapping):
                 styles = props[0]
@@ -141,7 +131,6 @@ class Tag(DOMElement):
 
     def toggle(self):
         """Same as jQuery's toggle, toggles the display attribute of this element."""
-        self._stable = False
         return self.show() if self.attrs["style"]["display"] == "none" else self.hide()
 
     def html(self, pretty=False):

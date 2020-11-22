@@ -2,13 +2,14 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Classes for DOM building"""
 from collections import Iterable
+from copy import copy
 
 from .bases import TempyClass
 from .tools import content_receiver
 from .exceptions import TagError, WrongArgsError, DOMModByKeyError, DOMModByIndexError
 
 
-class BaseDOMModifier:
+class BaseDOMModifier(TempyClass):
     def _insert(self, dom_group, idx=None, prepend=False, name=None):
         """Inserts a DOMGroup inside this element.
         If provided at the given index, if prepend at the start of the childs list, by default at the end.
@@ -39,8 +40,94 @@ class BaseDOMModifier:
         """Calling the object will add the given parameters as childs"""
         self._insert(child, name=name)
 
+    def clone(self):
+        """Returns a deepcopy of this element."""
+        return copy(self)
 
-class OperatorsModifier(BaseDOMModifier):
+
+class SiblingsManager(BaseDOMModifier):
+    @content_receiver()
+    def after(self, i, sibling, name=None):
+        """Adds siblings after the current tag."""
+        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
+        return self
+
+    @content_receiver(reverse=True)
+    def before(self, i, sibling, name=None):
+        """Adds siblings before the current tag."""
+        self.parent._insert(sibling, idx=self._own_index - i, name=name)
+        return self
+
+
+class DOMNihil(SiblingsManager):
+    def replace_with(self, other):
+        """Replace this element with the given DOMElement."""
+        self.after(other)
+        self.parent.pop(self._own_index)
+        return other
+
+    def remove(self):
+        """Detach this element from his father."""
+        if self._own_index is not None and self.parent:
+            self.parent.pop(self._own_index)
+        return self
+
+    def _detach_childs(self, idx_from=None, idx_to=None):
+        """Moves all the childs to a new father"""
+        idx_from = idx_from or 0
+        idx_to = idx_to or len(self.childs)
+        removed = self.childs[idx_from:idx_to]
+        for child in removed:
+            if issubclass(child.__class__, TempyClass):
+                child.parent = None
+        self.childs[idx_from:idx_to] = []
+        return removed
+
+    def move_childs(self, new_father, idx_from=None, idx_to=None):
+        removed = self._detach_childs(idx_from=idx_from, idx_to=idx_to)
+        new_father(removed)
+        return self
+
+    def move(self, new_father, idx=None, prepend=None, name=None):
+        """Moves this element from his father to the given one."""
+        self.parent.pop(self._own_index)
+        new_father._insert(self, idx=idx, prepend=prepend, name=name)
+        return self
+
+    def pop(self, arg=None):
+        """Removes the child at given position or by name (or name iterator).
+            if no argument is given removes the last."""
+        if arg is None:
+            arg = len(self.childs) - 1
+        if isinstance(arg, int):
+            try:
+                result = self.childs.pop(arg)
+            except IndexError:
+                raise DOMModByIndexError(self, "Given index invalid.")
+            if isinstance(result, TempyClass):
+                result.parent = None
+        else:
+            result = []
+            if isinstance(arg, str):
+                arg = [arg]
+            for x in arg:
+                try:
+                    result.append(getattr(self, x))
+                except AttributeError:
+                    raise DOMModByKeyError(self, "Given search key invalid. No child found.")
+            for x in result:
+                self.childs.remove(x)
+                if isinstance(x, TempyClass):
+                    x.parent = False
+        return result
+
+    def empty(self):
+        """Remove all this tag's childs."""
+        self._detach_childs()
+        return self
+
+
+class OperatorsModifier(DOMNihil):
     def __add__(self, other):
         """Addition produces a copy of the left operator, containig the right operator as a child."""
         return self.clone()(other)
@@ -81,21 +168,7 @@ class OperatorsModifier(BaseDOMModifier):
         return self.after(self * (n - 1))
 
 
-class SiblingsManager(OperatorsModifier):
-    @content_receiver()
-    def after(self, i, sibling, name=None):
-        """Adds siblings after the current tag."""
-        self.parent._insert(sibling, idx=self._own_index + 1 + i, name=name)
-        return self
-
-    @content_receiver(reverse=True)
-    def before(self, i, sibling, name=None):
-        """Adds siblings before the current tag."""
-        self.parent._insert(sibling, idx=self._own_index - i, name=name)
-        return self
-
-
-class DOMFather(SiblingsManager):
+class DOMFather(OperatorsModifier):
     @content_receiver(reverse=True)
     def prepend(self, _, child, name=None):
         """Adds childs to this tag, starting from the first position."""
@@ -177,73 +250,5 @@ class DOMWrapper(DOMFather):
         return self
 
 
-class DOMNihil(DOMWrapper):
-    def replace_with(self, other):
-        """Replace this element with the given DOMElement."""
-        self.after(other)
-        self.parent.pop(self._own_index)
-        return other
-
-    def remove(self):
-        """Detach this element from his father."""
-        if self._own_index is not None and self.parent:
-            self.parent.pop(self._own_index)
-        return self
-
-    def _detach_childs(self, idx_from=None, idx_to=None):
-        """Moves all the childs to a new father"""
-        idx_from = idx_from or 0
-        idx_to = idx_to or len(self.childs)
-        removed = self.childs[idx_from:idx_to]
-        for child in removed:
-            if issubclass(child.__class__, TempyClass):
-                child.parent = None
-        self.childs[idx_from:idx_to] = []
-        return removed
-
-    def move_childs(self, new_father, idx_from=None, idx_to=None):
-        removed = self._detach_childs(idx_from=idx_from, idx_to=idx_to)
-        new_father(removed)
-        return self
-
-    def move(self, new_father, idx=None, prepend=None, name=None):
-        """Moves this element from his father to the given one."""
-        self.parent.pop(self._own_index)
-        new_father._insert(self, idx=idx, prepend=prepend, name=name)
-        return self
-
-    def pop(self, arg=None):
-        """Removes the child at given position or by name (or name iterator).
-            if no argument is given removes the last."""
-        if arg is None:
-            arg = len(self.childs) - 1
-        if isinstance(arg, int):
-            try:
-                result = self.childs.pop(arg)
-            except IndexError:
-                raise DOMModByIndexError(self, "Given index invalid.")
-            if isinstance(result, TempyClass):
-                result.parent = None
-        else:
-            result = []
-            if isinstance(arg, str):
-                arg = [arg]
-            for x in arg:
-                try:
-                    result.append(getattr(self, x))
-                except AttributeError:
-                    raise DOMModByKeyError(self, "Given search key invalid. No child found.")
-            for x in result:
-                self.childs.remove(x)
-                if isinstance(x, TempyClass):
-                    x.parent = False
-        return result
-
-    def empty(self):
-        """Remove all this tag's childs."""
-        self._detach_childs()
-        return self
-
-
-class DOMModifier(DOMNihil):
+class DOMModifier(DOMWrapper):
     pass

@@ -3,15 +3,13 @@
 """Main Tempy classes"""
 from copy import copy
 
-from .bases import TempyClass
-from .tempyrepr import REPRFinder
 from .modifier import DOMModifier
-from .renderer import DOMRenderer, CodeRenderer
+from .renderer import TempyRenderer
 from .navigator import DOMNavigator
 from .exceptions import WrongContentError
 
 
-class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinder, TempyClass):
+class DOMElement(TempyRenderer, DOMNavigator, DOMModifier):
     """Takes care of the tree structure using the "childs" and "parent" attributes.
     Manages the DOM manipulation with proper valorization of those two.
     """
@@ -19,7 +17,6 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
     _from_factory = False
 
     def __init__(self, **kwargs):
-        super().__init__()
         self._name = None
         self.childs = []
         if not getattr(self, 'parent', None):
@@ -133,10 +130,6 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
         self.content_data.update(contents)
         return self
 
-    def clone(self):
-        """Returns a deepcopy of this element."""
-        return copy(self)
-
     @classmethod
     def join(cls, list_ele):
         n = len(list_ele)
@@ -148,6 +141,7 @@ class DOMElement(DOMRenderer, CodeRenderer, DOMNavigator, DOMModifier, REPRFinde
     def map(cls, list_ele):
         mapped_list = [cls()(ele) for ele in list_ele]
         return mapped_list
+
 
 class Escaped(DOMElement):
     def __init__(self, content, **kwargs):

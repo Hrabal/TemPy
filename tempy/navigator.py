@@ -6,7 +6,7 @@ from collections import deque
 from .bases import TempyClass
 
 
-class DOMNavigator:
+class DOMNavigator(TempyClass):
     @property
     def root(self):
         return self.parent.root if self.parent else self
