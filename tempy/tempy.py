@@ -146,4 +146,4 @@ class DOMElement(TempyRenderer, DOMNavigator, DOMModifier):
 class Escaped(DOMElement):
     def __init__(self, content, **kwargs):
         super().__init__(**kwargs)
-        self._render = content
+        self.render = content

@@ -29,7 +29,7 @@ class DOMRenderer(TempyClass):
 				yield str(child)
 			elif issubclass(child.__class__, TempyClass):
 				if child.__class__.__name__ == "Escaped":
-					yield child._render
+					yield child.render
 				else:
 					yield child.render(pretty=pretty)
 			elif not issubclass(child.__class__, TempyClass):

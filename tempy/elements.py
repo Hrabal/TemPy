@@ -23,9 +23,6 @@ class Tag(DOMElement):
         self.attr(*args, **kwargs)
         super().__init__(**data)
         self._tab_count = 0
-        self._render = None
-        if self._void:
-            self._render = self.render()
 
     def _get__tag(self):
         for cls in self.__class__.__mro__:
@@ -174,8 +171,7 @@ class Tag(DOMElement):
             pretty_inner,
             self._get__tag()
         )[: 6 - [0, 3][self._void]]
-        self._render = self._template % tag_data
-        return self._render
+        return self._template % tag_data
 
     def apply_function(self, format_function):
         for (index, child) in enumerate(self.childs):
