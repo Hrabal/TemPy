@@ -21,31 +21,31 @@ class DOMRenderer(TempyClass):
 			" Named %s" % self._name if self._name else "",
 		)
 
+	def _render_tempy_repr(self, tempy_repr_cls, child, pretty=False):
+		class Patched(tempy_repr_cls, self.__class__):
+			def __init__(s, obj, *args, **kwargs):
+				# Forced adoption of the patched element as son of us
+				s.parent = self
+				# MRO would init only the tempyREPR_cls, we force DOMElement init too
+				self.__class__.__init__(s, **kwargs)
+				super().__init__(obj)
+
+		return Patched(child).render(pretty=pretty)
+
 	def _iter_child_renders(self, pretty=False):
 		for child in self.childs:
 			if isinstance(child, str):
 				yield escape(child)
 			elif isinstance(child, Number):
 				yield str(child)
+			elif child.__class__.__name__ == "Escaped":
+				yield child.render
 			elif issubclass(child.__class__, TempyClass):
-				if child.__class__.__name__ == "Escaped":
-					yield child.render
-				else:
-					yield child.render(pretty=pretty)
+				yield child.render(pretty=pretty)
 			elif not issubclass(child.__class__, TempyClass):
 				tempy_repr_cls = self._search_for_view(child)
 				if tempy_repr_cls:
-					# If there is a TempyREPR class defined in the child class we make a DOMElement out of it
-					# this abomination is used to avoid circular imports
-					class Patched(tempy_repr_cls, self.__class__):
-						def __init__(s, obj, *args, **kwargs):
-							# Forced adoption of the patched element as son of us
-							s.parent = self
-							# MRO would init only the tempyREPR_cls, we force DOMElement init too
-							self.__class__.__init__(s, **kwargs)
-							super().__init__(obj)
-
-					yield Patched(child).render(pretty=pretty)
+					yield self._render_tempy_repr(tempy_repr_cls, child, pretty=pretty)
 				else:
 					yield escape(str(child))
 
