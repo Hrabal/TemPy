@@ -20,7 +20,9 @@ class TempyPage(tags.Html):
     """
     __tag = tags.Html._Html__tag
 
-    def __init__(self, title=None,content=None, charset="UTF-8", keywords=None, doctype=None, **kwargs):
+    def __init__(self, title=None, charset="UTF-8", doctype=None, **kwargs):
+        content = kwargs.pop("content", None)
+        keywords = kwargs.pop("keywords", None)
         super().__init__(**kwargs)
         self.set_title(title or "")
         if content:
