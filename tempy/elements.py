@@ -20,7 +20,8 @@ class Tag(DOMElement):
     def __init__(self, *args, **kwargs):
         data = kwargs.pop("data", {})
         self.attrs = {"style": {}, "klass": set()}
-        self.attr(*args, **kwargs)
+        if args or kwargs:
+            self.attr(*args, **kwargs)
         super().__init__(**data)
         self._tab_count = 0
 

@@ -16,24 +16,28 @@ class BaseDOMModifier(TempyClass):
         If the child is a DOMElement, correctly links the child.
         If the DOMGroup have a name, an attribute containing the child is created in this instance.
         """
+        if dom_group is None:
+            return
         if idx and idx < 0:
             idx = 0
         if prepend:
             idx = 0
-        else:
-            idx = idx if idx is not None else len(self.childs)
-        if dom_group is not None:
-            if not isinstance(dom_group, Iterable) or isinstance(dom_group, (TempyClass, str)):
-                dom_group = [dom_group]
-            for i_group, elem in enumerate(dom_group):
-                if elem is not None:
-                    # Element insertion in this DOMElement childs
+        if idx is None:
+            idx = -1
+        if not isinstance(dom_group, Iterable) or isinstance(dom_group, (TempyClass, str)):
+            dom_group = [dom_group]
+        for i_group, elem in enumerate(dom_group):
+            if elem is not None:
+                # Element insertion in this DOMElement childs
+                if idx == -1:
+                    self.childs.append(elem)
+                else:
                     self.childs.insert(idx + i_group, elem)
-                    # Managing child attributes if needed
-                    if issubclass(elem.__class__, TempyClass):
-                        elem.parent = self
-                    if name:
-                        setattr(self, name, elem)
+                # Managing child attributes if needed
+                if hasattr(elem, "parent"):
+                    elem.parent = self
+                if name:
+                    setattr(self, name, elem)
 
     @content_receiver()
     def __call__(self, _, child, name=None):

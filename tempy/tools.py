@@ -6,6 +6,7 @@ Tools for Tempy
 import sys
 import importlib
 from functools import wraps
+from itertools import zip_longest
 
 from .bases import TempyClass
 
@@ -35,19 +36,13 @@ def content_receiver(reverse=False):
             verse = (1, -1)[int(reverse)]
             kwtags = kwtags.items()
             i = 0
-            for typ in (tags, kwtags)[::verse]:
-                for item in typ:
-                    if typ is kwtags:
-                        name, item = item
-                    else:
-                        name, item = None, item
-                    if isinstance(item, TempyClass) and name:
+            for typ in (zip_longest((None, ), tags), kwtags)[::verse]:
+                for (name, item) in typ:
+                    if name and isinstance(item, TempyClass):
                         # Is the DOMGroup is a single DOMElement and we have a name we set his name accordingly
                         item._name = name
                     func(inst, i, item, name)
                     i += 1
             return inst
-
         return wrapped
-
     return _receiver
