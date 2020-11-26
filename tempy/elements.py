@@ -49,7 +49,6 @@ class Tag(DOMElement):
 
     def attr(self, *args, **kwargs):
         """Add an attribute to the element"""
-        kwargs.update({k: bool for k in args})
         for key, value in kwargs.items():
             if key == "klass":
                 self.attrs["klass"].update(value.split())
@@ -60,6 +59,8 @@ class Tag(DOMElement):
                 self.attrs["style"].update(value)
             else:
                 self.attrs[key] = value
+        for arg in args:
+            self.attrs[arg] = bool
         return self
 
     def remove_attr(self, attr):

@@ -19,8 +19,7 @@ class DOMElement(TempyRenderer, DOMNavigator, DOMModifier):
     def __init__(self, **kwargs):
         self._name = None
         self.childs = []
-        if not getattr(self, 'parent', None):
-            self.parent = None
+        self.parent = None
         self.content_data = kwargs
         for cls in reversed(self.__class__.__mro__[:-6]):
             init = getattr(cls, "init", None)
