@@ -35,10 +35,10 @@ class TempyPage(tags.Html):
     def init(self):
         self(
             head=tags.Head()(
+                title=tags.Title(),
                 charset=tags.Meta(),
                 description=tags.Meta(name="description"),
                 keywords=tags.Meta(name="keywords"),
-                title=tags.Title(),
             ),
             body=tags.Body(),
         )
