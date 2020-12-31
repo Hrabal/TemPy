@@ -3,7 +3,7 @@
 import sys
 from types import ModuleType
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 VERSION = tuple(map(int, __version__.split(".")))
 
 if sys.version_info < (3, 3):

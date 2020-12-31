@@ -65,5 +65,5 @@ class TempyPage(tags.Html):
 
     def set_title(self, title):
         """Changes the <meta> title tag."""
-        self.head.title.attr(content=title)
+        self.head.title(title)
         return self
