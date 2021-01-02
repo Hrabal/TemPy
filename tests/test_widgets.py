@@ -263,7 +263,7 @@ class TestTempyPage(unittest.TestCase):
         self.assertEqual(len(page), 2)
         self.assertIsInstance(page.head, Head)
         self.assertIsInstance(page.body, Body)
-        self.assertEqual(len(page.head.title), 0)
+        self.assertEqual(len(page.head.title), 1)
         self.assertEqual(page.head.charset.attrs['charset'], 'UTF-8')
 
     def test_charset(self):
@@ -292,4 +292,4 @@ class TestTempyPage(unittest.TestCase):
     def test_title(self):
         page = TempyPage()
         page.set_title('test title')
-        self.assertEqual(page.head.title.attrs['content'], 'test title')
+        self.assertEqual(page.head.title.childs[-1], 'test title')
