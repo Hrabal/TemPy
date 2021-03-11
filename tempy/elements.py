@@ -3,7 +3,10 @@
 Elements used inside Tempy Classes"""
 import re
 from copy import copy
-from collections import Mapping
+try:
+    from collections import Mapping
+except ImportError:
+    from collections.abc import Mapping
 
 from .bases import TempyClass
 from .tempy import DOMElement
