@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Classes for DOM building"""
-from collections import Iterable
+try:
+    from collections import Iterable
+except ImportError:
+    from collections.abc import Iterable
 from copy import copy
 
 from .bases import TempyClass
