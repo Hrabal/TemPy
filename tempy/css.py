@@ -3,9 +3,10 @@
 """Classes for css management"""
 import inspect
 try:
-    from collections import Iterable, ChainMap
+    from collections import Iterable
 except ImportError:
-    from collections.abc import Iterable, ChainMap
+    from collections.abc import Iterable
+from collections import ChainMap
 
 from .elements import Tag
 from .tempy import DOMElement
