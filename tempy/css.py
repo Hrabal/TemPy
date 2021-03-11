@@ -2,7 +2,10 @@
 # @author: Federico Cerchiari <federicocerchiari@gmail.com>
 """Classes for css management"""
 import inspect
-from collections import Iterable, ChainMap
+try:
+    from collections import Iterable, ChainMap
+except ImportError:
+    from collections.abc import Iterable, ChainMap
 
 from .elements import Tag
 from .tempy import DOMElement
