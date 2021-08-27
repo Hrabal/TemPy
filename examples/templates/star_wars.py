@@ -31,3 +31,4 @@ page = Html()(
             )
         )
     )
+#print(page.render(pretty=True))

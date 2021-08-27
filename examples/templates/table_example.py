@@ -70,3 +70,4 @@ page = Html()(
         table4, Br(), Br()
     )
 )
+#print(page.render(pretty=True))
