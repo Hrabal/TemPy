@@ -1,5 +1,5 @@
 from tempy.tags import *
-from tempy.elements import Css
+from tempy.css import Css
 
 animationCSS = Css(
     {

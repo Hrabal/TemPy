@@ -2,7 +2,7 @@
 
 from tempy.widgets import TempyTable
 from tempy.tags import *
-from tempy.elements import Css
+from tempy.css import Css
 
 data = [['Name', 'Last Name', 'Age', 'Telephone'],
         ['John', 'Doe', '34', '555666777', '444555333'],

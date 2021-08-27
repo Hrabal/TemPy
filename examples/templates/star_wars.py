@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from tempy.tags import *
 from tempy.elements import *
-
+from tempy.content import Content
 character = Div(klass='chr')(
         B()(Content('name')),
         P()('height:', Content('height')),
