@@ -33,4 +33,4 @@ body = Body()(
 page += head
 page += body
 
-# page.render(pretty=True)
+print(page.render(pretty=True))
