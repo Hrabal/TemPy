@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from tempy.tags import *
-from tempy.elements import Css
+from tempy.css import Css
 
 my_text_list = ['This is Foo.', 'This is Bar.', 'Have you met my friend Baz?']
 another_list = ['Lorem ipsum ', 'dolor sit amet, ', 'consectetur adipiscing elit']
