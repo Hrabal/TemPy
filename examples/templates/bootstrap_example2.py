@@ -36,8 +36,7 @@ body=Body()(
                         Div(klass="col")(Input (klass="form-control", id="email" ,type="email", placeholder="Enter email address..." ,label="Enter email address..." ,required="True")),
                         Div(klass="col-auto")(Button(klass="btn btn-primary disabled" ,id="submitButton" ,type="submit")("Notify Me!")),
                     ),
-                    Div(klass="invalid-feedback mt-2" ,feedback="email:required")("An email is required."),
-                    Div(klass="invalid-feedback mt-2" ,feedback="email:email")("Email is not valid."),
+                    ((Div(klass="invalid-feedback mt-2",feedback=div[0])(div[1]))for div in [["email:required","An email is required."],["email:email","Email is not valid."]]),
                     (Comment(comment)for comment in comment_blocks[1]),
                     Div(klass="d-none" ,id="submitSuccessMessage")(
                         Div(klass="text-center mb-3 mt-2")(
