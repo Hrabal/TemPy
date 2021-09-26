@@ -229,8 +229,8 @@ class MyClass:
 You can think the `TempyREPR` as a `__repr__` equivalent, so when an instance is placed inside a TemPy tree, the `TempyREPR` subclass is used to render the instance.
 
 You can define several `TempyREPR` nested classes, and when dealing with a non-TemPy object, TemPy will search for a `TempyREPR` subclass following this priority:
-* a `TempyREPR` subclass with the same name of his TemPy container.
-* a `TempyREPR` subclass with the same name of his TemPy container's root.
+* a `TempyREPR` subclass with the same name of its TemPy container.
+* a `TempyREPR` subclass with the same name of its TemPy container's root.
 * a `TempyREPR` subclass named `HtmlREPR`.
 * the first `TempyREPR` found.
 * if none of the previous ones are found, the object will be rendered calling its `__str__` method.
