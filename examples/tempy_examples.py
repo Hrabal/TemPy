@@ -115,10 +115,23 @@ def form_handler():
     return page.render()
 
 
+@app.route('/bootstrap')
+def bootstrap2_handler():
+    from templates.bootstrap_example2 import page
+    return page.render()
+
+@app.route('/chartjs')
+def chartjs_handler():
+    from templates.chartjs_example import page
+    return page.render()
+
 @app.route('/homepage')
 def homepage_handler():
     from templates.homepage import page
     return page.render()
+
+
+
 
 
 if __name__ == '__main__':
