@@ -25,7 +25,7 @@ _shortcuts = {
 
 class Module(ModuleType):
     def __getattr__(self, name):
-        if name in _shortcuts.keys():
+        if name in _shortcuts:
             submodule = __import__(
                 "tempy." + _shortcuts[name], globals(), locals(), [name]
             )
@@ -58,7 +58,7 @@ sys.modules["tempy"].__dict__.update(
         "__path__": __path__,
         "__doc__": __doc__,
         "__version__": __version__,
-        "__all__": tuple(_shortcuts.keys()),
+        "__all__": tuple(_shortcuts),
         "__docformat__": "restructuredtext en",
     }
 )
