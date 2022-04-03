@@ -16,7 +16,7 @@ class TempyParser(HTMLParser):
     inside this one.
     As a result of this, unclosed tags in imput will be closed in the resulting Tempy Tree right before
     the parent element is closed.
-    This behaviour is accidental and should not be used a s a html sanitizing feature.
+    This behavior is accidental and should not be used as an HTML sanitizing feature.
     """
 
     def __init__(self):
