@@ -77,7 +77,7 @@ class TempyFactory:
             self.Void = TempyFactory(void_maker=True)
 
     def make_tempy(self, tage_name):
-        base_class = [Tag, VoidTag][self._void]
+        base_class = VoidTag if self._void else Tag
         return type(
             tage_name,
             (base_class, ),
