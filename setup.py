@@ -96,11 +96,6 @@ setup(
             "License :: OSI Approved :: Apache Software License",
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: Implementation :: CPython",
-            "Programming Language :: Python :: Implementation :: PyPy",
-            "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
-            "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
       ],
       cmdclass={"upload": UploadCommand,},
 )
