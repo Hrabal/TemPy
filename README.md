@@ -1,3 +1,11 @@
+# Disclamer
+
+Since server-side rendering is getting old by the minute, I guess tempy can be useful in a bunch of fast and simple cases, but this is not how people whould generate HTML. Therefore this project is no longer mantained and there is no intention to evolve further.
+
+
+This was a nicely ended excercise, I wasn't expecting that much contrib&use. I'm non longer accepting pr's, if someone is interested on this repo maintenance PM me.
+
+
 # TemPy
 ![TemPy Logo](tempy.png)
 
